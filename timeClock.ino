@@ -1,10 +1,11 @@
 /*timeClock
 
 An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-Current dev version 0.1.2-alpha by Chris Frishkorn.
+Current dev version 0.1.3-alpha by Chris Frishkorn.
 
 Version release history
 -----------------------
+December 21st, 2015 - v0.1.3-alpha - Removed useless debouncing and delay, discovered library handles it internally.
 December 21st, 2015 - v0.1.2-alpha - Updated data-types across code and removed ECHO_TO_SERIAL debugging.
 December 21st, 2015 - v0.1.1-alpha - Added code to dump NVRAM from DS1307 on startup.
 December 21st, 2015 - v0.0.1-alpha - Code forked from arduinoTSens which runs the underlying RTC, LCD, and SD Arduino shields.
@@ -18,7 +19,6 @@ December 21st, 2015 - v0.0.1-alpha - Code forked from arduinoTSens which runs th
 
 Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
 
-#define REFRESH_INTERVAL 250
 #define LOG_INTERVAL 5000
 #define SYNC_INTERVAL 5000
 
@@ -53,7 +53,7 @@ void setup() {
   lcd.setBacklight(colorSelect);
   lcd.print("timeClock");
   lcd.setCursor(0, 1);
-  lcd.print("v0.1.2-alpha");
+  lcd.print("v0.1.3-alpha");
   RTC.begin();
   if (!RTC.isrunning()) {
     Serial.println("RTC is NOT running!");
@@ -109,7 +109,6 @@ void loop() {
         colorSelect = 7;
       }
       lcd.setBacklight(colorSelect);
-      delay(REFRESH_INTERVAL);
     }
     if (buttons & BUTTON_DOWN) {
       if (colorSelect < 1) {
@@ -119,7 +118,6 @@ void loop() {
         colorSelect--;
       }
       lcd.setBacklight(colorSelect);
-      delay(REFRESH_INTERVAL);
     }
   }
 
@@ -145,8 +143,6 @@ void loop() {
     logFile.println(colorSelect);
     delay(3000);
   }
-
-  delay((REFRESH_INTERVAL - 1) - (millis() % REFRESH_INTERVAL)); // Keep timing at least 1 second.
   
   // Display Date and Time on LCD.
   lcd.setCursor(0, 0);
