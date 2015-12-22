@@ -1,0 +1,221 @@
+/*timeClock
+
+An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
+Current version 0.0.1-alpha by Chris Frishkorn.
+
+Version release history
+-----------------------
+December 21st, 2015 - v0.0.1-alpha - Code forked from arduinoTSens which runs the underlying RTC, LCD, and SD Arduino shields.
+*/
+
+#include <Wire.h>
+#include <SPI.h>
+#include <SD.h>
+#include "RTClib.h"
+#include <Adafruit_RGBLCDShield.h>
+
+Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
+
+#define ECHO_TO_SERIAL 1
+#define REFRESH_INTERVAL 250
+#define LOG_INTERVAL 5000
+#define SYNC_INTERVAL 5000
+
+uint32_t syncTime = 0;
+uint8_t colorSelect = 7;
+const int chipSelect = 10;
+
+File logFile;
+
+RTC_DS1307 RTC;
+
+void error(char *str) {
+  lcd.clear();
+  lcd.print(" !System Error!");
+  Serial.print("error: ");
+  Serial.println(str);
+  while (1);
+}
+
+void setup() {
+  Serial.begin(9600);
+  Wire.begin();
+  lcd.begin(16, 2);
+  lcd.setBacklight(colorSelect);
+  lcd.print("timeClock");
+  lcd.setCursor(0, 1);
+  lcd.print("v0.0.1-alpha");
+  RTC.begin();
+  if (!RTC.isrunning()) {
+    Serial.println("RTC is NOT running!");
+  }
+  RTC.adjust(DateTime(__DATE__, __TIME__)); // Uncomment to set RTC to system time over serial interface.
+
+  // Check and see if the SD card is readable.
+  Serial.println();
+  Serial.print("SD card initializing... ");
+  pinMode(10, OUTPUT);
+  if (!SD.begin(chipSelect)) {
+    error("Card read error, or not inserted!");
+  }
+  Serial.println("Card sucessfully initialized.");
+
+  // Create logfile.
+  char filename[] = "RECORD00.CSV";
+  for (uint8_t i = 0; i < 100; i++) {
+    filename[6] = i / 10 + '0';
+    filename[7] = i % 10 + '0';
+    if (! SD.exists(filename)) {
+      logFile = SD.open(filename, FILE_WRITE);
+      break;
+    }
+  }
+  if (! logFile) {
+    error("unable to create file");
+  }
+  Serial.print("Creating file ");
+  Serial.println(filename);
+  Serial.println();
+  logFile.println("date,time,color_code");
+#if ECHO_TO_SERIAL
+  Serial.println("date,time,color_code");
+#endif
+  delay(5000);
+  lcd.clear();
+}
+
+void loop() {
+  DateTime now = RTC.now(); // Get current time and date from RTC.
+
+  // Use UP/DOWN buttons to change RGB backlight color.
+  uint8_t buttons = lcd.readButtons();
+
+  if (buttons) {
+    if (buttons & BUTTON_UP) {
+      colorSelect++;
+      if (colorSelect > 7) {
+        colorSelect = 7;
+      }
+      lcd.setBacklight(colorSelect);
+      delay(REFRESH_INTERVAL);
+    }
+    if (buttons & BUTTON_DOWN) {
+      if (colorSelect < 1) {
+        colorSelect = 0;
+      }
+      else { // else statement needed to deal with unsigned int rolling back to 255.
+        colorSelect--;
+      }
+      lcd.setBacklight(colorSelect);
+      delay(REFRESH_INTERVAL);
+    }
+  }
+
+  // Log time and date information if the SELECT button is pressed.
+  if (buttons & BUTTON_SELECT) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(" Data logged to");
+    lcd.setCursor(0, 1);
+    lcd.print("  media device");
+    logFile.print(now.month(), DEC);
+    logFile.print('/');
+    logFile.print(now.day(), DEC);
+    logFile.print('/');
+    logFile.print(now.year(), DEC);
+    logFile.print(", ");
+    logFile.print(now.hour(), DEC);
+    logFile.print(':');
+    logFile.print(now.minute(), DEC);
+    logFile.print(':');
+    logFile.print(now.second(), DEC);
+    logFile.print(", ");
+    logFile.println(colorSelect);
+    delay(3000);
+  }
+
+  delay((REFRESH_INTERVAL - 1) - (millis() % REFRESH_INTERVAL));
+  lcd.setCursor(0, 0);
+  lcd.print("Date ");
+  if (now.month() < 10) { // If month is a single digit preceed with a zero.
+    lcd.print("0");
+  }
+  lcd.print(now.month(), DEC);
+  lcd.print('/');
+#if ECHO_TO_SERIAL
+  Serial.print(now.month(), DEC);
+  Serial.print('/');
+#endif
+  if (now.day() < 10) { // If day is a single digit preceed with a zero.
+    lcd.print("0");
+  }
+  lcd.print(now.day(), DEC);
+  lcd.print('/');
+#if ECHO_TO_SERIAL
+  Serial.print(now.day(), DEC);
+  Serial.print('/');
+#endif
+  lcd.print(now.year(), DEC);
+#if ECHO_TO_SERIAL
+  Serial.print(now.year(), DEC);
+  Serial.print("|");
+#endif
+  lcd.setCursor(0, 1);
+  lcd.print("Time ");
+  if (now.hour() > 12) { // RTC is in 24 hour format, subtract 12 for 12 hour time.
+    if (now.hour() < 22) { // Don't preceed with a zero for 10:00 & 11:00 PM.
+      lcd.print("0");
+    }
+    lcd.print(now.hour() - 12, DEC);
+  }
+  else
+  {
+    if (now.hour() == 0) { // Set 00:00 AM to 12:00 AM.
+      lcd.print(now.hour() + 12, DEC);
+    }
+    else
+    {
+      if (now.hour() == 12) { // Don't preceed with a zero if it's noon.
+        lcd.print(now.hour(), DEC);
+      }
+      else {
+        lcd.print("0");
+        lcd.print(now.hour(), DEC);
+      }
+    }
+  }
+  lcd.print(':');
+#if ECHO_TO_SERIAL
+  Serial.print(now.hour(), DEC);
+  Serial.print(':');
+#endif
+  if (now.minute() < 10) { // If minute is a single digit preceed with a zero.
+    lcd.print("0");
+  }
+  lcd.print(now.minute(), DEC);
+  lcd.print(':');
+#if ECHO_TO_SERIAL
+  Serial.print(now.minute(), DEC);
+  Serial.print(':');
+#endif
+  if (now.second() < 10) { // If second is a single digit preceed with a zero.
+    lcd.print("0");
+  }
+  lcd.print(now.second(), DEC);
+  if (now.hour() > 11) {
+    lcd.print(" PM");
+  }
+  else {
+    lcd.print(" AM");
+  }
+#if ECHO_TO_SERIAL
+  Serial.print(now.second(), DEC);
+  Serial.println();
+#endif
+
+  // Write data to card.
+  if ((millis() - syncTime) < SYNC_INTERVAL) return;
+  syncTime = millis();
+  logFile.flush();
+}
+
