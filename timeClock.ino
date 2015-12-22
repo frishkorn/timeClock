@@ -5,8 +5,8 @@ Current dev version 0.1.1-alpha by Chris Frishkorn.
 
 Version release history
 -----------------------
-December 21st, 2015 - v0.0.1-alpha - Code forked from arduinoTSens which runs the underlying RTC, LCD, and SD Arduino shields.
 December 21st, 2015 - v0.1.1-alpha - Added code to dump NVRAM from DS1307 on startup.
+December 21st, 2015 - v0.0.1-alpha - Code forked from arduinoTSens which runs the underlying RTC, LCD, and SD Arduino shields.
 */
 
 #include <Wire.h>

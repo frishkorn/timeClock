@@ -6,6 +6,6 @@ Author: Chris Frishkorn
 
 Version Release History
 ---
-**December 21st, 2015 - v0.0.1-alpha -** *Code forked from RTCplusRGB.ino which runs the underlying RTC, LCD, and SD Arduino shields.*
-
 **December 21st, 2015 - v0.1.1-alpha -** *Added code to dump NVRAM from DS1307 on startup.*
+
+**December 21st, 2015 - v0.0.1-alpha -** *Code forked from RTCplusRGB.ino which runs the underlying RTC, LCD, and SD Arduino shields.*
