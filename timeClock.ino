@@ -1,11 +1,12 @@
 /*timeClock
 
 An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-Current version 0.0.1-alpha by Chris Frishkorn.
+Current dev version 0.1.1-alpha by Chris Frishkorn.
 
 Version release history
 -----------------------
 December 21st, 2015 - v0.0.1-alpha - Code forked from arduinoTSens which runs the underlying RTC, LCD, and SD Arduino shields.
+December 21st, 2015 - v0.1.1-alpha - Added code to dump NVRAM from DS1307 on startup.
 */
 
 #include <Wire.h>
@@ -16,7 +17,7 @@ December 21st, 2015 - v0.0.1-alpha - Code forked from arduinoTSens which runs th
 
 Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
 
-#define ECHO_TO_SERIAL 1
+#define ECHO_TO_SERIAL 0
 #define REFRESH_INTERVAL 250
 #define LOG_INTERVAL 5000
 #define SYNC_INTERVAL 5000
@@ -28,6 +29,13 @@ const int chipSelect = 10;
 File logFile;
 
 RTC_DS1307 RTC;
+
+void printnvram(uint8_t address) {
+  Serial.print("Address 0x");
+  Serial.print(address, HEX);
+  Serial.print(" = 0x");
+  Serial.println(RTC.readnvram(address), HEX);
+}
 
 void error(char *str) {
   lcd.clear();
@@ -44,7 +52,7 @@ void setup() {
   lcd.setBacklight(colorSelect);
   lcd.print("timeClock");
   lcd.setCursor(0, 1);
-  lcd.print("v0.0.1-alpha");
+  lcd.print("v0.1.1-alpha");
   RTC.begin();
   if (!RTC.isrunning()) {
     Serial.println("RTC is NOT running!");
@@ -80,6 +88,13 @@ void setup() {
 #if ECHO_TO_SERIAL
   Serial.println("date,time,color_code");
 #endif
+
+  // Dump old NVRAM contents on startup.
+  Serial.println("Current NVRAM values:");
+  for (int i = 0; i < 55; ++i) {
+    printnvram(i);
+  }
+
   delay(5000);
   lcd.clear();
 }
@@ -89,7 +104,6 @@ void loop() {
 
   // Use UP/DOWN buttons to change RGB backlight color.
   uint8_t buttons = lcd.readButtons();
-
   if (buttons) {
     if (buttons & BUTTON_UP) {
       colorSelect++;
