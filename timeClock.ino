@@ -1,10 +1,11 @@
 /*timeClock
 
 An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-Current dev version 0.1.1-alpha by Chris Frishkorn.
+Current dev version 0.1.2-alpha by Chris Frishkorn.
 
 Version release history
 -----------------------
+December 21st, 2015 - v0.1.2-alpha - Updated data-types across code and removed ECHO_TO_SERIAL debugging.
 December 21st, 2015 - v0.1.1-alpha - Added code to dump NVRAM from DS1307 on startup.
 December 21st, 2015 - v0.0.1-alpha - Code forked from arduinoTSens which runs the underlying RTC, LCD, and SD Arduino shields.
 */
@@ -17,7 +18,6 @@ December 21st, 2015 - v0.0.1-alpha - Code forked from arduinoTSens which runs th
 
 Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
 
-#define ECHO_TO_SERIAL 0
 #define REFRESH_INTERVAL 250
 #define LOG_INTERVAL 5000
 #define SYNC_INTERVAL 5000
@@ -46,13 +46,14 @@ void error(char *str) {
 }
 
 void setup() {
+  // Intialize Serial, I2C, LCD Communication.
   Serial.begin(9600);
   Wire.begin();
   lcd.begin(16, 2);
   lcd.setBacklight(colorSelect);
   lcd.print("timeClock");
   lcd.setCursor(0, 1);
-  lcd.print("v0.1.1-alpha");
+  lcd.print("v0.1.2-alpha");
   RTC.begin();
   if (!RTC.isrunning()) {
     Serial.println("RTC is NOT running!");
@@ -85,13 +86,10 @@ void setup() {
   Serial.println(filename);
   Serial.println();
   logFile.println("date,time,color_code");
-#if ECHO_TO_SERIAL
-  Serial.println("date,time,color_code");
-#endif
 
   // Dump old NVRAM contents on startup.
   Serial.println("Current NVRAM values:");
-  for (int i = 0; i < 55; ++i) {
+  for (uint8_t i = 0; i < 55; ++i) {
     printnvram(i);
   }
 
@@ -125,7 +123,7 @@ void loop() {
     }
   }
 
-  // Log time and date information if the SELECT button is pressed.
+  // Log date and time information if the SELECT button is pressed.
   if (buttons & BUTTON_SELECT) {
     lcd.clear();
     lcd.setCursor(0, 0);
@@ -148,36 +146,26 @@ void loop() {
     delay(3000);
   }
 
-  delay((REFRESH_INTERVAL - 1) - (millis() % REFRESH_INTERVAL));
+  delay((REFRESH_INTERVAL - 1) - (millis() % REFRESH_INTERVAL)); // Keep timing at least 1 second.
+  
+  // Display Date and Time on LCD.
   lcd.setCursor(0, 0);
   lcd.print("Date ");
-  if (now.month() < 10) { // If month is a single digit preceed with a zero.
+  if (now.month() < 10) { // If month is a single digit precede with a zero.
     lcd.print("0");
   }
   lcd.print(now.month(), DEC);
   lcd.print('/');
-#if ECHO_TO_SERIAL
-  Serial.print(now.month(), DEC);
-  Serial.print('/');
-#endif
-  if (now.day() < 10) { // If day is a single digit preceed with a zero.
+  if (now.day() < 10) { // If day is a single digit precede with a zero.
     lcd.print("0");
   }
   lcd.print(now.day(), DEC);
   lcd.print('/');
-#if ECHO_TO_SERIAL
-  Serial.print(now.day(), DEC);
-  Serial.print('/');
-#endif
   lcd.print(now.year(), DEC);
-#if ECHO_TO_SERIAL
-  Serial.print(now.year(), DEC);
-  Serial.print("|");
-#endif
   lcd.setCursor(0, 1);
   lcd.print("Time ");
   if (now.hour() > 12) { // RTC is in 24 hour format, subtract 12 for 12 hour time.
-    if (now.hour() < 22) { // Don't preceed with a zero for 10:00 & 11:00 PM.
+    if (now.hour() < 22) { // Don't precede with a zero for 10:00 & 11:00 PM.
       lcd.print("0");
     }
     lcd.print(now.hour() - 12, DEC);
@@ -189,7 +177,7 @@ void loop() {
     }
     else
     {
-      if (now.hour() == 12) { // Don't preceed with a zero if it's noon.
+      if (now.hour() == 12) { // Don't precede with a zero if it's noon.
         lcd.print(now.hour(), DEC);
       }
       else {
@@ -199,20 +187,12 @@ void loop() {
     }
   }
   lcd.print(':');
-#if ECHO_TO_SERIAL
-  Serial.print(now.hour(), DEC);
-  Serial.print(':');
-#endif
-  if (now.minute() < 10) { // If minute is a single digit preceed with a zero.
+  if (now.minute() < 10) { // If minute is a single digit precede with a zero.
     lcd.print("0");
   }
   lcd.print(now.minute(), DEC);
   lcd.print(':');
-#if ECHO_TO_SERIAL
-  Serial.print(now.minute(), DEC);
-  Serial.print(':');
-#endif
-  if (now.second() < 10) { // If second is a single digit preceed with a zero.
+  if (now.second() < 10) { // If second is a single digit precede with a zero.
     lcd.print("0");
   }
   lcd.print(now.second(), DEC);
@@ -222,10 +202,6 @@ void loop() {
   else {
     lcd.print(" AM");
   }
-#if ECHO_TO_SERIAL
-  Serial.print(now.second(), DEC);
-  Serial.println();
-#endif
 
   // Write data to card.
   if ((millis() - syncTime) < SYNC_INTERVAL) return;
