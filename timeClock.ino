@@ -1,15 +1,15 @@
 /*timeClock
 
-An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-Current dev version 0.1.4-alpha by Chris Frishkorn.
+  An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
+  Current dev version 0.1.4-alpha by Chris Frishkorn.
 
-Version release history
------------------------
-December 22nd, 2015 - v0.1.4-alpha - Fixed issue #8.
-December 21st, 2015 - v0.1.3-alpha - Removed useless debouncing and delay, discovered library handles it internally.
-December 21st, 2015 - v0.1.2-alpha - Updated data-types across code and removed ECHO_TO_SERIAL debugging.
-December 21st, 2015 - v0.1.1-alpha - Added code to dump NVRAM from DS1307 on startup.
-December 21st, 2015 - v0.0.1-alpha - Code forked from arduinoTSens which runs the underlying RTC, LCD, and SD Arduino shields.
+  Version release history
+  -----------------------
+  December 22nd, 2015 - v0.1.4-alpha - Fixed issue #8.
+  December 21st, 2015 - v0.1.3-alpha - Removed useless debouncing and delay, discovered library handles it internally.
+  December 21st, 2015 - v0.1.2-alpha - Updated data-types across code and removed ECHO_TO_SERIAL debugging.
+  December 21st, 2015 - v0.1.1-alpha - Added code to dump NVRAM from DS1307 on startup.
+  December 21st, 2015 - v0.0.1-alpha - Code forked from arduinoTSens which runs the underlying RTC, LCD, and SD Arduino shields.
 */
 
 #include <Wire.h>
@@ -59,7 +59,7 @@ void setup() {
   if (!RTC.isrunning()) {
     Serial.println("RTC is NOT running!");
   }
-  RTC.adjust(DateTime(__DATE__, __TIME__)); // Uncomment to set RTC to system time over serial interface.
+  // RTC.adjust(DateTime(__DATE__, __TIME__)); // Uncomment to set RTC to system time over serial interface.
 
   // Check and see if the SD card is readable.
   Serial.println();
@@ -144,7 +144,7 @@ void loop() {
     logFile.println(colorSelect);
     delay(3000);
   }
-  
+
   // Display Date and Time on LCD.
   lcd.setCursor(0, 0);
   lcd.print("Date ");
