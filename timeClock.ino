@@ -1,10 +1,11 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current dev version 0.1.4-alpha by Chris Frishkorn.
+  Current version 0.2.0-alpha by Chris Frishkorn.
 
   Version release history
   -----------------------
+  December 23rd, 2015 - v0.2.0-alpha - Start / Stop timer added to SELECT button (issue #2).
   December 22nd, 2015 - v0.1.4-alpha - Fixed issue #8.
   December 21st, 2015 - v0.1.3-alpha - Removed useless debouncing and delay, discovered library handles it internally.
   December 21st, 2015 - v0.1.2-alpha - Updated data-types across code and removed ECHO_TO_SERIAL debugging.
@@ -24,6 +25,10 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
 #define SYNC_INTERVAL 5000
 
 uint32_t syncTime = 0;
+uint32_t timerStart = 0;
+uint32_t timerStop = 0;
+uint8_t timerState = 0;
+uint8_t prevState = 0;
 uint8_t colorSelect = 7;
 const int chipSelect = 10;
 
@@ -54,12 +59,12 @@ void setup() {
   lcd.setBacklight(colorSelect);
   lcd.print("timeClock");
   lcd.setCursor(0, 1);
-  lcd.print("v0.1.4-alpha");
+  lcd.print("v0.2.0-alpha");
   RTC.begin();
   if (!RTC.isrunning()) {
     Serial.println("RTC is NOT running!");
   }
-  // RTC.adjust(DateTime(__DATE__, __TIME__)); // Uncomment to set RTC to system time over serial interface.
+  //RTC.adjust(DateTime(__DATE__, __TIME__)); // Uncomment to set RTC to system time over serial interface.
 
   // Check and see if the SD card is readable.
   Serial.println();
@@ -88,7 +93,7 @@ void setup() {
   Serial.println();
   logFile.println("date,time,color_code");
 
-  // Dump old NVRAM contents on startup.
+  // Dump old NV_SRAM contents on startup.
   Serial.println("Current NVRAM values:");
   for (uint8_t i = 0; i < 55; ++i) {
     printnvram(i);
@@ -142,6 +147,26 @@ void loop() {
     logFile.print(now.second(), DEC);
     logFile.print(", ");
     logFile.println(colorSelect);
+    timerState = 1 - timerState;
+
+    // Timer should start here with a press of the SELECT BUTTON.
+    if (timerState == 1 && prevState == 0) {
+      timerStart = millis();
+      Serial.println(timerStart); // DEBUG
+      Serial.println(timerState); // DEBUG
+      Serial.println(prevState); // DEBUG
+    }
+    if (timerState == 0 && prevState == 1) {
+      timerStop = millis();
+      logFile.print(", ");
+      logFile.println(timerStop - timerStart);
+      Serial.println(timerStop); // DEBUG
+      Serial.println(timerState); // DEBUG
+      Serial.println(prevState); // DEBUG
+      Serial.println(timerStop - timerStart); // DEBUG
+    }
+    prevState = timerState;
+
     delay(3000);
   }
 
@@ -174,7 +199,7 @@ void loop() {
     }
     else
     {
-      if (now.hour() >= 10 && now.hour() <= 12) { // Don't precede with a zero if it's noon.
+      if (now.hour() >= 10 && now.hour() <= 12) { // Don't precede with a zero if it's between 10 AM - 12 PM.
         lcd.print(now.hour(), DEC);
       }
       else {
