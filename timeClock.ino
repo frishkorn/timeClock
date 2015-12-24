@@ -147,23 +147,17 @@ void loop() {
     logFile.print(now.second(), DEC);
     logFile.print(", ");
     logFile.println(colorSelect);
+    
+    // Timer starts with the first press of the SELECT BUTTON.
     timerState = 1 - timerState;
-
-    // Timer should start here with a press of the SELECT BUTTON.
     if (timerState == 1 && prevState == 0) {
       timerStart = millis();
-      Serial.println(timerStart); // DEBUG
-      Serial.println(timerState); // DEBUG
-      Serial.println(prevState); // DEBUG
     }
+    // Timer stops with the second press of the SELECT BUTTON.
     if (timerState == 0 && prevState == 1) {
       timerStop = millis();
       logFile.print(", ");
       logFile.println(timerStop - timerStart);
-      Serial.println(timerStop); // DEBUG
-      Serial.println(timerState); // DEBUG
-      Serial.println(prevState); // DEBUG
-      Serial.println(timerStop - timerStart); // DEBUG
     }
     prevState = timerState;
 
