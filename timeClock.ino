@@ -1,10 +1,11 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 0.2.0-alpha by Chris Frishkorn.
+  Current version 0.2.1-alpha by Chris Frishkorn.
 
   Version release history
   -----------------------
+  December 27th, 2015 - v0.2.1-alpha - Added Start / Stop LCD notification (issue #13).
   December 23rd, 2015 - v0.2.0-alpha - Start / Stop timer added to SELECT button (issue #2).
   December 22nd, 2015 - v0.1.4-alpha - Fixed issue #8.
   December 21st, 2015 - v0.1.3-alpha - Removed useless debouncing and delay, discovered library handles it internally.
@@ -59,7 +60,7 @@ void setup() {
   lcd.setBacklight(colorSelect);
   lcd.print("timeClock");
   lcd.setCursor(0, 1);
-  lcd.print("v0.2.0-alpha");
+  lcd.print("v0.2.1-alpha");
   RTC.begin();
   if (!RTC.isrunning()) {
     Serial.println("RTC is NOT running!");
@@ -147,21 +148,36 @@ void loop() {
     logFile.print(now.second(), DEC);
     logFile.print(", ");
     logFile.println(colorSelect);
-    
+
     // Timer starts with the first press of the SELECT BUTTON.
     timerState = 1 - timerState;
     if (timerState == 1 && prevState == 0) {
       timerStart = millis();
+      delay(1500);
+      lcd.setBacklight(1);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("     Timer ");
+      lcd.setCursor(0, 1);
+      lcd.print("    Started ");
     }
     // Timer stops with the second press of the SELECT BUTTON.
     if (timerState == 0 && prevState == 1) {
       timerStop = millis();
+      lcd.setBacklight(colorSelect);
+      delay(1500);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("     Timer ");
+      lcd.setCursor(0, 1);
+      lcd.print("    Stopped ");
       logFile.print(", ");
       logFile.println(timerStop - timerStart);
+
     }
     prevState = timerState;
 
-    delay(3000);
+    delay(2500);
   }
 
   // Display Date and Time on LCD.
