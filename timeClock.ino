@@ -1,10 +1,11 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 0.2.1-alpha by Chris Frishkorn.
+  Current version 0.3.0-alpha by Chris Frishkorn.
 
   Version release history
   -----------------------
+  December 27th, 2015 - v0.3.0-alpha - Started work on adding select Project ability. (issue #4).
   December 27th, 2015 - v0.2.1-alpha - Added Start / Stop LCD notification (issue #13).
   December 23rd, 2015 - v0.2.0-alpha - Start / Stop timer added to SELECT button (issue #2).
   December 22nd, 2015 - v0.1.4-alpha - Fixed issue #8.
@@ -60,7 +61,7 @@ void setup() {
   lcd.setBacklight(colorSelect);
   lcd.print("timeClock");
   lcd.setCursor(0, 1);
-  lcd.print("v0.2.1-alpha");
+  lcd.print("v0.3.0-alpha");
   RTC.begin();
   if (!RTC.isrunning()) {
     Serial.println("RTC is NOT running!");
