@@ -6,7 +6,7 @@ Author: Chris Frishkorn
 
 Version Release History
 ---
-**December 27th, 2015 - v0.3.0-alpha -** *Started work on adding select Project ability. (issue #4).*
+**December 27th, 2015 - v0.3.0-alpha -** *Added select Project ability with notification. (issue #4).*
 
 **December 27th, 2015 - v0.2.1-alpha -** *Added Start / Stop LCD notification (issue #13).*
 
