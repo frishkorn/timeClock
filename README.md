@@ -6,7 +6,7 @@ Author: Chris Frishkorn
 
 Version Release History
 ---
-**December 27th, 2015 - v0.2.1-alpha -** *Started work on notification.*
+**December 27th, 2015 - v0.2.1-alpha -** *Added Start / Stop LCD notification (issue #13).*
 
 **December 23rd, 2015 - v0.2.0-alpha -** *Start / Stop timer added to SELECT button (issue #2).*
 
