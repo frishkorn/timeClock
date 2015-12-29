@@ -40,13 +40,6 @@ File logFile;
 
 RTC_DS1307 RTC;
 
-void printnvram(uint8_t address) {
-  Serial.print("Address 0x");
-  Serial.print(address, HEX);
-  Serial.print(" = 0x");
-  Serial.println(RTC.readnvram(address), HEX);
-}
-
 void error(char *str) {
   lcd.clear();
   lcd.print(" !System Error!");
@@ -63,7 +56,7 @@ void setup() {
   lcd.setBacklight(colorSelect);
   lcd.print("timeClock");
   lcd.setCursor(0, 1);
-  lcd.print("v0.3.1-alpha");
+  lcd.print("    v0.3.1-alpha");
   RTC.begin();
   if (!RTC.isrunning()) {
     Serial.println("RTC is NOT running!");
@@ -95,20 +88,11 @@ void setup() {
   Serial.println(filename);
   Serial.println();
   logFile.println("Date,Time,Project");
-
-  // Dump old NV_SRAM contents on startup.
-  Serial.println("Current NVRAM values:");
-  for (uint8_t i = 0; i < 55; ++i) {
-    printnvram(i);
-  }
-
-  delay(5000);
+  delay(3000);
   lcd.clear();
 }
 
 void loop() {
-  DateTime now = RTC.now(); // Get current time and date from RTC.
-
   // Use UP/DOWN buttons to change RGB backlight color.
   uint8_t buttons = lcd.readButtons();
   if (buttons) {
@@ -136,11 +120,7 @@ void loop() {
 
   // Log date and time information if the SELECT button is pressed.
   if (buttons & BUTTON_SELECT) {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print(" Data logged to");
-    lcd.setCursor(0, 1);
-    lcd.print("  media device");
+    DateTime now = RTC.now(); // Get current time and date from RTC.
     logFile.print(now.month(), DEC);
     logFile.print('/');
     logFile.print(now.day(), DEC);
@@ -155,12 +135,17 @@ void loop() {
     logFile.print(", ");
     logFile.print("Project ");
     logFile.println(projectSelect);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(" Data logged to");
+    lcd.setCursor(0, 1);
+    lcd.print("  media device");
 
     // Timer starts with the first press of the SELECT BUTTON.
     timerState = 1 - timerState;
     if (timerState == 1 && prevState == 0) {
       timerStart = millis();
-      delay(1500);
+      delay(1000);
       lcd.setBacklight(1);
       lcd.clear();
       lcd.setCursor(0, 0);
@@ -172,25 +157,24 @@ void loop() {
     // Timer stops with the second press of the SELECT BUTTON.
     if (timerState == 0 && prevState == 1) {
       timerStop = millis();
+      logFile.print("Timer (ms)");
+      logFile.print(", ");
+      logFile.println(timerStop - timerStart);
+      delay(1000);
       lcd.setBacklight(colorSelect);
-      delay(1500);
       lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print(" Timer Stopped!");
       lcd.setCursor(0, 1);
       lcd.print("   Project 0");
       lcd.print(projectSelect);
-      logFile.print("Timer (ms)");
-      logFile.print(", ");
-      logFile.println(timerStop - timerStart);
-
     }
     prevState = timerState;
-
     delay(2500);
   }
 
   // Display Date and Time on LCD.
+  DateTime now = RTC.now(); // Get current time and date from RTC.
   lcd.setCursor(0, 0);
   lcd.print("Date ");
   if (now.month() < 10) { // If month is a single digit precede with a zero.
