@@ -5,7 +5,7 @@
 
   Version Release History
   -----------------------
-  December 28th, 2015 - v0.0.1-alpha - Started work on issue #10.
+  December 28th, 2015 - v0.0.1-alpha - Utility created.
 */
 
 #include <Wire.h>
@@ -63,8 +63,17 @@ void setup() {
   }
   delay(1500);
   Serial.println("Done...");
+  
+  // Set all memory addresses to OxFF.
+  delay(1500);
+  Serial.println("Clearing NV_SRAM");
+  for (uint8_t i = 0; i < 55; ++i) {
+    RTC.writenvram(i, 0xFF);
+  }
+  delay(1500);
+  Serial.println("Done...");
 }
 
 void loop() {
-  // Set all memory addresses to OxFF
+  // File is for running once, not continous operation.
 }

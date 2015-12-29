@@ -6,7 +6,7 @@ Author: Chris Frishkorn
 
 Version Release History
 ---
-**December 28th, 2015 - v0.3.1-alpha -** *Started work on issue #10.*
+**December 28th, 2015 - v0.3.1-alpha -** *Optimized code around timers, removed RTC date time set functions.*
 
 **December 27th, 2015 - v0.3.0-alpha -** *Added select Project ability with notification. (issue #4).*
 
