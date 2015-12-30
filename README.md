@@ -6,7 +6,7 @@ Author: Chris Frishkorn
 
 Version Release History
 ---
-**December 28th, 2015 - v0.3.2-alpha -** *Started work on issue #17.*
+**December 29th, 2015 - v0.3.2-alpha -** *Started work on issue #17.*
 
 **December 28th, 2015 - v0.3.1-alpha -** *Optimized code around timers, removed RTC date time set functions.*
 
