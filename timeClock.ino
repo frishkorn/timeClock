@@ -99,26 +99,28 @@ void setup() {
 void loop() {
   // Use UP/DOWN buttons to change RGB backlight color.
   uint8_t buttons = lcd.readButtons();
-  if (buttons) {
-    if (buttons & BUTTON_UP) {
-      colorSelect++;
-      projectSelect--;
-      if (colorSelect >= 7) {
-        colorSelect = 7;
-        projectSelect = 1;
+  if (timerState == 0) { // Prevent user from pressing BUTTON_DOWN while timer is active.
+    if (buttons) {
+      if (buttons & BUTTON_UP) {
+        colorSelect++;
+        projectSelect--;
+        if (colorSelect >= 7) {
+          colorSelect = 7;
+          projectSelect = 1;
+        }
+        lcd.setBacklight(colorSelect);
       }
-      lcd.setBacklight(colorSelect);
-    }
-    if (buttons & BUTTON_DOWN) {
-      if (colorSelect <= 2) {
-        colorSelect = 2;
-        projectSelect = 6;
+      if (buttons & BUTTON_DOWN) {
+        if (colorSelect <= 2) {
+          colorSelect = 2;
+          projectSelect = 6;
+        }
+        else { // else statement needed to deal with unsigned int rolling back to 255.
+          colorSelect--;
+          projectSelect++;
+        }
+        lcd.setBacklight(colorSelect);
       }
-      else { // else statement needed to deal with unsigned int rolling back to 255.
-        colorSelect--;
-        projectSelect++;
-      }
-      lcd.setBacklight(colorSelect);
     }
   }
 
