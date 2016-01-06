@@ -39,11 +39,19 @@ uint8_t timerState = 0;
 uint8_t prevState = 0;
 uint8_t colorSelect = 7;
 uint8_t projectSelect = 1;
-const int chipSelect = 10;
+const uint8_t chipSelect = 10;
 
 File logFile;
 
+void dateTime(uint16_t* date, uint16_t* time) {
+  // Set file date / time from RTC for SD card.
+  DateTime now = RTC.now();
+  *date = FAT_DATE(now.year(), now.month(), now.day());
+  *time = FAT_TIME(now.hour(), now.minute(), now.second());
+}
+
 void error(char *str) {
+  // Display error messages to LCD and over a serial interface.
   lcd.clear();
   lcd.print("System Error!");
   lcd.setCursor(0, 1);
@@ -78,11 +86,12 @@ void setup() {
   Serial.println("Card sucessfully initialized.");
 
   // Create logfile.
+  SdFile::dateTimeCallback(dateTime); // Set file date / time from RTC for SD card.
   char filename[] = "RECORD00.CSV";
-  for (uint8_t i = 0; i < 100; i++) {
+  for (uint8_t i = 1; i < 100; i++) {
     filename[6] = i / 10 + '0';
     filename[7] = i % 10 + '0';
-    if (! SD.exists(filename)) {
+    if (!SD.exists(filename)) {
       logFile = SD.open(filename, FILE_WRITE);
       break;
     }
