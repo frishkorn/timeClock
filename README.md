@@ -6,7 +6,7 @@ Author: Chris Frishkorn
 
 Version Release History
 ---
-**January 5th, 2016   - v0.4.1-alpha -** *Started work on issue #3.*
+**January 5th, 2016   - v0.4.1-alpha -** *Filenames now contain creation date from RTC date / time (issue #3).*
 
 **January 3rd, 2016   - v0.4.0-alpha -** *Added project memory, when device resets last project will be loaded (issue #6).*
 
