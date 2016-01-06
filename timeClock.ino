@@ -1,11 +1,12 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 0.4.0-alpha by Chris Frishkorn.
+  Current version 0.4.1-beta by Chris Frishkorn.
 
   Version Release History
   -----------------------
-  January 3rd, 2016   - v0.4.0-alpha - Added project memory, when device resets last project will be loaded(issue #6).
+  January 5th, 2016   - v0.4.1-beta  - Filenames now contain creation date from RTC date / time (issue #3).
+  January 3rd, 2016   - v0.4.0-alpha - Added project memory, when device resets last project will be loaded (issue #6).
   January 3rd, 2016   - v0.3.3-alpha - Issue fixed to prevent user from leaving project once timer begins (issue #18).
   December 29th, 2015 - v0.3.2-alpha - Fixed error messages, LCD now displays errors (issue #17).
   December 28th, 2015 - v0.3.1-alpha - Optimized code around timers, removed RTC date time set functions (issue #10).
@@ -38,11 +39,19 @@ uint8_t timerState = 0;
 uint8_t prevState = 0;
 uint8_t colorSelect = 7;
 uint8_t projectSelect = 1;
-const int chipSelect = 10;
+const uint8_t chipSelect = 10;
 
 File logFile;
 
+void dateTime(uint16_t *date, uint16_t *time) {
+  // Set file date / time from RTC for SD card.
+  DateTime now = RTC.now();
+  *date = FAT_DATE(now.year(), now.month(), now.day());
+  *time = FAT_TIME(now.hour(), now.minute(), now.second());
+}
+
 void error(char *str) {
+  // Display error messages to LCD and over serial interface.
   lcd.clear();
   lcd.print("System Error!");
   lcd.setCursor(0, 1);
@@ -53,14 +62,14 @@ void error(char *str) {
 }
 
 void setup() {
-  // Intialize Serial, I2C, LCD Communication.
+  // Intialize serial, I2C, LCD communication.
   Serial.begin(9600);
   Wire.begin();
   lcd.begin(16, 2);
   lcd.setBacklight(colorSelect);
   lcd.print("timeClock");
   lcd.setCursor(0, 1);
-  lcd.print("    v0.4.0-alpha");
+  lcd.print("     v0.4.1-beta");
   RTC.begin();
   if (!RTC.isrunning()) {
     error("RTC Stopped");
@@ -77,16 +86,17 @@ void setup() {
   Serial.println("Card sucessfully initialized.");
 
   // Create logfile.
+  SdFile::dateTimeCallback(dateTime); // Set file date / time from RTC for SD card.
   char filename[] = "RECORD00.CSV";
-  for (uint8_t i = 0; i < 100; i++) {
+  for (uint8_t i = 1; i < 100; i++) {
     filename[6] = i / 10 + '0';
     filename[7] = i % 10 + '0';
-    if (! SD.exists(filename)) {
+    if (!SD.exists(filename)) {
       logFile = SD.open(filename, FILE_WRITE);
       break;
     }
   }
-  if (! logFile) {
+  if (!logFile) {
     error("File Write Error");
   }
   Serial.print("Creating file ");

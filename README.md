@@ -1,4 +1,4 @@
-timeClock - v0.4.0-alpha 
+timeClock - v0.4.1-alpha
 ---
 An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
 
@@ -6,9 +6,11 @@ Author: Chris Frishkorn
 
 Version Release History
 ---
-**January 3rd, 2016 - v0.4.0-alpha -** *Added project memory, when device resets last project will be loaded(issue #6).*
+**January 5th, 2016   - v0.4.1-alpha -** *Filenames now contain creation date from RTC date / time (issue #3).*
 
-**January 3rd, 2016 - v0.3.3-alpha -** *Issue fixed to prevent user from leaving project once timer begins (issue #18).*
+**January 3rd, 2016   - v0.4.0-alpha -** *Added project memory, when device resets last project will be loaded (issue #6).*
+
+**January 3rd, 2016   - v0.3.3-alpha -** *Issue fixed to prevent user from leaving project once timer begins (issue #18).*
 
 **December 29th, 2015 - v0.3.2-alpha -** *Fixed error messages, LCD now displays errors (issue #17).*
 
@@ -29,36 +31,3 @@ Version Release History
 **December 21st, 2015 - v0.1.1-alpha -** *Added code to dump NVRAM from DS1307 on startup.*
 
 **December 21st, 2015 - v0.0.1-alpha -** *Code forked from arduinoTSens which runs the underlying RTC, LCD, and SD Arduino shields.*
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
