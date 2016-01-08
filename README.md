@@ -6,6 +6,8 @@ Author: Chris Frishkorn
 
 Version Release History
 ---
+**January 7th, 2016   - v1.0.1-alpha   -** *Started work on issue #30.*
+
 **January 7th, 2016   - v1.0.0-release -** *Released version 1.0.*
 
 **January 5th, 2016   - v0.4.1-beta    -** *Filenames now contain creation date from RTC date / time (issue #3).*
