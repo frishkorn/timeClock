@@ -133,6 +133,13 @@ void loop() {
           RTC.writenvram(1, projectSelect);
         }
         lcd.setBacklight(colorSelect);
+        lcd.clear();
+        lcd.setCursor(3, 0);
+        lcd.print("Project 0");
+        lcd.print(projectSelect);
+        lcd.setCursor(4, 1);
+        lcd.print("Selected");
+        delay(3000);
       }
       if (buttons & BUTTON_DOWN) {
         if (colorSelect <= 2) {
@@ -148,6 +155,13 @@ void loop() {
           RTC.writenvram(1, projectSelect);
         }
         lcd.setBacklight(colorSelect);
+        lcd.clear();
+        lcd.setCursor(3, 0);
+        lcd.print("Project 0");
+        lcd.print(projectSelect);
+        lcd.setCursor(4, 1);
+        lcd.print("Selected");
+        delay(3000);
       }
     }
   }
