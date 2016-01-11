@@ -225,6 +225,9 @@ void loop() {
       }
       logFile.print(mm);
       logFile.print(":");
+      if (ss < 10) {
+        logFile.print("0");
+      }
       logFile.println(ss);     
       delay(1000);
       lcd.setBacklight(colorSelect);
