@@ -2,6 +2,12 @@ timeClock - v1.1.1-alpha
 ---
 An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
 
+*Arduino Uno, SD Shield, and RGB LCD Shield are required. There is a utility in the utility folder you can run once to set the RTC.*
+
+timeClock has 6 projects that can be selected using the UP / DOWN buttons. Back-light color will change for each Project. Time and date will always be displaying on the main screen.
+
+To start a timer press SELECT, the back-light will change red notifying you the timer is running. The project title, start time, and date will be logged to the SD card using a CSV file. Pressing SELECT again will stop the timer, the project title and stop time will be logged to the SD card in addition to the elapsed timer.
+
 Author: Chris Frishkorn
 
 Version Release History
