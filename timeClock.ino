@@ -139,7 +139,7 @@ void loop() {
         lcd.print(projectSelect);
         lcd.setCursor(4, 1);
         lcd.print("Selected");
-        delay(3000);
+        delay(2000);
       }
       if (buttons & BUTTON_DOWN) {
         if (colorSelect <= 2) {
@@ -161,7 +161,7 @@ void loop() {
         lcd.print(projectSelect);
         lcd.setCursor(4, 1);
         lcd.print("Selected");
-        delay(3000);
+        delay(2000);
       }
     }
   }
