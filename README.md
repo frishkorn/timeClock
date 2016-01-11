@@ -1,6 +1,6 @@
-timeClock - v1.1.1-alpha
+##timeClock - v1.1.1-alpha
 ---
-An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
+###An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
 
 *Arduino Uno, SD Shield, and RGB LCD Shield are required. There is a utility in the utility folder you can run once to set the RTC.*
 
