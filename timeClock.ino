@@ -215,8 +215,14 @@ void loop() {
       logFile.print(", ");
       logFile.print("Timer");
       logFile.print(", ");
+      if (hh < 10) {
+        logFile.print("0");
+      }
       logFile.print(hh);
       logFile.print(":");
+      if (mm < 10) {
+        logFile.print("0");
+      }
       logFile.print(mm);
       logFile.print(":");
       logFile.println(ss);     
