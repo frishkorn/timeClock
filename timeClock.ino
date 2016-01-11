@@ -1,11 +1,12 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.0.1-alpha by Chris Frishkorn.
+  Current version 1.1.1-alpha by Chris Frishkorn.
 
   Version Release History
   -----------------------
-  January 10th, 2016  - v1.0.1-alpha   - Added project notfication when pressing UP/DOWN buttons (issue #30). 
+  January 10th, 2016  - v1.1.1-alpha   - Started work on issue #34, fixed version.
+  January 10th, 2016  - v1.1.0-alpha   - Added project notfication when pressing UP/DOWN buttons (issue #30). 
   January 7th, 2016   - v1.0.0-release - Released version 1.0.
   January 5th, 2016   - v0.4.1-beta    - Filenames now contain creation date from RTC date / time (issue #3).
   January 3rd, 2016   - v0.4.0-alpha   - Added project memory, when device resets last project will be loaded (issue #6).
@@ -37,6 +38,7 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
 uint32_t syncTime = 0;
 uint32_t timerStart = 0;
 uint32_t timerStop = 0;
+uint32_t timerTime = 0;
 uint8_t timerState = 0;
 uint8_t prevState = 0;
 uint8_t colorSelect = 7;
@@ -71,8 +73,8 @@ void setup() {
   lcd.setBacklight(colorSelect);
   lcd.setCursor(2, 0);
   lcd.print("timeClock");
-  lcd.setCursor(8, 1);
-  lcd.print("v1.0.1");
+  lcd.setCursor(7, 1);
+  lcd.print("v1.1.1a");
   RTC.begin();
   if (!RTC.isrunning()) {
     error("RTC Stopped");
@@ -206,9 +208,18 @@ void loop() {
     // Timer stops with the second press of the SELECT BUTTON.
     if (timerState == 0 && prevState == 1) {
       timerStop = millis();
-      logFile.print("Timer (ms)");
+      timerTime = timerStop - timerStart;
+      uint8_t ss = (timerTime / 1000) % 60;
+      uint8_t mm = (timerTime / 60000) % 60;
+      uint8_t hh = (timerTime / 3600000);
       logFile.print(", ");
-      logFile.println(timerStop - timerStart);
+      logFile.print("Timer");
+      logFile.print(", ");
+      logFile.print(mm);
+      logFile.print(":");
+      logFile.print(ss);
+      logFile.print(":");
+      logFile.print(hh);
       delay(1000);
       lcd.setBacklight(colorSelect);
       lcd.clear();
