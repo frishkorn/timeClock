@@ -215,11 +215,11 @@ void loop() {
       logFile.print(", ");
       logFile.print("Timer");
       logFile.print(", ");
+      logFile.print(hh);
+      logFile.print(":");
       logFile.print(mm);
       logFile.print(":");
-      logFile.print(ss);
-      logFile.print(":");
-      logFile.print(hh);
+      logFile.println(ss);     
       delay(1000);
       lcd.setBacklight(colorSelect);
       lcd.clear();
