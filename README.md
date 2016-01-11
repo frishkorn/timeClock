@@ -6,7 +6,7 @@ Author: Chris Frishkorn
 
 Version Release History
 ---
-**January 10th, 2016  - v1.1.1-alpha   -** *Started work on issue #34, fixed version.*
+**January 10th, 2016  - v1.1.1-alpha   -** *Improved log format, changed timer to hh:mm:ss format (issue #34 & issue #27).*
 
 **January 10th, 2016  - v1.1.0-alpha   -** *Added project notfication when pressing UP/DOWN buttons (issue #30).*
 
