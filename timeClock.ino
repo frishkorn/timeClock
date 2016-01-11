@@ -1,10 +1,11 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.0.0-release by Chris Frishkorn.
+  Current version 1.0.1-alpha by Chris Frishkorn.
 
   Version Release History
   -----------------------
+  January 10th, 2016  - v1.0.1-alpha   - Added project notfication when pressing UP/DOWN buttons (issue #30). 
   January 7th, 2016   - v1.0.0-release - Released version 1.0.
   January 5th, 2016   - v0.4.1-beta    - Filenames now contain creation date from RTC date / time (issue #3).
   January 3rd, 2016   - v0.4.0-alpha   - Added project memory, when device resets last project will be loaded (issue #6).
@@ -68,9 +69,10 @@ void setup() {
   Wire.begin();
   lcd.begin(16, 2);
   lcd.setBacklight(colorSelect);
-  lcd.print("  timeClock");
-  lcd.setCursor(0, 1);
-  lcd.print("          v1.0");
+  lcd.setCursor(2, 0);
+  lcd.print("timeClock");
+  lcd.setCursor(8, 1);
+  lcd.print("v1.0.1");
   RTC.begin();
   if (!RTC.isrunning()) {
     error("RTC Stopped");
@@ -116,7 +118,7 @@ void setup() {
 void loop() {
   // Use UP/DOWN buttons to change RGB backlight color and select project.
   uint8_t buttons = lcd.readButtons();
-  if (timerState == 0) { // Prevent user from pressing BUTTON_DOWN while timer is active.
+  if (timerState == 0) { // Prevent user from changing project while timer is active.
     if (buttons) {
       if (buttons & BUTTON_UP) {
         if (colorSelect >= 7) {
@@ -132,6 +134,13 @@ void loop() {
           RTC.writenvram(1, projectSelect);
         }
         lcd.setBacklight(colorSelect);
+        lcd.clear();
+        lcd.setCursor(3, 0);
+        lcd.print("Project 0");
+        lcd.print(projectSelect);
+        lcd.setCursor(4, 1);
+        lcd.print("Selected");
+        delay(2000);
       }
       if (buttons & BUTTON_DOWN) {
         if (colorSelect <= 2) {
@@ -147,6 +156,13 @@ void loop() {
           RTC.writenvram(1, projectSelect);
         }
         lcd.setBacklight(colorSelect);
+        lcd.clear();
+        lcd.setCursor(3, 0);
+        lcd.print("Project 0");
+        lcd.print(projectSelect);
+        lcd.setCursor(4, 1);
+        lcd.print("Selected");
+        delay(2000);
       }
     }
   }
@@ -169,10 +185,10 @@ void loop() {
     logFile.print("Project ");
     logFile.println(projectSelect);
     lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print(" Data logged to");
-    lcd.setCursor(0, 1);
-    lcd.print("  media device");
+    lcd.setCursor(1, 0);
+    lcd.print("Data logged to");
+    lcd.setCursor(2, 1);
+    lcd.print("media device");
 
     // Timer starts with the first press of the SELECT BUTTON.
     timerState = 1 - timerState;
@@ -181,10 +197,10 @@ void loop() {
       delay(1000);
       lcd.setBacklight(1);
       lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print(" Timer Started!");
-      lcd.setCursor(0, 1);
-      lcd.print("   Project 0");
+      lcd.setCursor(1, 0);
+      lcd.print("Timer Started!");
+      lcd.setCursor(3, 1);
+      lcd.print("Project 0");
       lcd.print(projectSelect);
     }
     // Timer stops with the second press of the SELECT BUTTON.
@@ -196,10 +212,10 @@ void loop() {
       delay(1000);
       lcd.setBacklight(colorSelect);
       lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print(" Timer Stopped!");
-      lcd.setCursor(0, 1);
-      lcd.print("   Project 0");
+      lcd.setCursor(1, 0);
+      lcd.print("Timer Stopped!");
+      lcd.setCursor(3, 1);
+      lcd.print("Project 0");
       lcd.print(projectSelect);
     }
     prevState = timerState;
