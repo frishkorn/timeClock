@@ -5,7 +5,7 @@
 
   Version Release History
   -----------------------
-  January 10th, 2016  - v1.1.1-alpha   - Started work on issue #34, fixed version.
+  January 10th, 2016  - v1.1.1-alpha   - Improved log format, changed timer to hh:mm:ss format (issue #34 & issue #27).
   January 10th, 2016  - v1.1.0-alpha   - Added project notfication when pressing UP/DOWN buttons (issue #30). 
   January 7th, 2016   - v1.0.0-release - Released version 1.0.
   January 5th, 2016   - v0.4.1-beta    - Filenames now contain creation date from RTC date / time (issue #3).
@@ -172,16 +172,31 @@ void loop() {
   // Log date and time information if the SELECT button is pressed.
   if (buttons & BUTTON_SELECT) {
     DateTime now = RTC.now(); // Get current time and date from RTC.
+    if (now.month() < 10) {
+      logFile.print("0");
+    }
     logFile.print(now.month(), DEC);
     logFile.print('/');
+    if (now.day() < 10) {
+      logFile.print("0");
+    }
     logFile.print(now.day(), DEC);
     logFile.print('/');
     logFile.print(now.year(), DEC);
     logFile.print(", ");
+    if (now.hour() < 10) {
+      logFile.print("0");
+    }
     logFile.print(now.hour(), DEC);
     logFile.print(':');
+    if (now.minute() < 10) {
+      logFile.print("0");
+    }
     logFile.print(now.minute(), DEC);
     logFile.print(':');
+    if (now.second() < 10) {
+      logFile.print("0");
+    }
     logFile.print(now.second(), DEC);
     logFile.print(", ");
     logFile.print("Project ");
