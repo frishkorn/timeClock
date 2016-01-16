@@ -184,7 +184,7 @@ void loop() {
     logFile.print(now.day(), DEC);
     logFile.print('/');
     logFile.print(now.year(), DEC);
-    logFile.print(", ");
+    logFile.print(",");
     if (now.hour() < 10) {
       logFile.print("0");
     }
@@ -199,7 +199,7 @@ void loop() {
       logFile.print("0");
     }
     logFile.print(now.second(), DEC);
-    logFile.print(", ");
+    logFile.print(",");
     logFile.print("Project ");
     logFile.println(projectSelect);
     lcd.clear();
