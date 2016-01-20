@@ -221,6 +221,7 @@ void loop() {
       lcd.print("Project 0");
       lcd.print(projectSelect);
     }
+    
     // Timer stops with the second press of the SELECT BUTTON.
     if (timerState == 0 && prevState == 1) {
       timerStop = millis();
@@ -228,6 +229,10 @@ void loop() {
       uint8_t ss = (timerTime / 1000) % 60;
       uint8_t mm = (timerTime / 60000) % 60;
       uint8_t hh = (timerTime / 3600000);
+      
+      // Timer DEBUG
+      logFile.print(timerTime);
+      
       logFile.print(",");
       logFile.print("Timer");
       logFile.print(",");
