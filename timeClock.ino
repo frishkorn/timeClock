@@ -5,7 +5,7 @@
 
   Version Release History
   -----------------------
-  January 22nd, 2016  - v1.1.2-alpha   - Issue #38 fixed, working on issue #39.
+  January 22nd, 2016  - v1.1.2-alpha   - Issue #38 fixed, issue #39 fixed, testing code now.
   January 10th, 2016  - v1.1.1-alpha   - Improved log format, changed timer to hh:mm:ss format (issue #34 & issue #27).
   January 10th, 2016  - v1.1.0-alpha   - Added project notfication when pressing UP/DOWN buttons (issue #30).
   January 7th, 2016   - v1.0.0-release - Released version 1.0.
@@ -228,8 +228,7 @@ void loop() {
       timerTime = timerStop - timerStart;
       uint8_t ss = timerTime % 60;
       uint8_t mm = (timerTime / 60) % 60;
-      uint8_t hh = (timerTime / 3600000);
-      logFile.print(timerTime); // DEBUG
+      uint8_t hh = (timerTime / 3600);
       logFile.print(",");
       logFile.print("Timer");
       logFile.print(",");
