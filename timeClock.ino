@@ -37,9 +37,9 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
 #define SYNC_INTERVAL 5000
 
 uint32_t syncTime = 0;
-uint32_t timerStart = 0;
-uint32_t timerStop = 0;
-uint32_t timerTime = 0;
+unsigned long timerStart = 0;
+unsigned long timerStop = 0;
+unsigned long timerTime = 0;
 uint8_t timerState = 0;
 uint8_t prevState = 0;
 uint8_t colorSelect = 7;
