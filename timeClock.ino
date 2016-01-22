@@ -7,7 +7,7 @@
   -----------------------
   January 22nd, 2016  - v1.1.2-alpha   - Issue #38 fixed, working on issue #39.
   January 10th, 2016  - v1.1.1-alpha   - Improved log format, changed timer to hh:mm:ss format (issue #34 & issue #27).
-  January 10th, 2016  - v1.1.0-alpha   - Added project notfication when pressing UP/DOWN buttons (issue #30). 
+  January 10th, 2016  - v1.1.0-alpha   - Added project notfication when pressing UP/DOWN buttons (issue #30).
   January 7th, 2016   - v1.0.0-release - Released version 1.0.
   January 5th, 2016   - v0.4.1-beta    - Filenames now contain creation date from RTC date / time (issue #3).
   January 3rd, 2016   - v0.4.0-alpha   - Added project memory, when device resets last project will be loaded (issue #6).
@@ -37,6 +37,9 @@ Adafruit_RGBLCDShield LCD = Adafruit_RGBLCDShield();
 #define SYNC_INTERVAL 5000
 
 uint32_t syncTime = 0;
+uint32_t timerStart = 0;
+uint32_t timerStop = 0;
+uint32_t timerTime = 0;
 uint8_t timerState = 0;
 uint8_t prevState = 0;
 uint8_t colorSelect = 7;
@@ -208,7 +211,7 @@ void loop() {
     // Timer starts with the first press of the SELECT BUTTON.
     timerState = 1 - timerState;
     if (timerState == 1 && prevState == 0) {
-      // New timer code : DEBUG
+      timerStart = now.secondstime(); // Time from RTC in seconds since 1/1/2000.
       delay(1000);
       LCD.setBacklight(1);
       LCD.clear();
@@ -218,16 +221,32 @@ void loop() {
       LCD.print("Project 0");
       LCD.print(projectSelect);
     }
-    
+
     // Timer stops with the second press of the SELECT BUTTON.
     if (timerState == 0 && prevState == 1) {
-      // New timer code : DEBUG
-  
-      
+      timerStop = now.secondstime();
+      timerTime = timerStop - timerStart;
+      uint8_t ss = timerTime % 60;
+      uint8_t mm = (timerTime / 60) % 60;
+      uint8_t hh = (timerTime / 3600000);
+      logFile.print(timerTime); // DEBUG
       logFile.print(",");
       logFile.print("Timer");
       logFile.print(",");
-      
+      if (hh < 10) {
+        logFile.print("0");
+      }
+      logFile.print(hh);
+      logFile.print(":");
+      if (mm < 10) {
+        logFile.print("0");
+      }
+      logFile.print(mm);
+      logFile.print(":");
+      if (ss < 10) {
+        logFile.print("0");
+      }
+      logFile.println(ss);
       delay(1000);
       LCD.setBacklight(colorSelect);
       LCD.clear();
