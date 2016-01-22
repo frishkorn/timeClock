@@ -5,7 +5,7 @@
 
   Version Release History
   -----------------------
-  January 16th, 2016  - v1.1.2-alpha   - Issue #38 fixed, working on issue #39.
+  January 22nd, 2016  - v1.1.2-alpha   - Issue #38 fixed, working on issue #39.
   January 10th, 2016  - v1.1.1-alpha   - Improved log format, changed timer to hh:mm:ss format (issue #34 & issue #27).
   January 10th, 2016  - v1.1.0-alpha   - Added project notfication when pressing UP/DOWN buttons (issue #30). 
   January 7th, 2016   - v1.0.0-release - Released version 1.0.
