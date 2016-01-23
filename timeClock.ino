@@ -1,10 +1,11 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.1.2-alpha by Chris Frishkorn.
+  Current version 1.1.3-alpha by Chris Frishkorn.
 
   Version Release History
   -----------------------
+  January 23rd, 2016  - v1.1.3-alpha   - Project select boundary condition fixed, timers made consistant across code (issue #32).
   January 22nd, 2016  - v1.1.2-alpha   - Fixed timer accuracy, improved log format (issue #38 & issue #39).
   January 10th, 2016  - v1.1.1-alpha   - Improved log format, changed timer to hh:mm:ss format (issue #34 & issue #27).
   January 10th, 2016  - v1.1.0-alpha   - Added project notfication when pressing UP/DOWN buttons (issue #30).
@@ -75,7 +76,7 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print("timeClock");
   LCD.setCursor(7, 1);
-  LCD.print("v1.1.2a");
+  LCD.print("v1.1.3a");
   RTC.begin();
   if (!RTC.isrunning()) {
     error("RTC Stopped");
@@ -135,15 +136,15 @@ void loop() {
           projectSelect--;
           RTC.writenvram(0, colorSelect);
           RTC.writenvram(1, projectSelect);
+          LCD.setBacklight(colorSelect);
+          LCD.clear();
+          LCD.setCursor(3, 0);
+          LCD.print("Project 0");
+          LCD.print(projectSelect);
+          LCD.setCursor(4, 1);
+          LCD.print("Selected");
+          delay(1500);
         }
-        LCD.setBacklight(colorSelect);
-        LCD.clear();
-        LCD.setCursor(3, 0);
-        LCD.print("Project 0");
-        LCD.print(projectSelect);
-        LCD.setCursor(4, 1);
-        LCD.print("Selected");
-        delay(2000);
       }
       if (buttons & BUTTON_DOWN) {
         if (colorSelect <= 2) {
@@ -157,15 +158,15 @@ void loop() {
           projectSelect++;
           RTC.writenvram(0, colorSelect);
           RTC.writenvram(1, projectSelect);
+          LCD.setBacklight(colorSelect);
+          LCD.clear();
+          LCD.setCursor(3, 0);
+          LCD.print("Project 0");
+          LCD.print(projectSelect);
+          LCD.setCursor(4, 1);
+          LCD.print("Selected");
+          delay(1500);
         }
-        LCD.setBacklight(colorSelect);
-        LCD.clear();
-        LCD.setCursor(3, 0);
-        LCD.print("Project 0");
-        LCD.print(projectSelect);
-        LCD.setCursor(4, 1);
-        LCD.print("Selected");
-        delay(2000);
       }
     }
   }
@@ -212,7 +213,7 @@ void loop() {
     timerState = 1 - timerState;
     if (timerState == 1 && prevState == 0) {
       timerStart = now.secondstime(); // Time from RTC in seconds since 1/1/2000.
-      delay(1000);
+      delay(1500);
       LCD.setBacklight(1);
       LCD.clear();
       LCD.setCursor(1, 0);
@@ -247,7 +248,7 @@ void loop() {
         logFile.print("0");
       }
       logFile.println(ss);
-      delay(1000);
+      delay(1500);
       LCD.setBacklight(colorSelect);
       LCD.clear();
       LCD.setCursor(1, 0);
@@ -257,7 +258,7 @@ void loop() {
       LCD.print(projectSelect);
     }
     prevState = timerState;
-    delay(2500);
+    delay(1500);
   }
 
   // Display Date and Time on LCD.
