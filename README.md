@@ -12,7 +12,7 @@ Author: Chris Frishkorn
 
 Version Release History
 ---
-**January 23rd, 2016  - v1.1.3-alpha   -** *Started work on issue #32.*
+**January 23rd, 2016  - v1.1.3-alpha   -** *Project select boundary condition fixed, timers made consistant across code (issue #32).*
 
 **January 22nd, 2016  - v1.1.2-alpha   -** *Fixed timer accuracy, improved log format (issue #38 & issue #39).*
 

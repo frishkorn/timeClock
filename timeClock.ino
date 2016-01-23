@@ -5,7 +5,7 @@
 
   Version Release History
   -----------------------
-  January 23rd, 2016  - v1.1.3-alpha   - Started work on issue #32.
+  January 23rd, 2016  - v1.1.3-alpha   - Project select boundary condition fixed, timers made consistant across code (issue #32).
   January 22nd, 2016  - v1.1.2-alpha   - Fixed timer accuracy, improved log format (issue #38 & issue #39).
   January 10th, 2016  - v1.1.1-alpha   - Improved log format, changed timer to hh:mm:ss format (issue #34 & issue #27).
   January 10th, 2016  - v1.1.0-alpha   - Added project notfication when pressing UP/DOWN buttons (issue #30).
@@ -213,7 +213,7 @@ void loop() {
     timerState = 1 - timerState;
     if (timerState == 1 && prevState == 0) {
       timerStart = now.secondstime(); // Time from RTC in seconds since 1/1/2000.
-      delay(1000);
+      delay(1500);
       LCD.setBacklight(1);
       LCD.clear();
       LCD.setCursor(1, 0);
@@ -248,7 +248,7 @@ void loop() {
         logFile.print("0");
       }
       logFile.println(ss);
-      delay(1000);
+      delay(1500);
       LCD.setBacklight(colorSelect);
       LCD.clear();
       LCD.setCursor(1, 0);
@@ -258,7 +258,7 @@ void loop() {
       LCD.print(projectSelect);
     }
     prevState = timerState;
-    delay(2500);
+    delay(1500);
   }
 
   // Display Date and Time on LCD.
