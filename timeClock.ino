@@ -110,7 +110,21 @@ void setup() {
   Serial.print("Creating file ");
   Serial.println(filename);
   Serial.println();
-  logFile.println("Date,Time,Project");
+  logFile.print("Date,Time,Project,");
+
+  // Read last heartbeat from NV_SRAM and write to top of logfile.
+  uint8_t rammm = RTC.readnvram(2);
+  uint8_t ramdd = RTC.readnvram(3);
+  uint8_t ramyy = RTC.readnvram(4);
+  uint8_t ramrr = RTC.readnvram(5);
+  logFile.print("Last heartbeat detected: ");
+  logFile.print(rammm);
+  logFile.print("/");
+  logFile.print(ramdd);
+  logFile.print("/");
+  logFile.print(ramyy);
+  logFile.println(ramrr);
+
   delay(3000);
   LCD.clear();
 
@@ -322,5 +336,14 @@ void loop() {
   if ((millis() - syncTime) < SYNC_INTERVAL) return;
   syncTime = millis();
   logFile.flush();
+
+  // Write heartbeat to NV_SRAM.
+  RTC.writenvram(2, now.month());
+  RTC.writenvram(3, now.day());
+  uint16_t fyear = now.year();
+  uint8_t hiyear = fyear / 100;
+  uint8_t loyear = fyear - 2000;
+  RTC.writenvram(4, hiyear);
+  RTC.writenvram(5, loyear);
 }
 
