@@ -3,9 +3,11 @@
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
   Current version 1.2.0-alpha by Chris Frishkorn.
 
+  Track this project on GitHub: https://github.com/frishkorn/timeClock
+
   Version Release History
   -----------------------
-  February 1st, 2016  - v1.2.0-alpha   - Started work on issue #36.
+  February 3rd, 2016  - v1.2.0-alpha   - Started work on issue #36.
   January 23rd, 2016  - v1.1.3-alpha   - Project select boundary condition fixed, timers made consistant across code (issue #32).
   January 22nd, 2016  - v1.1.2-alpha   - Fixed timer accuracy, improved log format (issue #38 & issue #39).
   January 10th, 2016  - v1.1.1-alpha   - Improved log format, changed timer to hh:mm:ss format (issue #34 & issue #27).
@@ -32,11 +34,7 @@
 #include "RTClib.h"
 #include <Adafruit_RGBLCDShield.h>
 
-RTC_DS1307 RTC;
-Adafruit_RGBLCDShield LCD = Adafruit_RGBLCDShield();
-
-#define LOG_INTERVAL 5000
-#define SYNC_INTERVAL 5000
+#define SYNC_INTERVAL 15000
 
 uint32_t syncTime = 0;
 uint32_t timerStart = 0;
@@ -48,7 +46,9 @@ uint8_t colorSelect = 7;
 uint8_t projectSelect = 1;
 const uint8_t chipSelect = 10;
 
+RTC_DS1307 RTC;
 File logFile;
+Adafruit_RGBLCDShield LCD = Adafruit_RGBLCDShield();
 
 void dateTime(uint16_t *date, uint16_t *time) {
   // Set file date / time from RTC for SD card.
@@ -110,21 +110,26 @@ void setup() {
   Serial.print("Creating file ");
   Serial.println(filename);
   Serial.println();
-  logFile.print("Date,Time,Project,");
-
+  
   // Read last heartbeat from NV_SRAM and write to top of logfile.
   uint8_t rammm = RTC.readnvram(2);
   uint8_t ramdd = RTC.readnvram(3);
   uint8_t ramyy = RTC.readnvram(4);
   uint8_t ramrr = RTC.readnvram(5);
+  uint8_t ramhr = RTC.readnvram(6);
+  uint8_t rammi = RTC.readnvram(7);
   logFile.print("Last heartbeat detected: ");
   logFile.print(rammm);
   logFile.print("/");
   logFile.print(ramdd);
   logFile.print("/");
   logFile.print(ramyy);
-  logFile.println(ramrr);
-
+  logFile.print(ramrr);
+  logFile.print(" @ ");
+  logFile.print(ramhr);
+  logFile.print(":");
+  logFile.println(rammi);
+  logFile.println("Date,Time,Project");
   delay(3000);
   LCD.clear();
 
@@ -345,5 +350,6 @@ void loop() {
   uint8_t loyear = fyear - 2000;
   RTC.writenvram(4, hiyear);
   RTC.writenvram(5, loyear);
+  RTC.writenvram(6, now.hour());
+  RTC.writenvram(7, now.minute());
 }
-
