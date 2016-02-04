@@ -12,7 +12,7 @@ Author: Chris Frishkorn
 
 Version Release History
 ---
-**February 1st, 2016  - v1.2.0-alpha   -** *Added heartbeat to log file. (issue #36 & issue #44)*
+**February 3rd, 2016  - v1.2.0-alpha   -** *Added heartbeat to log file. (issue #36 & issue #44)*
 
 **January 23rd, 2016  - v1.1.3-alpha   -** *Project select boundary condition fixed, timers made consistant across code (issue #32).*
 
