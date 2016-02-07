@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.2.0-release by Chris Frishkorn.
+  Current version 1.2.1-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Release History
   -----------------------
+  February 7th, 2016  - v1.2.1-alpha   - Fixed RTC reset problem with colorSelect and projectSelect (issue #48).
   February 6th, 2016  - v1.2.0-release - Released version 1.2.
   February 3rd, 2016  - v1.1.4-beta    - Added heartbeat to log file. (issue #36 & issue #44).
   January 23rd, 2016  - v1.1.3-alpha   - Project select boundary condition fixed, timers made consistant across code (issue #32).
@@ -25,14 +26,8 @@
 
 #define SYNC_INTERVAL 15000
 
-uint32_t syncTime = 0;
-uint32_t timerStart = 0;
-uint32_t timerStop = 0;
-uint32_t timerTime = 0;
-uint8_t timerState = 0;
-uint8_t prevState = 0;
-uint8_t colorSelect = 7;
-uint8_t projectSelect = 1;
+uint32_t syncTime, timerStart, timerStop, timerTime, timerState, prevState;
+uint8_t colorSelect = 7, projectSelect = 1;
 const uint8_t chipSelect = 10;
 
 RTC_DS1307 RTC;
@@ -65,8 +60,8 @@ void setup() {
   LCD.setBacklight(colorSelect);
   LCD.setCursor(2, 0);
   LCD.print("timeClock");
-  LCD.setCursor(10, 1);
-  LCD.print("v1.2");
+  LCD.setCursor(7, 1);
+  LCD.print("v1.2.1a");
   RTC.begin();
   if (!RTC.isrunning()) {
     error("RTC Stopped");
@@ -125,6 +120,10 @@ void setup() {
   // Read first byte of NV_SRAM set colorSelect and projectSelect.
   colorSelect = RTC.readnvram(0);
   projectSelect = RTC.readnvram(1);
+  if (colorSelect == 255 && projectSelect == 255) {
+    colorSelect = 7;
+    projectSelect = 1;
+  }
   LCD.setBacklight(colorSelect);
 }
 
@@ -241,7 +240,7 @@ void loop() {
       uint8_t hh = (timerTime / 3600);
       logFile.print("Timer");
       logFile.print(",");
-      logFile.print("(hh:mm:ss)");
+      logFile.print("hh:mm:ss");
       logFile.print(",");
       if (hh < 10) {
         logFile.print("0");
