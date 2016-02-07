@@ -111,8 +111,14 @@ void setup() {
   logFile.print(ramyy);
   logFile.print(ramrr);
   logFile.print(" @ ");
+  if (ramhr < 10) {
+    logFile.print("0");
+  }
   logFile.print(ramhr);
   logFile.print(":");
+  if (rammi < 10) {
+    logFile.print("0");
+  }
   logFile.println(rammi);
   logFile.println("Date,Time,Project");
   delay(3000);
