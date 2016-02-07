@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.2.2-alpha by Chris Frishkorn.
+  Current version 1.2.3-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Release History
   -----------------------
+  February 7th, 2016  - v1.2.3-alpha   - Started work on issue #51 & issue #54.
   February 7th, 2016  - v1.2.2-alpha   - Fixed heartbeat, now has zeros appened to log file (issue #49).
   February 7th, 2016  - v1.2.1-alpha   - Fixed RTC reset problem with colorSelect and projectSelect (issue #48).
   February 6th, 2016  - v1.2.0-release - Released version 1.2.
@@ -25,7 +26,7 @@
 #include "RTClib.h"
 #include <Adafruit_RGBLCDShield.h>
 
-#define SYNC_INTERVAL 15000
+#define SYNC_INTERVAL 10000
 
 uint32_t syncTime, timerStart, timerStop, timerTime, timerState, prevState;
 uint8_t colorSelect = 7, projectSelect = 1;
@@ -62,7 +63,7 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print("timeClock");
   LCD.setCursor(7, 1);
-  LCD.print("v1.2.2a");
+  LCD.print("v1.2.3a");
   RTC.begin();
   if (!RTC.isrunning()) {
     error("RTC Stopped");
@@ -95,7 +96,7 @@ void setup() {
   Serial.print("Creating file ");
   Serial.println(filename);
   Serial.println();
-  
+
   // Read last heartbeat from NV_SRAM and write to top of logfile.
   uint8_t rammm = RTC.readnvram(2);
   uint8_t ramdd = RTC.readnvram(3);
@@ -104,22 +105,26 @@ void setup() {
   uint8_t ramhr = RTC.readnvram(6);
   uint8_t rammi = RTC.readnvram(7);
   logFile.print("Last heartbeat detected: ");
-  logFile.print(rammm);
-  logFile.print("/");
-  logFile.print(ramdd);
-  logFile.print("/");
-  logFile.print(ramyy);
-  logFile.print(ramrr);
-  logFile.print(" @ ");
-  if (ramhr < 10) {
-    logFile.print("0");
+  if (rammm != 255 && rammi != 255) {
+    logFile.print(rammm);
+    logFile.print("/");
+    logFile.print(ramdd);
+    logFile.print("/");
+    logFile.print(ramyy);
+    logFile.print(ramrr);
+    logFile.print(" @ ");
+    if (ramhr < 10) {
+      logFile.print("0");
+    }
+    logFile.print(ramhr);
+    logFile.print(":");
+    if (rammi < 10) {
+      logFile.print("0");
+    }
+    logFile.println(rammi);
+  } else {
+    logFile.println("None");
   }
-  logFile.print(ramhr);
-  logFile.print(":");
-  if (rammi < 10) {
-    logFile.print("0");
-  }
-  logFile.println(rammi);
   logFile.println("Date,Time,Project");
   delay(3000);
   LCD.clear();
