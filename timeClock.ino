@@ -7,7 +7,7 @@
 
   Version Release History
   -----------------------
-  February 7th, 2016  - v1.2.1-alpha   - Started work on issue #48.
+  February 7th, 2016  - v1.2.1-alpha   - Fixed RTC reset problem with colorSelect and projectSelect (issue #48).
   February 6th, 2016  - v1.2.0-release - Released version 1.2.
   February 3rd, 2016  - v1.1.4-beta    - Added heartbeat to log file. (issue #36 & issue #44).
   January 23rd, 2016  - v1.1.3-alpha   - Project select boundary condition fixed, timers made consistant across code (issue #32).
@@ -26,14 +26,8 @@
 
 #define SYNC_INTERVAL 15000
 
-uint32_t syncTime = 0;
-uint32_t timerStart = 0;
-uint32_t timerStop = 0;
-uint32_t timerTime = 0;
-uint8_t timerState = 0;
-uint8_t prevState = 0;
-uint8_t colorSelect = 7;
-uint8_t projectSelect = 1;
+uint32_t syncTime, timerStart, timerStop, timerTime, timerState, prevState;
+uint8_t colorSelect = 7, projectSelect = 1;
 const uint8_t chipSelect = 10;
 
 RTC_DS1307 RTC;
@@ -246,7 +240,7 @@ void loop() {
       uint8_t hh = (timerTime / 3600);
       logFile.print("Timer");
       logFile.print(",");
-      logFile.print("(hh:mm:ss)");
+      logFile.print("hh:mm:ss");
       logFile.print(",");
       if (hh < 10) {
         logFile.print("0");
