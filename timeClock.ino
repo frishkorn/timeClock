@@ -120,7 +120,7 @@ void setup() {
   // Read first byte of NV_SRAM set colorSelect and projectSelect.
   colorSelect = RTC.readnvram(0);
   projectSelect = RTC.readnvram(1);
-  if (colorSelect == 255 && projectSelect == 255) {
+  if (colorSelect == 255 && projectSelect == 255) { // Set to defaults if RTC has been recently set and NV_SRAM wiped.
     colorSelect = 7;
     projectSelect = 1;
   }
