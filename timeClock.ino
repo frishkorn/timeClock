@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.2.2-alpha by Chris Frishkorn.
+  Current version 1.2.3-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Release History
   -----------------------
+  February 7th, 2016  - v1.2.3-alpha   - Started work on issue #51 & issue #54.
   February 7th, 2016  - v1.2.2-alpha   - Fixed heartbeat, now has zeros appened to log file (issue #49).
   February 7th, 2016  - v1.2.1-alpha   - Fixed RTC reset problem with colorSelect and projectSelect (issue #48).
   February 6th, 2016  - v1.2.0-release - Released version 1.2.
@@ -25,7 +26,7 @@
 #include "RTClib.h"
 #include <Adafruit_RGBLCDShield.h>
 
-#define SYNC_INTERVAL 15000
+#define SYNC_INTERVAL 10000
 
 uint32_t syncTime, timerStart, timerStop, timerTime, timerState, prevState;
 uint8_t colorSelect = 7, projectSelect = 1;
@@ -62,7 +63,7 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print("timeClock");
   LCD.setCursor(7, 1);
-  LCD.print("v1.2.2a");
+  LCD.print("v1.2.3a");
   RTC.begin();
   if (!RTC.isrunning()) {
     error("RTC Stopped");
