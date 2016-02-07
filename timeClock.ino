@@ -7,7 +7,7 @@
 
   Version Release History
   -----------------------
-  February 7th, 2016  - v1.2.2-alpha   - Started work on issue #49.
+  February 7th, 2016  - v1.2.2-alpha   - Fixed heartbeat, now has zeros appened to log file (issue #49).
   February 7th, 2016  - v1.2.1-alpha   - Fixed RTC reset problem with colorSelect and projectSelect (issue #48).
   February 6th, 2016  - v1.2.0-release - Released version 1.2.
   February 3rd, 2016  - v1.1.4-beta    - Added heartbeat to log file. (issue #36 & issue #44).
