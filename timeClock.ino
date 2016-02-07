@@ -96,7 +96,7 @@ void setup() {
   Serial.print("Creating file ");
   Serial.println(filename);
   Serial.println();
-  
+
   // Read last heartbeat from NV_SRAM and write to top of logfile.
   uint8_t rammm = RTC.readnvram(2);
   uint8_t ramdd = RTC.readnvram(3);
@@ -105,22 +105,26 @@ void setup() {
   uint8_t ramhr = RTC.readnvram(6);
   uint8_t rammi = RTC.readnvram(7);
   logFile.print("Last heartbeat detected: ");
-  logFile.print(rammm);
-  logFile.print("/");
-  logFile.print(ramdd);
-  logFile.print("/");
-  logFile.print(ramyy);
-  logFile.print(ramrr);
-  logFile.print(" @ ");
-  if (ramhr < 10) {
-    logFile.print("0");
+  if (rammm != 255 && rammi != 255) {
+    logFile.print(rammm);
+    logFile.print("/");
+    logFile.print(ramdd);
+    logFile.print("/");
+    logFile.print(ramyy);
+    logFile.print(ramrr);
+    logFile.print(" @ ");
+    if (ramhr < 10) {
+      logFile.print("0");
+    }
+    logFile.print(ramhr);
+    logFile.print(":");
+    if (rammi < 10) {
+      logFile.print("0");
+    }
+    logFile.println(rammi);
+  } else {
+    logFile.println("None");
   }
-  logFile.print(ramhr);
-  logFile.print(":");
-  if (rammi < 10) {
-    logFile.print("0");
-  }
-  logFile.println(rammi);
   logFile.println("Date,Time,Project");
   delay(3000);
   LCD.clear();
