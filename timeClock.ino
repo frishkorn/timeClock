@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.2.3-alpha by Chris Frishkorn.
+  Current version 1.2.4-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Release History
   -----------------------
+  February 9th, 2016  - v1.2.4-alpha   - Fixed RTC Error message and optimized heartbeat log-file write code (issue #55).
   February 7th, 2016  - v1.2.3-alpha   - Fixed uninitialized heartbeat and updated sync interval (issue #51 & issue #54).
   February 7th, 2016  - v1.2.2-alpha   - Fixed heartbeat, now has zeros appened to log file (issue #49).
   February 7th, 2016  - v1.2.1-alpha   - Fixed RTC reset problem with colorSelect and projectSelect (issue #48).
@@ -63,10 +64,10 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print("timeClock");
   LCD.setCursor(7, 1);
-  LCD.print("v1.2.3a");
+  LCD.print("v1.2.4a");
   RTC.begin();
   if (!RTC.isrunning()) {
-    error("RTC Stopped");
+    error("RTC Not Set");
     Serial.println("RTC is NOT running!");
   }
 
@@ -97,31 +98,25 @@ void setup() {
   Serial.println(filename);
   Serial.println();
 
-  // Read last heartbeat from NV_SRAM and write to top of logfile.
-  uint8_t rammm = RTC.readnvram(2);
-  uint8_t ramdd = RTC.readnvram(3);
-  uint8_t ramyy = RTC.readnvram(4);
-  uint8_t ramrr = RTC.readnvram(5);
-  uint8_t ramhr = RTC.readnvram(6);
-  uint8_t rammi = RTC.readnvram(7);
+  // Read last heartbeat from NV_SRAM and write header to top of log-file.
   logFile.print("Last heartbeat detected: ");
-  if (rammm != 255 && rammi != 255) {
-    logFile.print(rammm);
+  if (RTC.readnvram(2) != 255 && RTC.readnvram(7) != 255) {
+    logFile.print(RTC.readnvram(2), DEC); // Print Month to log-file.
     logFile.print("/");
-    logFile.print(ramdd);
+    logFile.print(RTC.readnvram(3), DEC); // Print Day to log-file.
     logFile.print("/");
-    logFile.print(ramyy);
-    logFile.print(ramrr);
+    logFile.print(RTC.readnvram(4), DEC); // Print Year to log-file.
+    logFile.print(RTC.readnvram(5), DEC);
     logFile.print(" @ ");
-    if (ramhr < 10) {
+    if (RTC.readnvram(6) < 10) {
       logFile.print("0");
     }
-    logFile.print(ramhr);
+    logFile.print(RTC.readnvram(6), DEC); // Print Hour to log-file.
     logFile.print(":");
-    if (rammi < 10) {
+    if (RTC.readnvram(7) < 10) {
       logFile.print("0");
     }
-    logFile.println(rammi);
+    logFile.println(RTC.readnvram(7), DEC); // Print Minute to log-file.
   } else {
     logFile.println("None");
   }
@@ -160,7 +155,7 @@ void loop() {
           LCD.clear();
           LCD.setCursor(3, 0);
           LCD.print("Project 0");
-          LCD.print(projectSelect);
+          LCD.print(projectSelect, DEC);
           LCD.setCursor(4, 1);
           LCD.print("Selected");
           delay(1500);
@@ -182,7 +177,7 @@ void loop() {
           LCD.clear();
           LCD.setCursor(3, 0);
           LCD.print("Project 0");
-          LCD.print(projectSelect);
+          LCD.print(projectSelect, DEC);
           LCD.setCursor(4, 1);
           LCD.print("Selected");
           delay(1500);
@@ -222,7 +217,7 @@ void loop() {
     logFile.print(now.second(), DEC);
     logFile.print(",");
     logFile.print("Project ");
-    logFile.println(projectSelect);
+    logFile.println(projectSelect, DEC);
     LCD.clear();
     LCD.setCursor(1, 0);
     LCD.print("Data logged to");
@@ -240,7 +235,7 @@ void loop() {
       LCD.print("Timer Started!");
       LCD.setCursor(3, 1);
       LCD.print("Project 0");
-      LCD.print(projectSelect);
+      LCD.print(projectSelect, DEC);
     }
 
     // Timer stops with the second press of the SELECT BUTTON.
@@ -257,17 +252,17 @@ void loop() {
       if (hh < 10) {
         logFile.print("0");
       }
-      logFile.print(hh);
+      logFile.print(hh, DEC);
       logFile.print(":");
       if (mm < 10) {
         logFile.print("0");
       }
-      logFile.print(mm);
+      logFile.print(mm, DEC);
       logFile.print(":");
       if (ss < 10) {
         logFile.print("0");
       }
-      logFile.println(ss);
+      logFile.println(ss, DEC);
       delay(1500);
       LCD.setBacklight(colorSelect);
       LCD.clear();
@@ -275,7 +270,7 @@ void loop() {
       LCD.print("Timer Stopped!");
       LCD.setCursor(3, 1);
       LCD.print("Project 0");
-      LCD.print(projectSelect);
+      LCD.print(projectSelect, DEC);
     }
     prevState = timerState;
     delay(1500);
@@ -337,7 +332,7 @@ void loop() {
     LCD.print(" AM");
   }
 
-  // Write data to card.
+  // Write data to card, only if 10 seconds has elasped since last write.
   if ((millis() - syncTime) < SYNC_INTERVAL) return;
   syncTime = millis();
   logFile.flush();

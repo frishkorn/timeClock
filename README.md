@@ -1,4 +1,4 @@
-##timeClock - v1.2.3-alpha
+##timeClock - v1.2.4-alpha
 ---
 ###An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
 
@@ -8,12 +8,14 @@ timeClock has 6 projects that can be selected using the UP / DOWN buttons. Back-
 
 To start a timer press SELECT, the back-light will change red notifying you the timer is running. The project title, start time, and date will be logged to the SD card using a CSV file. Pressing SELECT again will stop the timer, the project title and stop time will be logged to the SD card in addition to the elapsed timer. Time in log file is in 24-hour format.
 
-Device records a heartbeat every 15 seconds in case of loss of power. When a new log file is created, the heartbeat will be time-stamped at the top of the log file.
+Device records a heartbeat every 10 seconds in case of loss of power. When a new log file is created, the heartbeat will be time-stamped at the top of the log file.
 
 Author: Chris Frishkorn
 
 Version Release History
 ---
+**February 9th, 2016  - v1.2.4-alpha   -** *Fixed RTC Error message and optimized heartbeat log-file write code (issue #55).*
+
 **February 7th, 2016  - v1.2.3-alpha   -** *Fixed uninitialized heartbeat and updated sync interval (issue #51 & issue #54).*
 
 **February 7th, 2016  - v1.2.2-alpha   -** *Fixed heartbeat, now has zeros appened to log file (issue #49).*
@@ -33,3 +35,5 @@ Version Release History
 **January 10th, 2016  - v1.1.0-alpha   -** *Added project notfication when pressing UP/DOWN buttons (issue #30).*
 
 **January 7th, 2016   - v1.0.0-release -** *Released version 1.0.*
+
+- See GitHub commit history for full version release history.
