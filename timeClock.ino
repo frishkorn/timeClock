@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.2.4-alpha by Chris Frishkorn.
+  Current version 1.3.0-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Release History
   -----------------------
+  February 10th, 2016 - v1.3.0-alpha   - Added LEFT button press Project Name notification, updated variables (issue #33).
   February 9th, 2016  - v1.2.4-alpha   - Fixed RTC Error message and optimized heartbeat log-file write code (issue #55).
   February 7th, 2016  - v1.2.3-alpha   - Fixed uninitialized heartbeat and updated sync interval (issue #51 & issue #54).
   February 7th, 2016  - v1.2.2-alpha   - Fixed heartbeat, now has zeros appened to log file (issue #49).
@@ -29,7 +30,7 @@
 
 #define SYNC_INTERVAL 10000
 
-uint32_t syncTime, timerStart, timerStop, timerTime, timerState, prevState;
+uint32_t syncTime, timerStart, timerState, prevState;
 uint8_t colorSelect = 7, projectSelect = 1;
 const uint8_t chipSelect = 10;
 
@@ -64,7 +65,7 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print("timeClock");
   LCD.setCursor(7, 1);
-  LCD.print("v1.2.4a");
+  LCD.print("v1.3.0a");
   RTC.begin();
   if (!RTC.isrunning()) {
     error("RTC Not Set");
@@ -240,8 +241,8 @@ void loop() {
 
     // Timer stops with the second press of the SELECT BUTTON.
     if (timerState == 0 && prevState == 1) {
-      timerStop = now.secondstime();
-      timerTime = timerStop - timerStart;
+      uint32_t timerStop = now.secondstime();
+      uint32_t timerTime = timerStop - timerStart;
       uint8_t ss = timerTime % 60;
       uint8_t mm = (timerTime / 60) % 60;
       uint8_t hh = (timerTime / 3600);
@@ -273,6 +274,17 @@ void loop() {
       LCD.print(projectSelect, DEC);
     }
     prevState = timerState;
+    delay(1500);
+  }
+
+  // Show Project Name on LCD when user presses LEFT BUTTON.
+  if (buttons & BUTTON_LEFT) {
+    LCD.clear();
+    LCD.setCursor(3, 0);
+    LCD.print("Project 0");
+    LCD.print(projectSelect, DEC);
+    LCD.setCursor(4, 1);
+    LCD.print("Selected");
     delay(1500);
   }
 
