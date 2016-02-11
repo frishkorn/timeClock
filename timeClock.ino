@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.2.4-alpha by Chris Frishkorn.
+  Current version 1.3.0-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Release History
   -----------------------
+  February 10th, 2016 - v1.3.0-alpha   - Started work on issue #33.
   February 9th, 2016  - v1.2.4-alpha   - Fixed RTC Error message and optimized heartbeat log-file write code (issue #55).
   February 7th, 2016  - v1.2.3-alpha   - Fixed uninitialized heartbeat and updated sync interval (issue #51 & issue #54).
   February 7th, 2016  - v1.2.2-alpha   - Fixed heartbeat, now has zeros appened to log file (issue #49).
@@ -64,7 +65,7 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print("timeClock");
   LCD.setCursor(7, 1);
-  LCD.print("v1.2.4a");
+  LCD.print("v1.3.0a");
   RTC.begin();
   if (!RTC.isrunning()) {
     error("RTC Not Set");
@@ -331,6 +332,8 @@ void loop() {
   else {
     LCD.print(" AM");
   }
+  
+  // Show Project Name when user presses LEFT BUTTON.
 
   // Write data to card, only if 10 seconds has elasped since last write.
   if ((millis() - syncTime) < SYNC_INTERVAL) return;
