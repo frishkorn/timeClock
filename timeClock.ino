@@ -277,6 +277,17 @@ void loop() {
     delay(1500);
   }
 
+  // Show Project Name on LCD when user presses LEFT BUTTON.
+  if (buttons & BUTTON_LEFT) {
+    LCD.clear();
+    LCD.setCursor(3, 0);
+    LCD.print("Project 0");
+    LCD.print(projectSelect, DEC);
+    LCD.setCursor(4, 1);
+    LCD.print("Selected");
+    delay(1500);
+  }
+
   // Display Date and Time on LCD.
   DateTime now = RTC.now(); // Get current time and date from RTC.
   LCD.setCursor(0, 0);
@@ -332,8 +343,6 @@ void loop() {
   else {
     LCD.print(" AM");
   }
-  
-  // Show Project Name when user presses LEFT BUTTON.
 
   // Write data to card, only if 10 seconds has elasped since last write.
   if ((millis() - syncTime) < SYNC_INTERVAL) return;
