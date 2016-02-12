@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.3.0-alpha by Chris Frishkorn.
+  Current version 1.3.1-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Release History
   -----------------------
+  February 11th, 2016 - v1.3.1-alpha   - Changed time-out constant to use pre-processor #define (issue #60).
   February 10th, 2016 - v1.3.0-alpha   - Added LEFT button press Project Name notification, updated variables (issue #33).
   February 9th, 2016  - v1.2.4-alpha   - Fixed RTC Error message and optimized heartbeat log-file write code (issue #55).
   February 7th, 2016  - v1.2.3-alpha   - Fixed uninitialized heartbeat and updated sync interval (issue #51 & issue #54).
@@ -29,9 +30,10 @@
 #include <Adafruit_RGBLCDShield.h>
 
 #define SYNC_INTERVAL 10000
+#define TIME_OUT 1500
 
-uint32_t syncTime, timerStart, timerState, prevState;
-uint8_t colorSelect = 7, projectSelect = 1;
+uint32_t syncTime, timerStart;
+uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState;
 const uint8_t chipSelect = 10;
 
 RTC_DS1307 RTC;
@@ -65,7 +67,7 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print("timeClock");
   LCD.setCursor(7, 1);
-  LCD.print("v1.3.0a");
+  LCD.print("v1.3.1a");
   RTC.begin();
   if (!RTC.isrunning()) {
     error("RTC Not Set");
@@ -159,7 +161,7 @@ void loop() {
           LCD.print(projectSelect, DEC);
           LCD.setCursor(4, 1);
           LCD.print("Selected");
-          delay(1500);
+          delay(TIME_OUT);
         }
       }
       if (buttons & BUTTON_DOWN) {
@@ -181,7 +183,7 @@ void loop() {
           LCD.print(projectSelect, DEC);
           LCD.setCursor(4, 1);
           LCD.print("Selected");
-          delay(1500);
+          delay(TIME_OUT);
         }
       }
     }
@@ -229,7 +231,7 @@ void loop() {
     timerState = 1 - timerState;
     if (timerState == 1 && prevState == 0) {
       timerStart = now.secondstime(); // Time from RTC in seconds since 1/1/2000.
-      delay(1500);
+      delay(TIME_OUT);
       LCD.setBacklight(1);
       LCD.clear();
       LCD.setCursor(1, 0);
@@ -264,7 +266,7 @@ void loop() {
         logFile.print("0");
       }
       logFile.println(ss, DEC);
-      delay(1500);
+      delay(TIME_OUT);
       LCD.setBacklight(colorSelect);
       LCD.clear();
       LCD.setCursor(1, 0);
@@ -274,7 +276,7 @@ void loop() {
       LCD.print(projectSelect, DEC);
     }
     prevState = timerState;
-    delay(1500);
+    delay(TIME_OUT);
   }
 
   // Show Project Name on LCD when user presses LEFT BUTTON.
@@ -285,7 +287,7 @@ void loop() {
     LCD.print(projectSelect, DEC);
     LCD.setCursor(4, 1);
     LCD.print("Selected");
-    delay(1500);
+    delay(TIME_OUT);
   }
 
   // Display Date and Time on LCD.
