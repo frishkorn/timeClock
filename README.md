@@ -4,7 +4,7 @@
 
 *Arduino Uno, SD Shield, and RGB LCD Shield are required. There is a utility in the utility folder you can run once to set the RTC.*
 
-timeClock has 6 projects that can be selected using the UP / DOWN buttons. Back-light color will change for each Project and Project Number will be displayed. Time and date will always be displaying on the Main Screen.
+timeClock has 6 projects that can be selected using the UP / DOWN buttons. Back-light color will change for each Project and Project Name will be displayed. Time and date will always be displaying on the Main Screen. To display the Project Name at any time, press LEFT button.
 
 To start a timer press SELECT, the back-light will change red notifying you the timer is running. The project title, start time, and date will be logged to the SD card using a CSV file. Pressing SELECT again will stop the timer, the project title and stop time will be logged to the SD card in addition to the elapsed timer. Time in log file is in 24-hour format.
 
