@@ -84,6 +84,16 @@ void setup() {
   }
   Serial.println("Card sucessfully initialized.");
 
+  // Read from projects.txt file and set Project Names
+  File projects = SD.open("projects.txt");
+  if (projects) {
+    while (projects.available()) {
+      Serial.write(projects.read());
+    }
+    Serial.println();
+    projects.close();
+  }
+  
   // Create logfile.
   SdFile::dateTimeCallback(dateTime); // Set file date / time from RTC for SD card.
   char filename[] = "RECORD00.CSV";
@@ -91,6 +101,9 @@ void setup() {
     filename[6] = i / 10 + '0';
     filename[7] = i % 10 + '0';
     if (!SD.exists(filename)) {
+      Serial.print("Creating file ");
+      Serial.println(filename);
+      Serial.println();
       logFile = SD.open(filename, FILE_WRITE);
       break;
     }
@@ -98,9 +111,6 @@ void setup() {
   if (!logFile) {
     error("File Write Error");
   }
-  Serial.print("Creating file ");
-  Serial.println(filename);
-  Serial.println();
 
   // Read last heartbeat from NV_SRAM and write header to top of log-file.
   logFile.print("Last heartbeat detected: ");
