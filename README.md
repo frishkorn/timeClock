@@ -1,4 +1,4 @@
-##timeClock - v1.3.1-alpha
+##timeClock - v1.4.0-alpha
 ---
 ###An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
 
@@ -12,8 +12,10 @@ Device records a heartbeat every 10 seconds in case of loss of power. When a new
 
 Author: Chris Frishkorn
 
-Version Release History
+Version Tracking
 ---
+**February 27th, 2016 - v1.4.0-alpha   -** *Started work on adding Project Name functionality (issue #40).*
+
 **February 11th, 2016 - v1.3.1-alpha   -** *Changed time-out constant to use pre-processor #define (issue #60).*
 
 **February 10th, 2016 - v1.3.0-alpha   -** *Added LEFT button press Project Name notification, updated variables (issue #33).*
@@ -40,4 +42,4 @@ Version Release History
 
 **January 7th, 2016   - v1.0.0-release -** *Released version 1.0.*
 
-- See GitHub commit history for full version release history.
+- See GitHub commit history for full version tracking notes.
