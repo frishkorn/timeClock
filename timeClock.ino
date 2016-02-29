@@ -86,14 +86,22 @@ void setup() {
 
   // Read from projects.txt file and set Project Names
   File projects = SD.open("projects.txt");
+  char projectName[9];
   if (projects) {
+    uint8_t i = 0;
     while (projects.available()) {
-      Serial.write(projects.read());
+      projectName[i] = projects.read();
+      i++;
+      if (i == 8) {
+        projectName[i] = 0; // Null terminate array.
+        break;
+      }
     }
-    Serial.println();
+    Serial.println(projectName);
     projects.close();
+    delay(TIME_OUT); // Noticing card errors with Windows 7, putting in delay to see if it prevents this.
   }
-  
+
   // Create logfile.
   SdFile::dateTimeCallback(dateTime); // Set file date / time from RTC for SD card.
   char filename[] = "RECORD00.CSV";
