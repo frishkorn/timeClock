@@ -86,21 +86,25 @@ void setup() {
 
   // Read from projects.txt file and set Project Names
   File projects = SD.open("projects.txt");
-  char projectName[9];
+  char projectName[7][9];
   if (projects) {
     for (uint8_t h = 0; h < 6; h++) {
-      delay(TIME_OUT); // DEBUG DELAY
       uint8_t i = 0;
       while (projects.available()) {
-        projectName[i] = projects.read();
+        projectName[h][i] = projects.read();
         i++;
         if (i == 8) {
-          projectName[i] = '\0'; // Null terminate array.
+          projectName[h][i] = '\0'; // Null terminate array.
           break;
         }
       }
-      Serial.println(projectName);
     }
+    Serial.println(projectName[0]); // SERIAL DEBUG
+    Serial.println(projectName[1]);
+    Serial.println(projectName[2]);
+    Serial.println(projectName[3]);
+    Serial.println(projectName[4]);
+    Serial.println(projectName[5]);
     projects.close();
     delay(TIME_OUT); // Noticing card errors with Windows 7, putting in delay to see if it prevents this.
   }
