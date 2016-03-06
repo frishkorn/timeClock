@@ -31,11 +31,12 @@
 #include <Adafruit_RGBLCDShield.h>
 
 #define SYNC_INTERVAL 10000
-#define TIME_OUT 1500
+#define TIME_OUT 2000
 
 uint32_t syncTime, timerStart;
 uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState;
 const uint8_t chipSelect = 10;
+char projectName[7][9];
 
 RTC_DS1307 RTC;
 File logFile;
@@ -86,7 +87,6 @@ void setup() {
 
   // Read from projects.txt file and set Project Names
   File projects = SD.open("projects.txt");
-  char projectName[7][9];
   if (projects) {
     for (uint8_t h = 0; h < 6; h++) {
       uint8_t i = 0;
@@ -99,14 +99,8 @@ void setup() {
         }
       }
     }
-    Serial.println(projectName[0]); // SERIAL DEBUG
-    Serial.println(projectName[1]);
-    Serial.println(projectName[2]);
-    Serial.println(projectName[3]);
-    Serial.println(projectName[4]);
-    Serial.println(projectName[5]);
     projects.close();
-    delay(TIME_OUT); // Noticing card errors with Windows 7, putting in delay to see if it prevents this.
+    delay(TIME_OUT); // Delay before opening another file.
   }
 
   // Create logfile.
@@ -182,10 +176,10 @@ void loop() {
           RTC.writenvram(1, projectSelect);
           LCD.setBacklight(colorSelect);
           LCD.clear();
-          LCD.setCursor(3, 0);
-          LCD.print("Project 0");
-          LCD.print(projectSelect, DEC);
-          LCD.setCursor(4, 1);
+          LCD.setCursor(2, 0);
+          uint8_t i = projectSelect - 1;
+          LCD.print(projectName[i]);
+          LCD.setCursor(6, 1);
           LCD.print("Selected");
           delay(TIME_OUT);
         }
@@ -204,10 +198,10 @@ void loop() {
           RTC.writenvram(1, projectSelect);
           LCD.setBacklight(colorSelect);
           LCD.clear();
-          LCD.setCursor(3, 0);
-          LCD.print("Project 0");
-          LCD.print(projectSelect, DEC);
-          LCD.setCursor(4, 1);
+          LCD.setCursor(2, 0);
+          uint8_t i = projectSelect - 1;
+          LCD.print(projectName[i]);
+          LCD.setCursor(6, 1);
           LCD.print("Selected");
           delay(TIME_OUT);
         }
@@ -308,10 +302,10 @@ void loop() {
   // Show Project Name on LCD when user presses LEFT BUTTON.
   if (buttons & BUTTON_LEFT) {
     LCD.clear();
-    LCD.setCursor(3, 0);
-    LCD.print("Project 0");
-    LCD.print(projectSelect, DEC);
-    LCD.setCursor(4, 1);
+    LCD.setCursor(2, 0);
+    uint8_t i = projectSelect - 1;
+    LCD.print(projectName[i]);
+    LCD.setCursor(6, 1);
     LCD.print("Selected");
     delay(TIME_OUT);
   }
