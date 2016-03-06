@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.3.1-alpha by Chris Frishkorn.
+  Current version 1.4.0-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
-  Version Release History
+  Version Tracking
   -----------------------
+  March 6th, 2016     - v1.4.0-alpha   - Added Project Names which are loaded from the SD card (issue #40).
   February 11th, 2016 - v1.3.1-alpha   - Changed time-out constant to use pre-processor #define (issue #60).
   February 10th, 2016 - v1.3.0-alpha   - Added LEFT button press Project Name notification, updated variables (issue #33).
   February 9th, 2016  - v1.2.4-alpha   - Fixed RTC Error message and optimized heartbeat log-file write code (issue #55).
@@ -14,13 +15,7 @@
   February 7th, 2016  - v1.2.2-alpha   - Fixed heartbeat, now has zeros appened to log file (issue #49).
   February 7th, 2016  - v1.2.1-alpha   - Fixed RTC reset problem with colorSelect and projectSelect (issue #48).
   February 6th, 2016  - v1.2.0-release - Released version 1.2.
-  February 3rd, 2016  - v1.1.4-beta    - Added heartbeat to log file. (issue #36 & issue #44).
-  January 23rd, 2016  - v1.1.3-alpha   - Project select boundary condition fixed, timers made consistant across code (issue #32).
-  January 22nd, 2016  - v1.1.2-alpha   - Fixed timer accuracy, improved log format (issue #38 & issue #39).
-  January 10th, 2016  - v1.1.1-alpha   - Improved log format, changed timer to hh:mm:ss format (issue #34 & issue #27).
-  January 10th, 2016  - v1.1.0-alpha   - Added project notfication when pressing UP/DOWN buttons (issue #30).
-  January 7th, 2016   - v1.0.0-release - Released version 1.0.
-  - See GitHub for older version release notes.
+  - See GitHub for older version tracking notes.
 */
 
 #include <Wire.h>
@@ -30,11 +25,12 @@
 #include <Adafruit_RGBLCDShield.h>
 
 #define SYNC_INTERVAL 10000
-#define TIME_OUT 1500
+#define TIME_OUT 2000
 
 uint32_t syncTime, timerStart;
 uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState;
 const uint8_t chipSelect = 10;
+char projectName[7][9];
 
 RTC_DS1307 RTC;
 File logFile;
@@ -67,7 +63,7 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print("timeClock");
   LCD.setCursor(7, 1);
-  LCD.print("v1.3.1a");
+  LCD.print("v1.4.0a");
   RTC.begin();
   if (!RTC.isrunning()) {
     error("RTC Not Set");
@@ -83,6 +79,24 @@ void setup() {
   }
   Serial.println("Card sucessfully initialized.");
 
+  // Read from projects.txt file and set Project Names
+  File projects = SD.open("projects.txt");
+  if (projects) {
+    for (uint8_t h = 0; h < 6; h++) {
+      uint8_t i = 0;
+      while (projects.available()) {
+        projectName[h][i] = projects.read();
+        i++;
+        if (i == 8) {
+          projectName[h][i] = '\0'; // Null terminate array.
+          break;
+        }
+      }
+    }
+    projects.close();
+    delay(TIME_OUT); // Delay before opening another file.
+  }
+
   // Create logfile.
   SdFile::dateTimeCallback(dateTime); // Set file date / time from RTC for SD card.
   char filename[] = "RECORD00.CSV";
@@ -90,6 +104,9 @@ void setup() {
     filename[6] = i / 10 + '0';
     filename[7] = i % 10 + '0';
     if (!SD.exists(filename)) {
+      Serial.print("Creating file ");
+      Serial.println(filename);
+      Serial.println();
       logFile = SD.open(filename, FILE_WRITE);
       break;
     }
@@ -97,9 +114,6 @@ void setup() {
   if (!logFile) {
     error("File Write Error");
   }
-  Serial.print("Creating file ");
-  Serial.println(filename);
-  Serial.println();
 
   // Read last heartbeat from NV_SRAM and write header to top of log-file.
   logFile.print("Last heartbeat detected: ");
@@ -156,10 +170,10 @@ void loop() {
           RTC.writenvram(1, projectSelect);
           LCD.setBacklight(colorSelect);
           LCD.clear();
-          LCD.setCursor(3, 0);
-          LCD.print("Project 0");
-          LCD.print(projectSelect, DEC);
-          LCD.setCursor(4, 1);
+          LCD.setCursor(2, 0);
+          uint8_t i = projectSelect - 1;
+          LCD.print(projectName[i]);
+          LCD.setCursor(6, 1);
           LCD.print("Selected");
           delay(TIME_OUT);
         }
@@ -178,10 +192,10 @@ void loop() {
           RTC.writenvram(1, projectSelect);
           LCD.setBacklight(colorSelect);
           LCD.clear();
-          LCD.setCursor(3, 0);
-          LCD.print("Project 0");
-          LCD.print(projectSelect, DEC);
-          LCD.setCursor(4, 1);
+          LCD.setCursor(2, 0);
+          uint8_t i = projectSelect - 1;
+          LCD.print(projectName[i]);
+          LCD.setCursor(6, 1);
           LCD.print("Selected");
           delay(TIME_OUT);
         }
@@ -219,8 +233,8 @@ void loop() {
     }
     logFile.print(now.second(), DEC);
     logFile.print(",");
-    logFile.print("Project ");
-    logFile.println(projectSelect, DEC);
+    uint8_t i = projectSelect - 1;
+    logFile.println(projectName[i]);
     LCD.clear();
     LCD.setCursor(1, 0);
     LCD.print("Data logged to");
@@ -237,8 +251,9 @@ void loop() {
       LCD.setCursor(1, 0);
       LCD.print("Timer Started!");
       LCD.setCursor(3, 1);
-      LCD.print("Project 0");
-      LCD.print(projectSelect, DEC);
+      uint8_t i = projectSelect - 1;
+      LCD.print("- ");
+      LCD.print(projectName[i]);
     }
 
     // Timer stops with the second press of the SELECT BUTTON.
@@ -272,8 +287,9 @@ void loop() {
       LCD.setCursor(1, 0);
       LCD.print("Timer Stopped!");
       LCD.setCursor(3, 1);
-      LCD.print("Project 0");
-      LCD.print(projectSelect, DEC);
+      uint8_t i = projectSelect - 1;
+      LCD.print("- ");
+      LCD.print(projectName[i]);
     }
     prevState = timerState;
     delay(TIME_OUT);
@@ -282,10 +298,10 @@ void loop() {
   // Show Project Name on LCD when user presses LEFT BUTTON.
   if (buttons & BUTTON_LEFT) {
     LCD.clear();
-    LCD.setCursor(3, 0);
-    LCD.print("Project 0");
-    LCD.print(projectSelect, DEC);
-    LCD.setCursor(4, 1);
+    LCD.setCursor(2, 0);
+    uint8_t i = projectSelect - 1;
+    LCD.print(projectName[i]);
+    LCD.setCursor(6, 1);
     LCD.print("Selected");
     delay(TIME_OUT);
   }
