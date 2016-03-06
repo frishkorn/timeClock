@@ -14,7 +14,7 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
-**February 27th, 2016 - v1.4.0-alpha   -** *Started work on adding Project Name functionality (issue #40).*
+**March 6th, 2016     - v1.4.0-alpha   -** *Added Project Names which are loaded from the SD card (issue #40).*
 
 **February 11th, 2016 - v1.3.1-alpha   -** *Changed time-out constant to use pre-processor #define (issue #60).*
 
@@ -29,17 +29,5 @@ Version Tracking
 **February 7th, 2016  - v1.2.1-alpha   -** *Fixed RTC reset problem with colorSelect and projectSelect (issue #48).*
 
 **February 6th, 2016  - v1.2.0-release -** *Released version 1.2.*
-
-**February 3rd, 2016  - v1.1.4-beta    -** *Added heartbeat to log file. (issue #36 & issue #44)*
-
-**January 23rd, 2016  - v1.1.3-alpha   -** *Project select boundary condition fixed, timers made consistant across code (issue #32).*
-
-**January 22nd, 2016  - v1.1.2-alpha   -** *Fixed timer accuracy, improved log format (issue #38 & issue #39).*
-
-**January 10th, 2016  - v1.1.1-alpha   -** *Improved log format, changed timer to hh:mm:ss format (issue #34 & issue #27).*
-
-**January 10th, 2016  - v1.1.0-alpha   -** *Added project notfication when pressing UP/DOWN buttons (issue #30).*
-
-**January 7th, 2016   - v1.0.0-release -** *Released version 1.0.*
 
 - See GitHub commit history for full version tracking notes.
