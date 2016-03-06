@@ -239,8 +239,8 @@ void loop() {
     }
     logFile.print(now.second(), DEC);
     logFile.print(",");
-    logFile.print("Project ");
-    logFile.println(projectSelect, DEC);
+    uint8_t i = projectSelect - 1;
+    logFile.println(projectName[i]);
     LCD.clear();
     LCD.setCursor(1, 0);
     LCD.print("Data logged to");
@@ -257,8 +257,9 @@ void loop() {
       LCD.setCursor(1, 0);
       LCD.print("Timer Started!");
       LCD.setCursor(3, 1);
-      LCD.print("Project 0");
-      LCD.print(projectSelect, DEC);
+      uint8_t i = projectSelect - 1;
+      LCD.print("- ");
+      LCD.print(projectName[i]);
     }
 
     // Timer stops with the second press of the SELECT BUTTON.
@@ -292,8 +293,9 @@ void loop() {
       LCD.setCursor(1, 0);
       LCD.print("Timer Stopped!");
       LCD.setCursor(3, 1);
-      LCD.print("Project 0");
-      LCD.print(projectSelect, DEC);
+      uint8_t i = projectSelect - 1;
+      LCD.print("- ");
+      LCD.print(projectName[i]);
     }
     prevState = timerState;
     delay(TIME_OUT);
