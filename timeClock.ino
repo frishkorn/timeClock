@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.4.0-alpha by Chris Frishkorn.
+  Current version 1.5.0-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  March 6th, 2016     - v1.5.0-alpha   - Added RIGHT button press show Elapsed Timer (issue #62).
   March 6th, 2016     - v1.4.0-alpha   - Added Project Names which are loaded from the SD card (issue #40).
   February 11th, 2016 - v1.3.1-alpha   - Changed time-out constant to use pre-processor #define (issue #60).
   February 10th, 2016 - v1.3.0-alpha   - Added LEFT button press Project Name notification, updated variables (issue #33).
@@ -24,7 +25,7 @@
 #include "RTClib.h"
 #include <Adafruit_RGBLCDShield.h>
 
-#define SYNC_INTERVAL 10000
+#define SYNC_INTERVAL 5000
 #define TIME_OUT 2000
 
 uint32_t syncTime, timerStart;
@@ -63,7 +64,7 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print("timeClock");
   LCD.setCursor(7, 1);
-  LCD.print("v1.4.0a");
+  LCD.print("v1.5.0a");
   RTC.begin();
   if (!RTC.isrunning()) {
     error("RTC Not Set");
@@ -138,7 +139,7 @@ void setup() {
     logFile.println("None");
   }
   logFile.println("Date,Time,Project");
-  delay(3000);
+  delay(TIME_OUT);
   LCD.clear();
 
   // Read first byte of NV_SRAM set colorSelect and projectSelect.
@@ -306,75 +307,107 @@ void loop() {
     delay(TIME_OUT);
   }
 
-  // Display Date and Time on LCD.
-  DateTime now = RTC.now(); // Get current time and date from RTC.
-  LCD.setCursor(0, 0);
-  LCD.print("Date ");
-  if (now.month() < 10) { // If month is a single digit precede with a zero.
-    LCD.print("0");
+  // Show Elapsed Timer time on LCD when user presses RIGHT BUTTON, only while timer is running.
+  if (timerState == 1) {
+    if (buttons & BUTTON_RIGHT) {
+      DateTime now = RTC.now(); // Get current time and date from RTC.
+      LCD.clear();
+      LCD.setCursor(0, 0);
+      LCD.print("Timer  ");
+      uint32_t timerStop = now.secondstime();
+      uint32_t timerTime = timerStop - timerStart;
+      uint8_t ss = timerTime % 60;
+      uint8_t mm = (timerTime / 60) % 60;
+      uint8_t hh = (timerTime / 3600);
+      if (hh < 10) {
+        LCD.print("0");
+      }
+      LCD.print(hh);
+      LCD.print(":");
+      if (mm < 10) {
+        LCD.print("0");
+      }
+      LCD.print(mm);
+      LCD.print(":");
+      if (ss < 10) {
+        LCD.print("0");
+      }
+      LCD.print(ss);
+      LCD.setCursor(6, 1);
+      LCD.print("(hh:mm:ss)");
+      delay(TIME_OUT);
+    }
   }
-  LCD.print(now.month(), DEC);
-  LCD.print('/');
-  if (now.day() < 10) { // If day is a single digit precede with a zero.
-    LCD.print("0");
-  }
-  LCD.print(now.day(), DEC);
-  LCD.print('/');
-  LCD.print(now.year(), DEC);
-  LCD.setCursor(0, 1);
-  LCD.print("Time ");
-  if (now.hour() > 12) { // RTC is in 24 hour format, subtract 12 for 12 hour time.
-    if (now.hour() < 22) { // Don't precede with a zero for 10:00 & 11:00 PM.
+
+    // Display Date and Time on LCD.
+    DateTime now = RTC.now(); // Get current time and date from RTC.
+    LCD.setCursor(0, 0);
+    LCD.print("Date ");
+    if (now.month() < 10) { // If month is a single digit precede with a zero.
       LCD.print("0");
     }
-    LCD.print(now.hour() - 12, DEC);
-  }
-  else
-  {
-    if (now.hour() == 0) { // Set 00:00 AM to 12:00 AM.
-      LCD.print(now.hour() + 12, DEC);
+    LCD.print(now.month(), DEC);
+    LCD.print('/');
+    if (now.day() < 10) { // If day is a single digit precede with a zero.
+      LCD.print("0");
+    }
+    LCD.print(now.day(), DEC);
+    LCD.print('/');
+    LCD.print(now.year(), DEC);
+    LCD.setCursor(0, 1);
+    LCD.print("Time ");
+    if (now.hour() > 12) { // RTC is in 24 hour format, subtract 12 for 12 hour time.
+      if (now.hour() < 22) { // Don't precede with a zero for 10:00 & 11:00 PM.
+        LCD.print("0");
+      }
+      LCD.print(now.hour() - 12, DEC);
     }
     else
     {
-      if (now.hour() >= 10 && now.hour() <= 12) { // Don't precede with a zero if it's between 10 AM - 12 PM.
-        LCD.print(now.hour(), DEC);
+      if (now.hour() == 0) { // Set 00:00 AM to 12:00 AM.
+        LCD.print(now.hour() + 12, DEC);
       }
-      else {
-        LCD.print("0");
-        LCD.print(now.hour(), DEC);
+      else
+      {
+        if (now.hour() >= 10 && now.hour() <= 12) { // Don't precede with a zero if it's between 10 AM - 12 PM.
+          LCD.print(now.hour(), DEC);
+        }
+        else {
+          LCD.print("0");
+          LCD.print(now.hour(), DEC);
+        }
       }
     }
-  }
-  LCD.print(':');
-  if (now.minute() < 10) { // If minute is a single digit precede with a zero.
-    LCD.print("0");
-  }
-  LCD.print(now.minute(), DEC);
-  LCD.print(':');
-  if (now.second() < 10) { // If second is a single digit precede with a zero.
-    LCD.print("0");
-  }
-  LCD.print(now.second(), DEC);
-  if (now.hour() > 11) {
-    LCD.print(" PM");
-  }
-  else {
-    LCD.print(" AM");
-  }
+    LCD.print(':');
+    if (now.minute() < 10) { // If minute is a single digit precede with a zero.
+      LCD.print("0");
+    }
+    LCD.print(now.minute(), DEC);
+    LCD.print(':');
+    if (now.second() < 10) { // If second is a single digit precede with a zero.
+      LCD.print("0");
+    }
+    LCD.print(now.second(), DEC);
+    if (now.hour() > 11) {
+      LCD.print(" PM");
+    }
+    else {
+      LCD.print(" AM");
+    }
 
-  // Write data to card, only if 10 seconds has elasped since last write.
-  if ((millis() - syncTime) < SYNC_INTERVAL) return;
-  syncTime = millis();
-  logFile.flush();
+    // Write data to card, only if 10 seconds has elasped since last write.
+    if ((millis() - syncTime) < SYNC_INTERVAL) return;
+    syncTime = millis();
+    logFile.flush();
 
-  // Write heartbeat to NV_SRAM.
-  RTC.writenvram(2, now.month());
-  RTC.writenvram(3, now.day());
-  uint16_t fyear = now.year();
-  uint8_t hiyear = fyear / 100;
-  uint8_t loyear = fyear - 2000;
-  RTC.writenvram(4, hiyear);
-  RTC.writenvram(5, loyear);
-  RTC.writenvram(6, now.hour());
-  RTC.writenvram(7, now.minute());
-}
+    // Write heartbeat to NV_SRAM.
+    RTC.writenvram(2, now.month());
+    RTC.writenvram(3, now.day());
+    uint16_t fyear = now.year();
+    uint8_t hiyear = fyear / 100;
+    uint8_t loyear = fyear - 2000;
+    RTC.writenvram(4, hiyear);
+    RTC.writenvram(5, loyear);
+    RTC.writenvram(6, now.hour());
+    RTC.writenvram(7, now.minute());
+  }
