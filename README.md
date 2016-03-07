@@ -8,13 +8,13 @@ timeClock has 6 projects that can be selected using the UP / DOWN buttons. Back-
 
 To start a timer press SELECT, the back-light will change red notifying you the timer is running. The project title, start time, and date will be logged to the SD card using a CSV file. Pressing SELECT again will stop the timer, the project title and stop time will be logged to the SD card in addition to the elapsed timer. Time in log file is in 24-hour format.
 
-Device records a heartbeat every 10 seconds in case of loss of power. When a new log file is created, the heartbeat will be time-stamped at the top of the log file.
+Device records a heartbeat every 5 seconds in case of loss of power. When a new log file is created, the heartbeat will be time-stamped at the top of the log file.
 
 Author: Chris Frishkorn
 
 Version Tracking
 ---
-**March 6th, 2016     - v1.5.0-alpha   -** *Started work on show elasped timer (issue #62).*
+**March 6th, 2016     - v1.5.0-alpha   -** *Added RIGHT button press show Elapsed Timer (issue #62).*
 
 **March 6th, 2016     - v1.4.0-alpha   -** *Added Project Names which are loaded from the SD card (issue #40).*
 
