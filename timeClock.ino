@@ -375,10 +375,11 @@ void loop() {
   // Show Elapsed Timer time on LCD when user presses RIGHT BUTTON, only while timer is running.
   if (timerState == 1) {
     if (buttons & BUTTON_RIGHT) {
+      LCD.clear();
       for (uint8_t i = 1; i < 25; i++) { // Refresh display fast enough to show counting seconds for 5 seconds.
         DateTime now = RTC.now(); // Get current time and date from RTC.
         LCD.setCursor(0, 0);
-        LCD.print("Elapsd ");
+        LCD.print("Elapsed ");
         uint32_t timerStop = now.secondstime();
         uint32_t timerTime = timerStop - timerStart;
         uint8_t ss = timerTime % 60;
@@ -398,10 +399,11 @@ void loop() {
           LCD.print("0");
         }
         LCD.print(ss);
-        LCD.setCursor(0, 1);
-        LCD.print("Timer (hh:mm:ss)");
+        LCD.setCursor(1, 1);
+        LCD.print("Timer  hh:mm:ss");
         delay(5);
       }
+      LCD.clear();
     }
   }
 
