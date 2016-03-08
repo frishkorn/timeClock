@@ -14,7 +14,7 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
-**March 7th, 2016     - v1.5.1-alpha   -** *Started work on improving serial output (issue #63).*
+**March 7th, 2016     - v1.5.1-alpha   -** *Minor UI adjustments, updated Serial output (issue #63).*
 
 **March 6th, 2016     - v1.5.0-alpha   -** *Added RIGHT button press show Elapsed Timer (issue #62).*
 
