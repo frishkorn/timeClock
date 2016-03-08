@@ -7,7 +7,7 @@
 
   Version Tracking
   -----------------------
-  March 7th, 2016     - v1.5.2-alpha   - Started work on heartbeat Serial output (issue #70).
+  March 7th, 2016     - v1.5.2-alpha   - Last heartbeat added to Serial output (issue #70).
   March 7th, 2016     - v1.5.1-alpha   - Minor UI adjustments, updated Serial output (issue #63).
   March 6th, 2016     - v1.5.0-alpha   - Added RIGHT button press show Elapsed Timer (issue #62).
   March 6th, 2016     - v1.4.0-alpha   - Added Project Names which are loaded from the SD card (issue #40).
@@ -66,8 +66,8 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print("timeClock"); // Version splash screen.
   LCD.setCursor(7, 1);
-  LCD.print("v1.5.1a");
-  Serial.println("timeClock v1.5.1a");
+  LCD.print("v1.5.2a");
+  Serial.println("timeClock v1.5.2a");
   RTC.begin();
   if (!RTC.isrunning()) {
     error("RTC Not Set");
@@ -111,7 +111,6 @@ void setup() {
     if (!SD.exists(filename)) {
       Serial.print("Creating file ");
       Serial.println(filename);
-      Serial.println("---");
       logFile = SD.open(filename, FILE_WRITE);
       break;
     }
@@ -119,6 +118,36 @@ void setup() {
   if (!logFile) {
     error("File Write Error");
   }
+  
+  // Print last heartbeat over Serial Interface
+  Serial.print("Last heartbeat... ");
+  if (RTC.readnvram(2) != 255 && RTC.readnvram(7) != 255) {
+    if (RTC.readnvram(2) < 10) {
+      Serial.print("0");
+    }
+    Serial.print(RTC.readnvram(2), DEC); // Print Month to log-file.
+    Serial.print("/");
+    if (RTC.readnvram(3) < 10) {
+      Serial.print("0");
+    }
+    Serial.print(RTC.readnvram(3), DEC); // Print Day to log-file.
+    Serial.print("/");
+    Serial.print(RTC.readnvram(4), DEC); // Print Year to log-file.
+    Serial.print(RTC.readnvram(5), DEC);
+    Serial.print(" @ ");
+    if (RTC.readnvram(6) < 10) {
+      Serial.print("0");
+    }
+    Serial.print(RTC.readnvram(6), DEC); // Print Hour to log-file.
+    Serial.print(":");
+    if (RTC.readnvram(7) < 10) {
+      Serial.print("0");
+    }
+    Serial.println(RTC.readnvram(7), DEC); // Print Minute to log-file.
+  } else {
+    Serial.println("None");
+  }
+  Serial.println("---");
 
   // Print Date over Serial Interface
   DateTime now = RTC.now(); // Get current time and date from RTC.

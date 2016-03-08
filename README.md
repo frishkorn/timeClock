@@ -14,7 +14,7 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
-**March 7th, 2016     - v1.5.2-alpha   -** *Started work on heartbeat Serial output (issue #70).*
+**March 7th, 2016     - v1.5.2-alpha   -** *Last heartbeat added to Serial output (issue #70).*
 
 **March 7th, 2016     - v1.5.1-alpha   -** *Minor UI adjustments, updated Serial output (issue #63).*
 
