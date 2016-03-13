@@ -8,6 +8,7 @@ timeClock has 6 projects that can be selected using the UP / DOWN buttons. Back-
 Project names can be written to the SD card in the projects.txt file. Currently they are limited to 8 characters, and must be contiguous. See example file in utility folder. 
 
 To start a timer press SELECT, the back-light will change red notifying you the timer is running. The project title, start time, and date will be logged to the SD card using a CSV file. Pressing SELECT again will stop the timer, the project title and stop time will be logged to the SD card in addition to the elapsed timer. Time in log file is in 24-hour format.
+To view the Elapsed Timer while timer is running, press the RIGHT button at any time.
 
 Device records a heartbeat every 5 seconds in case of loss of power. When a new log file is created, the heartbeat will be time-stamped at the top of the log file.
 
