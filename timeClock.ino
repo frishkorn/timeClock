@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.5.2-alpha by Chris Frishkorn.
+  Current version 1.5.3-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  March 12th, 2016    - v1.5.3-alpha   - Removed heartbeat from Serial output, moved serial output after LCD output (issue #72).
   March 7th, 2016     - v1.5.2-alpha   - Last heartbeat added to Serial output (issue #70).
   March 7th, 2016     - v1.5.1-alpha   - Minor UI adjustments, updated Serial output (issue #63).
   March 6th, 2016     - v1.5.0-alpha   - Added RIGHT button press show Elapsed Timer (issue #62).
@@ -40,7 +41,7 @@ File logFile;
 Adafruit_RGBLCDShield LCD = Adafruit_RGBLCDShield();
 
 void dateTime(uint16_t *date, uint16_t *time) {
-  // Set file date / time from RTC for SD card.
+  // Set file date / time from RTC for SD card FAT time.
   DateTime now = RTC.now();
   *date = FAT_DATE(now.year(), now.month(), now.day());
   *time = FAT_TIME(now.hour(), now.minute(), now.second());
@@ -58,17 +59,18 @@ void error(char *str) {
 }
 
 void setup() {
-  // Intialize serial, I2C, LCD communication.
+  // Intialize Serial, I2C, LCD communications.
   Serial.begin(9600);
   Wire.begin();
+  RTC.begin();
   LCD.begin(16, 2);
+  LCD.clear();
   LCD.setBacklight(colorSelect);
   LCD.setCursor(2, 0);
   LCD.print("timeClock"); // Version splash screen.
   LCD.setCursor(7, 1);
-  LCD.print("v1.5.2a");
-  Serial.println("timeClock v1.5.2a");
-  RTC.begin();
+  LCD.print("v1.5.3a");
+  Serial.println("timeClock v1.5.3a");
   if (!RTC.isrunning()) {
     error("RTC Not Set");
     Serial.println("RTC is NOT running!");
@@ -118,36 +120,6 @@ void setup() {
   if (!logFile) {
     error("File Write Error");
   }
-  
-  // Print last heartbeat over Serial Interface
-  Serial.print("Last heartbeat... ");
-  if (RTC.readnvram(2) != 255 && RTC.readnvram(7) != 255) {
-    if (RTC.readnvram(2) < 10) {
-      Serial.print("0");
-    }
-    Serial.print(RTC.readnvram(2), DEC); // Print Month to log-file.
-    Serial.print("/");
-    if (RTC.readnvram(3) < 10) {
-      Serial.print("0");
-    }
-    Serial.print(RTC.readnvram(3), DEC); // Print Day to log-file.
-    Serial.print("/");
-    Serial.print(RTC.readnvram(4), DEC); // Print Year to log-file.
-    Serial.print(RTC.readnvram(5), DEC);
-    Serial.print(" @ ");
-    if (RTC.readnvram(6) < 10) {
-      Serial.print("0");
-    }
-    Serial.print(RTC.readnvram(6), DEC); // Print Hour to log-file.
-    Serial.print(":");
-    if (RTC.readnvram(7) < 10) {
-      Serial.print("0");
-    }
-    Serial.println(RTC.readnvram(7), DEC); // Print Minute to log-file.
-  } else {
-    Serial.println("None");
-  }
-  Serial.println("---");
 
   // Print Date over Serial Interface
   DateTime now = RTC.now(); // Get current time and date from RTC.
@@ -304,6 +276,21 @@ void loop() {
       uint8_t i = projectSelect - 1;
       LCD.print("- ");
       LCD.print(projectName[i]);
+      Serial.print("Timer Started: ");
+      if (now.hour() < 10) {
+        Serial.print("0");
+      }
+      Serial.print(now.hour(), DEC);
+      Serial.print(":");
+      if (now.minute() < 10) {
+        Serial.print("0");
+      }
+      Serial.print(now.minute(), DEC);
+      Serial.print(":");
+      if (now.second() < 10) {
+        Serial.print("0");
+      }
+      Serial.println(now.second(), DEC);
     }
 
     // Timer stops with the second press of the SELECT BUTTON.
@@ -376,7 +363,7 @@ void loop() {
   if (timerState == 1) {
     if (buttons & BUTTON_RIGHT) {
       LCD.clear();
-      for (uint8_t i = 1; i < 25; i++) { // Refresh display fast enough to show counting seconds for 5 seconds.
+      for (uint8_t i = 0; i < 25; i++) { // Refresh display fast enough to show counting seconds for ~5 seconds.
         DateTime now = RTC.now(); // Get current time and date from RTC.
         LCD.setCursor(0, 0);
         LCD.print("Elapsed ");
