@@ -14,7 +14,7 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
-**March 12th, 2016    - v1.5.3-alpha   -** *Started work on issue #72.*
+**March 12th, 2016    - v1.5.3-alpha   -** *Removed heartbeat from Serial output, moved serial output after LCD output (issue #72).*
 
 **March 7th, 2016     - v1.5.2-alpha   -** *Last heartbeat added to Serial output (issue #70).*
 
