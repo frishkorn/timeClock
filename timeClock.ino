@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.5.3-alpha by Chris Frishkorn.
+  Current version 1.5.4-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  March 24th, 2016    - v1.5.4-alpha   - Minor UI update.
   March 12th, 2016    - v1.5.3-alpha   - Removed heartbeat from Serial output, moved serial output after LCD output (issue #72).
   March 7th, 2016     - v1.5.2-alpha   - Last heartbeat added to Serial output (issue #70).
   March 7th, 2016     - v1.5.1-alpha   - Minor UI adjustments, updated Serial output (issue #63).
@@ -69,8 +70,8 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print("timeClock"); // Version splash screen.
   LCD.setCursor(7, 1);
-  LCD.print("v1.5.3a");
-  Serial.println("timeClock v1.5.3a");
+  LCD.print("v1.5.4a");
+  Serial.println("timeClock v1.5.4a");
   if (!RTC.isrunning()) {
     error("RTC Not Set");
     Serial.println("RTC is NOT running!");
@@ -272,9 +273,8 @@ void loop() {
       LCD.clear();
       LCD.setCursor(1, 0);
       LCD.print("Timer Started!");
-      LCD.setCursor(3, 1);
+      LCD.setCursor(4, 1);
       uint8_t i = projectSelect - 1;
-      LCD.print("- ");
       LCD.print(projectName[i]);
       Serial.print("Timer Started: ");
       if (now.hour() < 10) {
@@ -323,9 +323,8 @@ void loop() {
       LCD.clear();
       LCD.setCursor(1, 0);
       LCD.print("Timer Stopped!");
-      LCD.setCursor(3, 1);
+      LCD.setCursor(4, 1);
       uint8_t i = projectSelect - 1;
-      LCD.print("- ");
       LCD.print(projectName[i]);
       if (hh < 10) {
         Serial.print("0");
