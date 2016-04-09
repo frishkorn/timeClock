@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.5.5-alpha by Chris Frishkorn.
+  Current version 1.5.6-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  April 8th, 2016     - v1.5.6-alpha   - Started work on issue #78.
   March 24th, 2016    - v1.5.5-alpha   - Strings moved to PROGMEM, SRAM memory savings. 78% to 61% SRAM (issue #76).
   March 24th, 2016    - v1.5.4-alpha   - Minor UI update.
   March 12th, 2016    - v1.5.3-alpha   - Removed heartbeat from Serial output, moved serial output after LCD output (issue #72).
@@ -30,6 +31,7 @@
 #include "RTClib.h"
 #include <Adafruit_RGBLCDShield.h>
 
+#define MAX_INTERVAL 360000
 #define SYNC_INTERVAL 5000
 #define TIME_OUT 2000
 
@@ -71,8 +73,8 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock")); // Version splash screen.
   LCD.setCursor(7, 1);
-  LCD.print(F("v1.5.5a"));
-  Serial.println(F("timeClock v1.5.5a"));
+  LCD.print(F("v1.5.6a"));
+  Serial.println(F("timeClock v1.5.6a"));
   if (!RTC.isrunning()) {
     error("RTC Not Set");
     Serial.println(F("RTC is NOT running!"));
@@ -368,6 +370,9 @@ void loop() {
         LCD.setCursor(0, 0);
         LCD.print(F("Elapsed "));
         uint32_t timerStop = now.secondstime();
+        // DEBUG
+        timerStop = timerStop + 359939;
+        // DEBUG
         uint32_t timerTime = timerStop - timerStart;
         uint8_t ss = timerTime % 60;
         uint8_t mm = (timerTime / 60) % 60;
@@ -394,8 +399,20 @@ void loop() {
     }
   }
 
-  // Display Date and Time on LCD.
+  // When Elapsed Timer reaches 99:59:59 stop timer.
   DateTime now = RTC.now(); // Get current time and date from RTC.
+  uint32_t maxTimer = now.secondstime();
+  // DEBUG
+  maxTimer = maxTimer + 359800;
+  Serial.println(maxTimer - timerStart);
+  delay(500);
+  // DEBUG
+  if ((maxTimer - timerStart) >= MAX_INTERVAL) {
+    Serial.print("DEBUG");
+  }
+
+  // Display Date and Time on LCD.
+  //DateTime now = RTC.now(); // Get current time and date from RTC.
   LCD.setCursor(0, 0);
   LCD.print(F("Date "));
   if (now.month() < 10) { // If month is a single digit precede with a zero.
