@@ -7,7 +7,7 @@
 
   Version Tracking
   -----------------------
-  April 8th, 2016     - v1.5.6-alpha   - Started work on issue #78.
+  April 8th, 2016     - v1.5.6-alpha   - Fixed Elapsed Timer roll-over problem (issue #78).
   March 24th, 2016    - v1.5.5-alpha   - Strings moved to PROGMEM, SRAM memory savings. 78% to 61% SRAM (issue #76).
   March 24th, 2016    - v1.5.4-alpha   - Minor UI update.
   March 12th, 2016    - v1.5.3-alpha   - Removed heartbeat from Serial output, moved serial output after LCD output (issue #72).
@@ -370,9 +370,6 @@ void loop() {
         LCD.setCursor(0, 0);
         LCD.print(F("Elapsed "));
         uint32_t timerStop = now.secondstime();
-        // DEBUG
-        timerStop = timerStop + 359939;
-        // DEBUG
         uint32_t timerTime = timerStop - timerStart;
         uint8_t ss = timerTime % 60;
         uint8_t mm = (timerTime / 60) % 60;
@@ -399,20 +396,77 @@ void loop() {
     }
   }
 
-  // When Elapsed Timer reaches 99:59:59 stop timer.
-  DateTime now = RTC.now(); // Get current time and date from RTC.
-  uint32_t maxTimer = now.secondstime();
-  // DEBUG
-  maxTimer = maxTimer + 359800;
-  Serial.println(maxTimer - timerStart);
-  delay(500);
-  // DEBUG
-  if ((maxTimer - timerStart) >= MAX_INTERVAL) {
-    Serial.print("DEBUG");
+  // If Elapsed Timer reaches 99:59:59 stop timer.
+  if (timerState == 1) {
+    DateTime now = RTC.now();
+    uint32_t maxTimer = now.secondstime();
+    if ((maxTimer - timerStart) >= MAX_INTERVAL) {
+      uint32_t timerStop = now.secondstime();
+      uint32_t timerTime = timerStop - timerStart;
+      uint8_t ss = timerTime % 60;
+      uint8_t mm = (timerTime / 60) % 60;
+      uint8_t hh = (timerTime / 3600);
+      if (now.month() < 10) {
+        logFile.print("0");
+      }
+      logFile.print(now.month(), DEC);
+      logFile.print('/');
+      if (now.day() < 10) {
+        logFile.print("0");
+      }
+      logFile.print(now.day(), DEC);
+      logFile.print('/');
+      logFile.print(now.year(), DEC);
+      logFile.print(",");
+      if (now.hour() < 10) {
+        logFile.print("0");
+      }
+      logFile.print(now.hour(), DEC);
+      logFile.print(':');
+      if (now.minute() < 10) {
+        logFile.print("0");
+      }
+      logFile.print(now.minute(), DEC);
+      logFile.print(':');
+      if (now.second() < 10) {
+        logFile.print("0");
+      }
+      logFile.print(now.second(), DEC);
+      logFile.print(",");
+      uint8_t i = projectSelect - 1;
+      logFile.println(projectName[i]);
+      logFile.print(F("Timer"));
+      logFile.print(",");
+      logFile.print(F("hh:mm:ss"));
+      logFile.print(",");
+      if (hh < 10) {
+        logFile.print("0");
+      }
+      logFile.print(hh, DEC);
+      logFile.print(":");
+      if (mm < 10) {
+        logFile.print("0");
+      }
+      logFile.print(mm, DEC);
+      logFile.print(":");
+      if (ss < 10) {
+        logFile.print("0");
+      }
+      logFile.println(ss, DEC);
+      LCD.setBacklight(colorSelect);
+      LCD.clear();
+      LCD.setCursor(2, 0);
+      LCD.print(F("Timer Maxed!"));
+      LCD.setCursor(4, 1);
+      LCD.print(projectName[i]);
+      delay(TIME_OUT);
+      timerState = 0;
+      prevState = 0;
+    }
   }
 
   // Display Date and Time on LCD.
-  //DateTime now = RTC.now(); // Get current time and date from RTC.
+  DateTime now = RTC.now(); // Get current time and date from RTC.
   LCD.setCursor(0, 0);
   LCD.print(F("Date "));
   if (now.month() < 10) { // If month is a single digit precede with a zero.
