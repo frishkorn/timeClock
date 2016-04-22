@@ -7,7 +7,7 @@
 
   Version Tracking
   -----------------------
-  April 8th, 2016     - v1.5.6-alpha   - Fixed Elapsed Timer roll-over problem (issue #78).
+  April 21st, 2016    - v1.5.6-alpha   - Fixed Elapsed Timer roll-over problem, minor UI update (issue #78).
   March 24th, 2016    - v1.5.5-alpha   - Strings moved to PROGMEM, SRAM memory savings. 78% to 61% SRAM (issue #76).
   March 24th, 2016    - v1.5.4-alpha   - Minor UI update.
   March 12th, 2016    - v1.5.3-alpha   - Removed heartbeat from Serial output, moved serial output after LCD output (issue #72).
@@ -274,11 +274,10 @@ void loop() {
       delay(TIME_OUT);
       LCD.setBacklight(1);
       LCD.clear();
-      LCD.setCursor(1, 0);
-      LCD.print(F("Timer Started!"));
-      LCD.setCursor(4, 1);
-      uint8_t i = projectSelect - 1;
-      LCD.print(projectName[i]);
+      LCD.setCursor(3, 0);
+      LCD.print(F("Timer"));
+      LCD.setCursor(5, 1);
+      LCD.print(F("Started!"));
       Serial.print(F("Timer Started: "));
       if (now.hour() < 10) {
         Serial.print("0");
@@ -324,11 +323,10 @@ void loop() {
       delay(TIME_OUT);
       LCD.setBacklight(colorSelect);
       LCD.clear();
-      LCD.setCursor(1, 0);
-      LCD.print(F("Timer Stopped!"));
-      LCD.setCursor(4, 1);
-      uint8_t i = projectSelect - 1;
-      LCD.print(projectName[i]);
+      LCD.setCursor(3, 0);
+      LCD.print(F("Timer"));
+      LCD.setCursor(5, 1);
+      LCD.print(F("Stopped!"));
       if (hh < 10) {
         Serial.print("0");
       }

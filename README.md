@@ -16,7 +16,7 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
-**April 8th, 2016     - v1.5.6-alpha   -** *Fixed Elapsed Timer roll-over problem (issue #78).*
+**April 21st, 2016    - v1.5.6-alpha   -** *Fixed Elapsed Timer roll-over problem, minor UI update (issue #78).*
 
 **March 24th, 2016    - v1.5.5-alpha   -** *Strings moved to PROGMEM, SRAM memory savings. 78% to 61% SRAM (issue #76).*
 
