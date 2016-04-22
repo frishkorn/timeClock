@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.5.5-alpha by Chris Frishkorn.
+  Current version 1.5.6-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  April 21st, 2016    - v1.5.6-alpha   - Fixed Elapsed Timer roll-over problem, minor UI update (issue #78).
   March 24th, 2016    - v1.5.5-alpha   - Strings moved to PROGMEM, SRAM memory savings. 78% to 61% SRAM (issue #76).
   March 24th, 2016    - v1.5.4-alpha   - Minor UI update.
   March 12th, 2016    - v1.5.3-alpha   - Removed heartbeat from Serial output, moved serial output after LCD output (issue #72).
@@ -30,6 +31,7 @@
 #include "RTClib.h"
 #include <Adafruit_RGBLCDShield.h>
 
+#define MAX_INTERVAL 360000
 #define SYNC_INTERVAL 5000
 #define TIME_OUT 2000
 
@@ -71,8 +73,8 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock")); // Version splash screen.
   LCD.setCursor(7, 1);
-  LCD.print(F("v1.5.5a"));
-  Serial.println(F("timeClock v1.5.5a"));
+  LCD.print(F("v1.5.6a"));
+  Serial.println(F("timeClock v1.5.6a"));
   if (!RTC.isrunning()) {
     error("RTC Not Set");
     Serial.println(F("RTC is NOT running!"));
@@ -272,11 +274,10 @@ void loop() {
       delay(TIME_OUT);
       LCD.setBacklight(1);
       LCD.clear();
-      LCD.setCursor(1, 0);
-      LCD.print(F("Timer Started!"));
-      LCD.setCursor(4, 1);
-      uint8_t i = projectSelect - 1;
-      LCD.print(projectName[i]);
+      LCD.setCursor(3, 0);
+      LCD.print(F("Timer"));
+      LCD.setCursor(5, 1);
+      LCD.print(F("Started!"));
       Serial.print(F("Timer Started: "));
       if (now.hour() < 10) {
         Serial.print("0");
@@ -322,11 +323,10 @@ void loop() {
       delay(TIME_OUT);
       LCD.setBacklight(colorSelect);
       LCD.clear();
-      LCD.setCursor(1, 0);
-      LCD.print(F("Timer Stopped!"));
-      LCD.setCursor(4, 1);
-      uint8_t i = projectSelect - 1;
-      LCD.print(projectName[i]);
+      LCD.setCursor(3, 0);
+      LCD.print(F("Timer"));
+      LCD.setCursor(5, 1);
+      LCD.print(F("Stopped!"));
       if (hh < 10) {
         Serial.print("0");
       }
@@ -391,6 +391,75 @@ void loop() {
         delay(5);
       }
       LCD.clear();
+    }
+  }
+
+  // If Elapsed Timer reaches 99:59:59 stop timer.
+  if (timerState == 1) {
+    DateTime now = RTC.now();
+    uint32_t maxTimer = now.secondstime();
+    if ((maxTimer - timerStart) >= MAX_INTERVAL) {
+      uint32_t timerStop = now.secondstime();
+      uint32_t timerTime = timerStop - timerStart;
+      uint8_t ss = timerTime % 60;
+      uint8_t mm = (timerTime / 60) % 60;
+      uint8_t hh = (timerTime / 3600);
+      if (now.month() < 10) {
+        logFile.print("0");
+      }
+      logFile.print(now.month(), DEC);
+      logFile.print('/');
+      if (now.day() < 10) {
+        logFile.print("0");
+      }
+      logFile.print(now.day(), DEC);
+      logFile.print('/');
+      logFile.print(now.year(), DEC);
+      logFile.print(",");
+      if (now.hour() < 10) {
+        logFile.print("0");
+      }
+      logFile.print(now.hour(), DEC);
+      logFile.print(':');
+      if (now.minute() < 10) {
+        logFile.print("0");
+      }
+      logFile.print(now.minute(), DEC);
+      logFile.print(':');
+      if (now.second() < 10) {
+        logFile.print("0");
+      }
+      logFile.print(now.second(), DEC);
+      logFile.print(",");
+      uint8_t i = projectSelect - 1;
+      logFile.println(projectName[i]);
+      logFile.print(F("Timer"));
+      logFile.print(",");
+      logFile.print(F("hh:mm:ss"));
+      logFile.print(",");
+      if (hh < 10) {
+        logFile.print("0");
+      }
+      logFile.print(hh, DEC);
+      logFile.print(":");
+      if (mm < 10) {
+        logFile.print("0");
+      }
+      logFile.print(mm, DEC);
+      logFile.print(":");
+      if (ss < 10) {
+        logFile.print("0");
+      }
+      logFile.println(ss, DEC);
+      LCD.setBacklight(colorSelect);
+      LCD.clear();
+      LCD.setCursor(2, 0);
+      LCD.print(F("Timer Maxed!"));
+      LCD.setCursor(4, 1);
+      LCD.print(projectName[i]);
+      delay(TIME_OUT);
+      timerState = 0;
+      prevState = 0;
     }
   }
 
