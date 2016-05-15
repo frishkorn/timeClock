@@ -18,6 +18,8 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
+**May 15th, 2016      - v1.6.2-alpha   -** *Started work on issue #83.*
+
 **May 14th, 2016      - v1.6.1-alpha   -** *Fixed timeFormat initialation issue with RTC reset (issue #81).*
 
 **May 14th, 2016      - v1.6.0-alpha   -** *Added select 12/24 time format option (issue #7) and reduced TIME_OUT.*
