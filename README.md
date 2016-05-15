@@ -1,4 +1,4 @@
-##timeClock - v1.6.1-alpha
+##timeClock - v1.6.2-alpha
 ---
 ###An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
 
@@ -18,6 +18,8 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
+**May 15th, 2016      - v1.6.2-alpha   -** *Fixed missing zero from 24 hour time (issue #83).*
+
 **May 14th, 2016      - v1.6.1-alpha   -** *Fixed timeFormat initialation issue with RTC reset (issue #81).*
 
 **May 14th, 2016      - v1.6.0-alpha   -** *Added select 12/24 time format option (issue #7) and reduced TIME_OUT.*

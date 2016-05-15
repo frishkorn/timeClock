@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.6.1-alpha by Chris Frishkorn.
+  Current version 1.6.2-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  May 15th, 2016      - v1.6.2-alpha   - Fixed missing zero from 24 hour time (issue #83).
   May 14th, 2016      - v1.6.1-alpha   - Fixed timeFormat initialation issue with RTC reset (issue #81).
   May 14th, 2016      - v1.6.0-alpha   - Added select 12/24 time format option (issue #7) and reduced TIME_OUT.
   April 21st, 2016    - v1.5.6-alpha   - Fixed Elapsed Timer roll-over problem, minor UI update (issue #78).
@@ -76,8 +77,8 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock")); // Version splash screen.
   LCD.setCursor(7, 1);
-  LCD.print(F("v1.6.1a"));
-  Serial.println(F("timeClock v1.6.1a"));
+  LCD.print(F("v1.6.2a"));
+  Serial.println(F("timeClock v1.6.2a"));
   if (!RTC.isrunning()) {
     error("RTC Not Set");
     Serial.println(F("RTC is NOT running!"));
@@ -496,6 +497,9 @@ void loop() {
     LCD.print(now.year(), DEC);
     LCD.setCursor(0, 1);
     LCD.print(F("Time "));
+    if (now.hour() < 10) {
+      LCD.print("0");
+    }
     LCD.print(now.hour(), DEC);
     LCD.print(":");
     if (now.minute() < 10) {
