@@ -7,7 +7,7 @@
 
   Version Tracking
   -----------------------
-  May 15th, 2016      - v1.6.2-alpha   - Started work on issue #83.
+  May 15th, 2016      - v1.6.2-alpha   - Fixed missing zero from 24 hour time (issue #83).
   May 14th, 2016      - v1.6.1-alpha   - Fixed timeFormat initialation issue with RTC reset (issue #81).
   May 14th, 2016      - v1.6.0-alpha   - Added select 12/24 time format option (issue #7) and reduced TIME_OUT.
   April 21st, 2016    - v1.5.6-alpha   - Fixed Elapsed Timer roll-over problem, minor UI update (issue #78).
@@ -497,6 +497,9 @@ void loop() {
     LCD.print(now.year(), DEC);
     LCD.setCursor(0, 1);
     LCD.print(F("Time "));
+    if (now.hour() < 10) {
+      LCD.print("0");
+    }
     LCD.print(now.hour(), DEC);
     LCD.print(":");
     if (now.minute() < 10) {
