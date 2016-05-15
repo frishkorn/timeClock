@@ -1,4 +1,4 @@
-##timeClock - v1.5.6-alpha
+##timeClock - v1.6.0-alpha
 ---
 ###An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
 
@@ -10,12 +10,16 @@ Project names can be written to the SD card in the projects.txt file. Currently 
 To start a timer press SELECT, the back-light will change red notifying you the timer is running. The project title, start time, and date will be logged to the SD card using a CSV file. Pressing SELECT again will stop the timer, the project title and stop time will be logged to the SD card in addition to the elapsed timer. Time in log file is in 24-hour format.
 To view the Elapsed Timer while timer is running, press the RIGHT button at any time. Elapsed timer can run a maximum of 99 hours, 59 minutes, and 59 seconds.
 
+To select between 12/24 time formats, while timer is not running press RIGHT button.
+
 Device records a heartbeat every 5 seconds in case of loss of power. When a new log file is created, the heartbeat will be time-stamped at the top of the log file.
 
 Author: Chris Frishkorn
 
 Version Tracking
 ---
+**May 14th, 2016      - v1.6.0-alpha   -** *Added select 12/24 time format option (issue #7) and reduced TIME_OUT.*
+
 **April 21st, 2016    - v1.5.6-alpha   -** *Fixed Elapsed Timer roll-over problem, minor UI update (issue #78).*
 
 **March 24th, 2016    - v1.5.5-alpha   -** *Strings moved to PROGMEM, SRAM memory savings. 78% to 61% SRAM (issue #76).*
