@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.5.6-alpha by Chris Frishkorn.
+  Current version 1.6.0-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  May 14th, 2016      - v1.6.0-alpha   - Added select 12/24 time format option (issue #7) and reduced TIME_OUT. 
   April 21st, 2016    - v1.5.6-alpha   - Fixed Elapsed Timer roll-over problem, minor UI update (issue #78).
   March 24th, 2016    - v1.5.5-alpha   - Strings moved to PROGMEM, SRAM memory savings. 78% to 61% SRAM (issue #76).
   March 24th, 2016    - v1.5.4-alpha   - Minor UI update.
@@ -33,10 +34,11 @@
 
 #define MAX_INTERVAL 360000
 #define SYNC_INTERVAL 5000
-#define TIME_OUT 2000
+#define TIME_OUT 1500
+#define PAUSE 100
 
 uint32_t syncTime, timerStart;
-uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState;
+uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState, timeFormat;
 const uint8_t chipSelect = 10;
 char projectName[7][9];
 
@@ -73,8 +75,8 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock")); // Version splash screen.
   LCD.setCursor(7, 1);
-  LCD.print(F("v1.5.6a"));
-  Serial.println(F("timeClock v1.5.6a"));
+  LCD.print(F("v1.6.0a"));
+  Serial.println(F("timeClock v1.6.0a"));
   if (!RTC.isrunning()) {
     error("RTC Not Set");
     Serial.println(F("RTC is NOT running!"));
@@ -175,56 +177,57 @@ void setup() {
     projectSelect = 1;
   }
   LCD.setBacklight(colorSelect);
+
+  // Read previously set timeFormat.
+  timeFormat = RTC.readnvram(8);
 }
 
 void loop() {
   // Use UP/DOWN buttons to change RGB backlight color and select project.
   uint8_t buttons = LCD.readButtons();
   if (timerState == 0) { // Prevent user from changing project while timer is active.
-    if (buttons) {
-      if (buttons & BUTTON_UP) {
-        if (colorSelect >= 7) {
-          colorSelect = 7;
-          projectSelect = 1;
-          RTC.writenvram(0, colorSelect);
-          RTC.writenvram(1, projectSelect);
-        }
-        else {
-          colorSelect++;
-          projectSelect--;
-          RTC.writenvram(0, colorSelect);
-          RTC.writenvram(1, projectSelect);
-          LCD.setBacklight(colorSelect);
-          LCD.clear();
-          LCD.setCursor(2, 0);
-          uint8_t i = projectSelect - 1;
-          LCD.print(projectName[i]);
-          LCD.setCursor(6, 1);
-          LCD.print(F("Selected"));
-          delay(TIME_OUT);
-        }
+    if (buttons & BUTTON_UP) {
+      if (colorSelect >= 7) {
+        colorSelect = 7;
+        projectSelect = 1;
+        RTC.writenvram(0, colorSelect);
+        RTC.writenvram(1, projectSelect);
       }
-      if (buttons & BUTTON_DOWN) {
-        if (colorSelect <= 2) {
-          colorSelect = 2;
-          projectSelect = 6;
-          RTC.writenvram(0, colorSelect);
-          RTC.writenvram(1, projectSelect);
-        }
-        else {
-          colorSelect--;
-          projectSelect++;
-          RTC.writenvram(0, colorSelect);
-          RTC.writenvram(1, projectSelect);
-          LCD.setBacklight(colorSelect);
-          LCD.clear();
-          LCD.setCursor(2, 0);
-          uint8_t i = projectSelect - 1;
-          LCD.print(projectName[i]);
-          LCD.setCursor(6, 1);
-          LCD.print(F("Selected"));
-          delay(TIME_OUT);
-        }
+      else {
+        colorSelect++;
+        projectSelect--;
+        RTC.writenvram(0, colorSelect);
+        RTC.writenvram(1, projectSelect);
+        LCD.setBacklight(colorSelect);
+        LCD.clear();
+        LCD.setCursor(2, 0);
+        uint8_t i = projectSelect - 1;
+        LCD.print(projectName[i]);
+        LCD.setCursor(6, 1);
+        LCD.print(F("Selected"));
+        delay(TIME_OUT);
+      }
+    }
+    if (buttons & BUTTON_DOWN) {
+      if (colorSelect <= 2) {
+        colorSelect = 2;
+        projectSelect = 6;
+        RTC.writenvram(0, colorSelect);
+        RTC.writenvram(1, projectSelect);
+      }
+      else {
+        colorSelect--;
+        projectSelect++;
+        RTC.writenvram(0, colorSelect);
+        RTC.writenvram(1, projectSelect);
+        LCD.setBacklight(colorSelect);
+        LCD.clear();
+        LCD.setCursor(2, 0);
+        uint8_t i = projectSelect - 1;
+        LCD.print(projectName[i]);
+        LCD.setCursor(6, 1);
+        LCD.print(F("Selected"));
+        delay(TIME_OUT);
       }
     }
   }
@@ -463,60 +466,102 @@ void loop() {
     }
   }
 
-  // Display Date and Time on LCD.
-  DateTime now = RTC.now(); // Get current time and date from RTC.
-  LCD.setCursor(0, 0);
-  LCD.print(F("Date "));
-  if (now.month() < 10) { // If month is a single digit precede with a zero.
-    LCD.print("0");
+  // Allow user to change time format between 12/24 hours while timer is not active with RIGHT button.
+  if (timerState == 0) {
+    if (buttons & BUTTON_RIGHT) {
+      timeFormat = 1 - timeFormat;
+      delay(PAUSE);
+    }
   }
-  LCD.print(now.month(), DEC);
-  LCD.print('/');
-  if (now.day() < 10) { // If day is a single digit precede with a zero.
-    LCD.print("0");
-  }
-  LCD.print(now.day(), DEC);
-  LCD.print('/');
-  LCD.print(now.year(), DEC);
-  LCD.setCursor(0, 1);
-  LCD.print(F("Time "));
-  if (now.hour() > 12) { // RTC is in 24 hour format, subtract 12 for 12 hour time.
-    if (now.hour() < 22) { // Don't precede with a zero for 10:00 & 11:00 PM.
+
+  // Display Date and Time on LCD in 24 hour format.
+  if (timeFormat == 1) {
+    DateTime now = RTC.now(); // Get current time and date from RTC.
+    LCD.setCursor(0, 0);
+    LCD.print(F("Date "));
+    if (now.month() < 10) { // If month is a single digit precede with a zero.
       LCD.print("0");
     }
-    LCD.print(now.hour() - 12, DEC);
+    LCD.print(now.month(), DEC);
+    LCD.print('/');
+    if (now.day() < 10) { // If day is a single digit precede with a zero.
+      LCD.print("0");
+    }
+    LCD.print(now.day(), DEC);
+    LCD.print('/');
+    LCD.print(now.year(), DEC);
+    LCD.setCursor(0, 1);
+    LCD.print(F("Time "));
+    LCD.print(now.hour(), DEC);
+    LCD.print(":");
+    if (now.minute() < 10) {
+      LCD.print("0");
+    }
+    LCD.print(now.minute(), DEC);
+    LCD.print(":");
+    if (now.second() < 10) {
+      LCD.print("0");
+    }
+    LCD.print(now.second(), DEC);
+    LCD.print(" HR");
   }
   else
   {
-    if (now.hour() == 0) { // Set 00:00 AM to 12:00 AM.
-      LCD.print(now.hour() + 12, DEC);
+    // Display Date and Time on LCD in 12 hour format.
+    DateTime now = RTC.now(); // Get current time and date from RTC.
+    LCD.setCursor(0, 0);
+    LCD.print(F("Date "));
+    if (now.month() < 10) { // If month is a single digit precede with a zero.
+      LCD.print("0");
+    }
+    LCD.print(now.month(), DEC);
+    LCD.print('/');
+    if (now.day() < 10) { // If day is a single digit precede with a zero.
+      LCD.print("0");
+    }
+    LCD.print(now.day(), DEC);
+    LCD.print('/');
+    LCD.print(now.year(), DEC);
+    LCD.setCursor(0, 1);
+    LCD.print(F("Time "));
+    if (now.hour() > 12) { // RTC is in 24 hour format, subtract 12 for 12 hour time.
+      if (now.hour() < 22) { // Don't precede with a zero for 10:00 & 11:00 PM.
+        LCD.print("0");
+      }
+      LCD.print(now.hour() - 12, DEC);
     }
     else
     {
-      if (now.hour() >= 10 && now.hour() <= 12) { // Don't precede with a zero if it's between 10 AM - 12 PM.
-        LCD.print(now.hour(), DEC);
+      if (now.hour() == 0) { // Set 00:00 AM to 12:00 AM.
+        LCD.print(now.hour() + 12, DEC);
       }
-      else {
-        LCD.print("0");
-        LCD.print(now.hour(), DEC);
+      else
+      {
+        if (now.hour() >= 10 && now.hour() <= 12) { // Don't precede with a zero if it's between 10 AM - 12 PM.
+          LCD.print(now.hour(), DEC);
+        }
+        else {
+          LCD.print("0");
+          LCD.print(now.hour(), DEC);
+        }
       }
     }
-  }
-  LCD.print(':');
-  if (now.minute() < 10) { // If minute is a single digit precede with a zero.
-    LCD.print("0");
-  }
-  LCD.print(now.minute(), DEC);
-  LCD.print(':');
-  if (now.second() < 10) { // If second is a single digit precede with a zero.
-    LCD.print("0");
-  }
-  LCD.print(now.second(), DEC);
-  if (now.hour() > 11) {
-    LCD.print(F(" PM"));
-  }
-  else {
-    LCD.print(F(" AM"));
+    LCD.print(':');
+    if (now.minute() < 10) { // If minute is a single digit precede with a zero.
+      LCD.print("0");
+    }
+    LCD.print(now.minute(), DEC);
+    LCD.print(':');
+    if (now.second() < 10) { // If second is a single digit precede with a zero.
+      LCD.print("0");
+    }
+    LCD.print(now.second(), DEC);
+    if (now.hour() > 11) {
+      LCD.print(F(" PM"));
+    }
+    else {
+      LCD.print(F(" AM"));
+    }
   }
 
   // Write data to card, only if 5 seconds has elasped since last write.
@@ -525,6 +570,7 @@ void loop() {
   logFile.flush();
 
   // Write heartbeat to NV_SRAM.
+  DateTime now = RTC.now(); // Get current time and date from RTC.
   RTC.writenvram(2, now.month());
   RTC.writenvram(3, now.day());
   uint16_t fyear = now.year();
@@ -534,4 +580,5 @@ void loop() {
   RTC.writenvram(5, loyear);
   RTC.writenvram(6, now.hour());
   RTC.writenvram(7, now.minute());
+  RTC.writenvram(8, timeFormat);
 }
