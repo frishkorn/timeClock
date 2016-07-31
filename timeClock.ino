@@ -32,7 +32,7 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
-#include "RTClib.h"
+#include <RTClib.h>
 #include <Adafruit_RGBLCDShield.h>
 
 #define MAX_INTERVAL 360000
