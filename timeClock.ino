@@ -100,7 +100,22 @@ void setup() {
   // Read from projects.txt file and set Project Names
   File projects = SD.open("projects.txt");
   Serial.print(F("Reading projects.txt file... "));
+
+  // PROTOTYPE
   if (projects) {
+    for (uint8_t h = 0; h < 6; h++) {
+      while (projects.available()) {
+        String line = projects.readStringUntil('\n');
+        // DEBUG
+        Serial.println(line);
+        // DEBUG
+        break;
+      }
+    }
+  }
+
+  /* Working multi-dimensional array code, remove once solution is created.
+    if (projects) {
     for (uint8_t h = 0; h < 6; h++) {
       uint8_t i = 0;
       while (projects.available()) {
@@ -111,11 +126,11 @@ void setup() {
           break;
         }
       }
-    }
-    delay(TIME_OUT); // Delay before opening another file.
-    projects.close();
-    Serial.println(F("Done."));
-  }
+    }*/
+
+  delay(TIME_OUT); // Delay before opening another file.
+  projects.close();
+  Serial.println(F("Done."));
 
   // Create logfile.
   SdFile::dateTimeCallback(dateTime); // Set file date / time from RTC for SD card.
