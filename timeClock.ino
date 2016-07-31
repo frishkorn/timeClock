@@ -106,9 +106,7 @@ void setup() {
     for (uint8_t h = 0; h < 6; h++) {
       while (projects.available()) {
         String line = projects.readStringUntil('\n');
-        // DEBUG
-        Serial.println(line);
-        // DEBUG
+        line.toCharArray(projectName[h], 9);
         break;
       }
     }
