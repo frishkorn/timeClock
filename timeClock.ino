@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.6.2-alpha by Chris Frishkorn.
+  Current version 1.6.3-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  July 30th, 2016     - v1.6.3-alpha   - Started work on issue #87.
   May 15th, 2016      - v1.6.2-alpha   - Fixed missing zero from 24 hour time (issue #83).
   May 14th, 2016      - v1.6.1-alpha   - Fixed timeFormat initialation issue with RTC reset (issue #81).
   May 14th, 2016      - v1.6.0-alpha   - Added select 12/24 time format option (issue #7) and reduced TIME_OUT.
@@ -77,8 +78,10 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock")); // Version splash screen.
   LCD.setCursor(7, 1);
-  LCD.print(F("v1.6.2a"));
-  Serial.println(F("timeClock v1.6.2a"));
+  LCD.print(F("v1.6.3a"));
+  Serial.println("-----------------");
+  Serial.println(F("timeClock v1.6.3a"));
+  Serial.println("-----------------");
   if (!RTC.isrunning()) {
     error("RTC Not Set");
     Serial.println(F("RTC is NOT running!"));
@@ -90,7 +93,8 @@ void setup() {
   if (!SD.begin(chipSelect)) {
     error("Card Read Error");
   }
-  Serial.println(F("Card sucessfully initialized."));
+  delay(TIME_OUT); // Delay before reading files.
+  Serial.println(F("Done."));
 
   // Read from projects.txt file and set Project Names
   File projects = SD.open("projects.txt");
@@ -120,8 +124,11 @@ void setup() {
     filename[7] = i % 10 + '0';
     if (!SD.exists(filename)) {
       Serial.print(F("Creating file "));
-      Serial.println(filename);
+      Serial.print(filename);
+      Serial.print("... ");
       logFile = SD.open(filename, FILE_WRITE);
+      delay(TIME_OUT); // Delay before writing another file.
+      Serial.println("Done.");
       break;
     }
   }
@@ -131,6 +138,7 @@ void setup() {
 
   // Print Date over Serial Interface
   DateTime now = RTC.now(); // Get current time and date from RTC.
+  Serial.println("---");
   Serial.print(F("Date: "));
   if (now.month() < 10) { // If month is a single digit precede with a zero.
     Serial.print("0");
@@ -351,6 +359,7 @@ void loop() {
       Serial.print(ss, DEC);
       Serial.print(F(" - "));
       Serial.println(projectName[i]);
+      Serial.println("---");
     }
     prevState = timerState;
     delay(TIME_OUT);
