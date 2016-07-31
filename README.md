@@ -18,7 +18,7 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
-**July 30th, 2016     - v1.6.3-alpha   -** Updated serial output (issue #87).*
+**July 30th, 2016     - v1.6.3-alpha   -** *Updated serial output (issue #87).*
 
 **May 15th, 2016      - v1.6.2-alpha   -** *Fixed missing zero from 24 hour time (issue #83).*
 
