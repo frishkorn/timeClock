@@ -7,7 +7,7 @@
 
   Version Tracking
   -----------------------
-  July 30th, 2016     - v1.6.3-alpha   - Started work on issue #87.
+  July 30th, 2016     - v1.6.3-alpha   - Updated serial output (issue #87).
   May 15th, 2016      - v1.6.2-alpha   - Fixed missing zero from 24 hour time (issue #83).
   May 14th, 2016      - v1.6.1-alpha   - Fixed timeFormat initialation issue with RTC reset (issue #81).
   May 14th, 2016      - v1.6.0-alpha   - Added select 12/24 time format option (issue #7) and reduced TIME_OUT.
@@ -79,9 +79,9 @@ void setup() {
   LCD.print(F("timeClock")); // Version splash screen.
   LCD.setCursor(7, 1);
   LCD.print(F("v1.6.3a"));
-  Serial.println("-----------------");
+  Serial.println(F("-----------------"));
   Serial.println(F("timeClock v1.6.3a"));
-  Serial.println("-----------------");
+  Serial.println(F("-----------------"));
   if (!RTC.isrunning()) {
     error("RTC Not Set");
     Serial.println(F("RTC is NOT running!"));
@@ -125,10 +125,10 @@ void setup() {
     if (!SD.exists(filename)) {
       Serial.print(F("Creating file "));
       Serial.print(filename);
-      Serial.print("... ");
+      Serial.print(F("... "));
       logFile = SD.open(filename, FILE_WRITE);
       delay(TIME_OUT); // Delay before writing another file.
-      Serial.println("Done.");
+      Serial.println(F("Done."));
       break;
     }
   }
@@ -138,7 +138,7 @@ void setup() {
 
   // Print Date over Serial Interface
   DateTime now = RTC.now(); // Get current time and date from RTC.
-  Serial.println("---");
+  Serial.println(F("----------------"));
   Serial.print(F("Date: "));
   if (now.month() < 10) { // If month is a single digit precede with a zero.
     Serial.print("0");
@@ -151,7 +151,7 @@ void setup() {
   Serial.print(now.day(), DEC);
   Serial.print('/');
   Serial.println(now.year(), DEC);
-  Serial.println(F("---"));
+  Serial.println(F("----------------"));
 
   // Read last heartbeat from NV_SRAM and write header to top of log-file.
   logFile.print(F("Last heartbeat detected: "));
