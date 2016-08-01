@@ -1,18 +1,27 @@
-timeClock v1.5.3a
-SD card initializing... Card sucessfully initialized.
+-----------------
+timeClock v1.6.4b
+-----------------
+SD card initializing... Done.
 Reading projects.txt file... Done.
-Creating file RECORD07.CSV
-Date: 03/12/2016
+Creating file RECORD01.CSV... Done.
+----------------
+Date: 07/31/2016
+----------------
+Timer Started: 20:49:35
+00:01:48 - Process
 ---
-Timer Started: 23:04:55
-00:01:20 - Project1
-Timer Started: 23:06:27
-00:02:44 - Project2
-Timer Started: 23:09:21
-00:11:17 - Project3
-Timer Started: 23:20:57
-00:22:27 - Project4
-Timer Started: 23:43:45
-01:11:35 - Project5
-Timer Started: 00:55:29
-16:17:02 - Project6
+Timer Started: 20:51:35
+00:02:55 - Meeting
+---
+Timer Started: 20:54:38
+00:14:21 - Training
+---
+Timer Started: 21:09:31
+00:25:02 - Panda
+---
+Timer Started: 21:34:46
+00:39:04 - Elephant
+---
+Timer Started: 22:14:02
+01:14:47 - Lunch
+---
