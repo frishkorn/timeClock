@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 1.6.3-alpha by Chris Frishkorn.
+  Current version 1.6.4-beta by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  July 31th, 2016     - v1.6.4-beta    - Project names are now read line by line from projects.txt (issue #74).
   July 30th, 2016     - v1.6.3-alpha   - Updated serial output (issue #87).
   May 15th, 2016      - v1.6.2-alpha   - Fixed missing zero from 24 hour time (issue #83).
   May 14th, 2016      - v1.6.1-alpha   - Fixed timeFormat initialation issue with RTC reset (issue #81).
@@ -78,9 +79,9 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock")); // Version splash screen.
   LCD.setCursor(7, 1);
-  LCD.print(F("v1.6.3a"));
+  LCD.print(F("v1.6.4b"));
   Serial.println(F("-----------------"));
-  Serial.println(F("timeClock v1.6.3a"));
+  Serial.println(F("timeClock v1.6.4b"));
   Serial.println(F("-----------------"));
   if (!RTC.isrunning()) {
     error("RTC Not Set");
@@ -101,20 +102,16 @@ void setup() {
   Serial.print(F("Reading projects.txt file... "));
   if (projects) {
     for (uint8_t h = 0; h < 6; h++) {
-      uint8_t i = 0;
       while (projects.available()) {
-        projectName[h][i] = projects.read();
-        i++;
-        if (i == 8) {
-          projectName[h][i] = '\0'; // Null terminate array.
-          break;
-        }
+        String line = projects.readStringUntil('\n');
+        line.toCharArray(projectName[h], 9);
+        break;
       }
     }
-    delay(TIME_OUT); // Delay before opening another file.
-    projects.close();
-    Serial.println(F("Done."));
   }
+  projects.close();
+  delay(TIME_OUT); // Delay before opening another file.
+  Serial.println(F("Done."));
 
   // Create logfile.
   SdFile::dateTimeCallback(dateTime); // Set file date / time from RTC for SD card.
