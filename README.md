@@ -1,4 +1,4 @@
-##timeClock - v2.0.0-release
+##timeClock - v2.0.1-alpha
 ---
 ###An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
 
