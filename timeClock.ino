@@ -7,7 +7,7 @@
 
   Version Tracking
   -----------------------
-  September 4th, 2016 - v2.0.1-alpha   - Initial commit, undecided on which issue to work on next.
+  September 4th, 2016 - v2.0.1-alpha   - Testing, issue #90.
   August 23rd, 2016   - v2.0.0-release - Released version 2.0.
   - See GitHub for older version tracking notes.
 */
@@ -19,11 +19,12 @@
 #include <Adafruit_RGBLCDShield.h>
 
 #define MAX_INTERVAL 360000
+#define MAX_SYNC 60000
 #define SYNC_INTERVAL 5000
 #define TIME_OUT 1500
 #define PAUSE 100
 
-uint32_t syncTime, timerStart;
+uint32_t syncTime, beatTime, timerStart;
 uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState, timeFormat;
 const uint8_t chipSelect = 10;
 char projectName[7][9];
@@ -61,7 +62,7 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock")); // Version splash screen.
   LCD.setCursor(7, 1);
-  LCD.print(F("v2.0.0r"));
+  LCD.print(F("v2.0.1a"));
   Serial.println(F("----------------------"));
   Serial.println(F("timeClock v2.0.1-alpha"));
   Serial.println(F("----------------------"));
@@ -560,12 +561,8 @@ void loop() {
     }
   }
 
-  // Write data to card, only if 5 seconds has elasped since last write.
-  if ((millis() - syncTime) < SYNC_INTERVAL) return;
-  syncTime = millis();
-  logFile.flush();
-
-  // Write heartbeat to NV_SRAM.
+  // Write heartbeat to NV_SRAM every 60 seconds.
+  if ((millis() - beatTime) >= MAX_SYNC) {
   DateTime now = RTC.now(); // Get current time and date from RTC.
   RTC.writenvram(2, now.month());
   RTC.writenvram(3, now.day());
@@ -577,4 +574,16 @@ void loop() {
   RTC.writenvram(6, now.hour());
   RTC.writenvram(7, now.minute());
   RTC.writenvram(8, timeFormat);
+  // DEBUG
+  Serial.print(now.minute(), DEC);
+  Serial.print(":");
+  Serial.println(now.second(), DEC);
+  // DEBUG
+  }
+  beatTime = millis();
+
+  // Write data to card, only if 5 seconds has elasped since last write.
+  if ((millis() - syncTime) < SYNC_INTERVAL) return;
+  syncTime = millis();
+  logFile.flush();
 }
