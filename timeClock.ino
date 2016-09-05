@@ -82,7 +82,7 @@ void setup() {
   LCD.setCursor(7, 1);
   LCD.print(F("v2.0.0r"));
   Serial.println(F("--------------"));
-  Serial.println(F("timeClock v2.0.r"));
+  Serial.println(F("timeClock v2.0.0r"));
   Serial.println(F("--------------"));
   if (!RTC.isrunning()) {
     error("RTC Not Set");
