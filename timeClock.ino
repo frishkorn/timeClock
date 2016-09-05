@@ -1,34 +1,17 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 2.0.0-release by Chris Frishkorn.
+  Current version 2.0.1-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  September 5th, 2016 - v2.0.1-alpha   - Added seconds to heartbeat resolution (issue #90).
   August 23rd, 2016   - v2.0.0-release - Released version 2.0.
-  July 31th, 2016     - v1.6.4-beta    - Project names are now read line by line from projects.txt (issue #74).
-  July 30th, 2016     - v1.6.3-alpha   - Updated serial output (issue #87).
-  May 15th, 2016      - v1.6.2-alpha   - Fixed missing zero from 24 hour time (issue #83).
-  May 14th, 2016      - v1.6.1-alpha   - Fixed timeFormat initialation issue with RTC reset (issue #81).
-  May 14th, 2016      - v1.6.0-alpha   - Added select 12/24 time format option (issue #7) and reduced TIME_OUT.
-  April 21st, 2016    - v1.5.6-alpha   - Fixed Elapsed Timer roll-over problem, minor UI update (issue #78).
-  March 24th, 2016    - v1.5.5-alpha   - Strings moved to PROGMEM, SRAM memory savings. 78% to 61% SRAM (issue #76).
-  March 24th, 2016    - v1.5.4-alpha   - Minor UI update.
-  March 12th, 2016    - v1.5.3-alpha   - Removed heartbeat from Serial output, moved serial output after LCD output (issue #72).
-  March 7th, 2016     - v1.5.2-alpha   - Last heartbeat added to Serial output (issue #70).
-  March 7th, 2016     - v1.5.1-alpha   - Minor UI adjustments, updated Serial output (issue #63).
-  March 6th, 2016     - v1.5.0-alpha   - Added RIGHT button press show Elapsed Timer (issue #62).
-  March 6th, 2016     - v1.4.0-alpha   - Added Project Names which are loaded from the SD card (issue #40).
-  February 11th, 2016 - v1.3.1-alpha   - Changed time-out constant to use pre-processor #define (issue #60).
-  February 10th, 2016 - v1.3.0-alpha   - Added LEFT button press Project Name notification, updated variables (issue #33).
-  February 9th, 2016  - v1.2.4-alpha   - Fixed RTC Error message and optimized heartbeat log-file write code (issue #55).
-  February 7th, 2016  - v1.2.3-alpha   - Fixed uninitialized heartbeat and updated sync interval (issue #51 & issue #54).
-  February 7th, 2016  - v1.2.2-alpha   - Fixed heartbeat, now has zeros appened to log file (issue #49).
-  February 7th, 2016  - v1.2.1-alpha   - Fixed RTC reset problem with colorSelect and projectSelect (issue #48).
-  February 6th, 2016  - v1.2.0-release - Released version 1.2.
+  
   - See GitHub for older version tracking notes.
+
 */
 
 #include <Wire.h>
@@ -80,10 +63,10 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock")); // Version splash screen.
   LCD.setCursor(7, 1);
-  LCD.print(F("v2.0.0r"));
-  Serial.println(F("------------------------"));
-  Serial.println(F("timeClock v2.0.0-release"));
-  Serial.println(F("------------------------"));
+  LCD.print(F("v2.0.1a"));
+  Serial.println(F("----------------------"));
+  Serial.println(F("timeClock v2.0.1-alpha"));
+  Serial.println(F("----------------------"));
   if (!RTC.isrunning()) {
     error("RTC Not Set");
     Serial.println(F("RTC is NOT running!"));
@@ -169,8 +152,11 @@ void setup() {
     if (RTC.readnvram(7) < 10) {
       logFile.print("0");
     }
-    logFile.println(RTC.readnvram(7), DEC); // Print Minute to log-file.
-  } else {
+    logFile.print(RTC.readnvram(7), DEC); // Print Minute to log-file.
+    logFile.print(":");
+    logFile.println(RTC.readnvram(8), DEC); // Print Second to log-file.
+  }
+  else {
     logFile.println(F("None"));
   }
   logFile.println(F("Date,Time,Project"));
@@ -187,7 +173,7 @@ void setup() {
   LCD.setBacklight(colorSelect);
 
   // Read previously set timeFormat.
-  timeFormat = RTC.readnvram(8);
+  timeFormat = RTC.readnvram(9);
   if (timeFormat > 1) {
     timeFormat = 0;
   }
@@ -520,8 +506,7 @@ void loop() {
     LCD.print(now.second(), DEC);
     LCD.print(" HR");
   }
-  else
-  {
+  else {
     // Display Date and Time on LCD in 12 hour format.
     DateTime now = RTC.now(); // Get current time and date from RTC.
     LCD.setCursor(0, 0);
@@ -545,13 +530,11 @@ void loop() {
       }
       LCD.print(now.hour() - 12, DEC);
     }
-    else
-    {
+    else {
       if (now.hour() == 0) { // Set 00:00 AM to 12:00 AM.
         LCD.print(now.hour() + 12, DEC);
       }
-      else
-      {
+      else {
         if (now.hour() >= 10 && now.hour() <= 12) { // Don't precede with a zero if it's between 10 AM - 12 PM.
           LCD.print(now.hour(), DEC);
         }
@@ -595,5 +578,6 @@ void loop() {
   RTC.writenvram(5, loyear);
   RTC.writenvram(6, now.hour());
   RTC.writenvram(7, now.minute());
-  RTC.writenvram(8, timeFormat);
+  RTC.writenvram(8, now.second());
+  RTC.writenvram(9, timeFormat);
 }
