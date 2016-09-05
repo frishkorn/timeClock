@@ -7,9 +7,11 @@
 
   Version Tracking
   -----------------------
-  September 4th, 2016 - v2.0.1-alpha   - Testing, issue #90.
+  September 5th, 2016 - v2.0.1-alpha   - Added seconds to heartbeat resolution (issue #90).
   August 23rd, 2016   - v2.0.0-release - Released version 2.0.
+  
   - See GitHub for older version tracking notes.
+
 */
 
 #include <Wire.h>
@@ -19,12 +21,11 @@
 #include <Adafruit_RGBLCDShield.h>
 
 #define MAX_INTERVAL 360000
-#define MAX_SYNC 60000
 #define SYNC_INTERVAL 5000
 #define TIME_OUT 1500
 #define PAUSE 100
 
-uint32_t syncTime, beatTime, timerStart;
+uint32_t syncTime, timerStart;
 uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState, timeFormat;
 const uint8_t chipSelect = 10;
 char projectName[7][9];
@@ -151,8 +152,11 @@ void setup() {
     if (RTC.readnvram(7) < 10) {
       logFile.print("0");
     }
-    logFile.println(RTC.readnvram(7), DEC); // Print Minute to log-file.
-  } else {
+    logFile.print(RTC.readnvram(7), DEC); // Print Minute to log-file.
+    logFile.print(":");
+    logFile.println(RTC.readnvram(8), DEC); // Print Second to log-file.
+  }
+  else {
     logFile.println(F("None"));
   }
   logFile.println(F("Date,Time,Project"));
@@ -169,7 +173,7 @@ void setup() {
   LCD.setBacklight(colorSelect);
 
   // Read previously set timeFormat.
-  timeFormat = RTC.readnvram(8);
+  timeFormat = RTC.readnvram(9);
   if (timeFormat > 1) {
     timeFormat = 0;
   }
@@ -502,8 +506,7 @@ void loop() {
     LCD.print(now.second(), DEC);
     LCD.print(" HR");
   }
-  else
-  {
+  else {
     // Display Date and Time on LCD in 12 hour format.
     DateTime now = RTC.now(); // Get current time and date from RTC.
     LCD.setCursor(0, 0);
@@ -527,13 +530,11 @@ void loop() {
       }
       LCD.print(now.hour() - 12, DEC);
     }
-    else
-    {
+    else {
       if (now.hour() == 0) { // Set 00:00 AM to 12:00 AM.
         LCD.print(now.hour() + 12, DEC);
       }
-      else
-      {
+      else {
         if (now.hour() >= 10 && now.hour() <= 12) { // Don't precede with a zero if it's between 10 AM - 12 PM.
           LCD.print(now.hour(), DEC);
         }
@@ -561,8 +562,12 @@ void loop() {
     }
   }
 
-  // Write heartbeat to NV_SRAM every 60 seconds.
-  if ((millis() - beatTime) >= MAX_SYNC) {
+  // Write data to card, only if 5 seconds has elasped since last write.
+  if ((millis() - syncTime) < SYNC_INTERVAL) return;
+  syncTime = millis();
+  logFile.flush();
+
+  // Write heartbeat to NV_SRAM.
   DateTime now = RTC.now(); // Get current time and date from RTC.
   RTC.writenvram(2, now.month());
   RTC.writenvram(3, now.day());
@@ -573,17 +578,6 @@ void loop() {
   RTC.writenvram(5, loyear);
   RTC.writenvram(6, now.hour());
   RTC.writenvram(7, now.minute());
-  RTC.writenvram(8, timeFormat);
-  // DEBUG
-  Serial.print(now.minute(), DEC);
-  Serial.print(":");
-  Serial.println(now.second(), DEC);
-  // DEBUG
-  }
-  beatTime = millis();
-
-  // Write data to card, only if 5 seconds has elasped since last write.
-  if ((millis() - syncTime) < SYNC_INTERVAL) return;
-  syncTime = millis();
-  logFile.flush();
+  RTC.writenvram(8, now.second());
+  RTC.writenvram(9, timeFormat);
 }
