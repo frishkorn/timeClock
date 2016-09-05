@@ -1,4 +1,4 @@
-##timeClock - v2.0.1-alpha
+##timeClock - v2.0.2-alpha
 ---
 ###An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
 
@@ -18,6 +18,8 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
+**September 5th, 2016 - v2.0.2-alpha   -** *Initial commit (issue #92).*
+
 **September 5th, 2016 - v2.0.1-alpha   -** *Added seconds to heartbeat resolution (issue #90).*
 
 **August 23rd, 2016   - v2.0.0-release -** *Released version 2.0.*
