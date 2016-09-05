@@ -81,9 +81,9 @@ void setup() {
   LCD.print(F("timeClock")); // Version splash screen.
   LCD.setCursor(7, 1);
   LCD.print(F("v2.0.0r"));
-  Serial.println(F("--------------"));
-  Serial.println(F("timeClock v2.0.0r"));
-  Serial.println(F("--------------"));
+  Serial.println(F("------------------------"));
+  Serial.println(F("timeClock v2.0.0-release"));
+  Serial.println(F("------------------------"));
   if (!RTC.isrunning()) {
     error("RTC Not Set");
     Serial.println(F("RTC is NOT running!"));
