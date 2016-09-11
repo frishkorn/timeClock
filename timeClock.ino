@@ -87,10 +87,9 @@ void setup() {
   Serial.print(F("Reading projects.txt file... "));
   if (projects) {
     for (uint8_t h = 0; h < 6; h++) {
-      while (projects.available()) {
+      if (projects.available()) {
         String line = projects.readStringUntil('\n');
         line.toCharArray(projectName[h], 9);
-        break;
       }
     }
   }
