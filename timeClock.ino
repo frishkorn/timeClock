@@ -7,10 +7,10 @@
 
   Version Tracking
   -----------------------
-  Seotember 5th, 2016 - v2.0.2-alpha   - Initial commit (issue #92).
-  September 5th, 2016 - v2.0.1-alpha   - Added seconds to heartbeat resolution (issue #90).
-  August 23rd, 2016   - v2.0.0-release - Released version 2.0.
-  
+  Seotember 14th, 2016 - v2.0.2-alpha   - Initial commit (issue #92).
+  September 5th, 2016  - v2.0.1-alpha   - Added seconds to heartbeat resolution (issue #90).
+  August 23rd, 2016    - v2.0.0-release - Released version 2.0.
+
   - See GitHub for older version tracking notes.
 
 */
@@ -96,6 +96,19 @@ void setup() {
   projects.close();
   delay(TIME_OUT); // Delay before opening another file.
   Serial.println(F("Done."));
+
+  // LCD cannot render character 0x0D (CR), replace with 0x20 (SPACE).
+  // DEBUG
+  for (uint8_t a = 0; a < 6; a++) {
+    uint8_t len = strlen(projectName[a]);
+    Serial.print(a);
+    Serial.print(": ");
+    Serial.println(len);
+    for (uint8_t b = 0; b < 8; b++) {
+      Serial.println(projectName [a][b], HEX);
+    }
+  }
+  // DEBUG
 
   // Create logfile.
   SdFile::dateTimeCallback(dateTime); // Set file date / time from RTC for SD card.
