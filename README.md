@@ -18,7 +18,7 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
-**September 5th, 2016 - v2.0.2-alpha   -** *Initial commit (issue #92).*
+**October 26th, 2016  - v2.0.2-alpha   -** *Fixed Carriage Return LCD rendering problem (issue #92).*
 
 **September 5th, 2016 - v2.0.1-alpha   -** *Added seconds to heartbeat resolution (issue #90).*
 
