@@ -1,15 +1,16 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 2.0.1-alpha by Chris Frishkorn.
+  Current version 2.0.2-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
-  September 5th, 2016 - v2.0.1-alpha   - Added seconds to heartbeat resolution (issue #90).
-  August 23rd, 2016   - v2.0.0-release - Released version 2.0.
-  
+  October 26th, 2016   - v2.0.2-alpha   - Fixed Carriage Return LCD rendering problem (issue #92).
+  September 5th, 2016  - v2.0.1-alpha   - Added seconds to heartbeat resolution (issue #90).
+  August 23rd, 2016    - v2.0.0-release - Released version 2.0.
+
   - See GitHub for older version tracking notes.
 
 */
@@ -63,9 +64,9 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock")); // Version splash screen.
   LCD.setCursor(7, 1);
-  LCD.print(F("v2.0.1a"));
+  LCD.print(F("v2.0.2a"));
   Serial.println(F("----------------------"));
-  Serial.println(F("timeClock v2.0.1-alpha"));
+  Serial.println(F("timeClock v2.0.2-alpha"));
   Serial.println(F("----------------------"));
   if (!RTC.isrunning()) {
     error("RTC Not Set");
@@ -86,16 +87,24 @@ void setup() {
   Serial.print(F("Reading projects.txt file... "));
   if (projects) {
     for (uint8_t h = 0; h < 6; h++) {
-      while (projects.available()) {
+      if (projects.available()) {
         String line = projects.readStringUntil('\n');
         line.toCharArray(projectName[h], 9);
-        break;
       }
     }
   }
   projects.close();
   delay(TIME_OUT); // Delay before opening another file.
   Serial.println(F("Done."));
+
+  // LCD cannot render character 0xD (CR), replace with 0x20 (SPACE).
+  for (uint8_t a = 0; a < 6; a++) {
+    for (uint8_t b = 0; b < 8; b++) {
+      if (projectName [a][b] == 13) {
+        projectName [a][b] = 32;
+      }
+    }
+  }
 
   // Create logfile.
   SdFile::dateTimeCallback(dateTime); // Set file date / time from RTC for SD card.
