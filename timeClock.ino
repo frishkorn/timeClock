@@ -42,7 +42,7 @@ void dateTime(uint16_t *date, uint16_t *time) {
   *time = FAT_TIME(now.hour(), now.minute(), now.second());
 }
 
-void error(char *str) {
+void error(const char *str) {
   // Display error messages to LCD and over serial interface.
   LCD.clear();
   LCD.print(F("System Error!"));
