@@ -98,7 +98,7 @@ void setup() {
   delay(TIME_OUT); // Delay before opening another file.
   Serial.println(F("Done."));
 
-  // LCD cannot render character 0xD (CR), replace with 0x20 (SPACE).
+  // LCD cannot render ASCII character 13 (CR), replace with 32 (SPACE).
   for (uint8_t a = 0; a < 6; a++) {
     for (uint8_t b = 0; b < 8; b++) {
       if (projectName [a][b] == 13) {
@@ -276,9 +276,9 @@ void loop() {
     LCD.print(F("Data logged to"));
     LCD.setCursor(2, 1);
     LCD.print(F("media device"));
+    timerState = 1 - timerState;
 
     // Timer starts with the first press of the SELECT BUTTON.
-    timerState = 1 - timerState;
     if (timerState == 1 && prevState == 0) {
       timerStart = now.secondstime(); // Time from RTC in seconds since 1/1/2000.
       delay(TIME_OUT);
