@@ -93,6 +93,8 @@ void setup() {
         line.toCharArray(projectName[h], 9);
       }
     }
+  } else { // Set projectName to Project1 - Project6 if SD card contains no projects.txt file
+    Serial.println("This is a test.");
   }
   projects.close();
   delay(TIME_OUT); // Delay before opening another file.
@@ -577,7 +579,7 @@ void loop() {
   syncTime = millis();
   logFile.flush();
 
-  // Write heartbeat to NV_SRAM.
+  // Write heartbeat and user time selection to NV_SRAM.
   DateTime now = RTC.now(); // Get current time and date from RTC.
   RTC.writenvram(2, now.month());
   RTC.writenvram(3, now.day());
