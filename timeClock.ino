@@ -7,7 +7,7 @@
 
   Version Tracking
   -----------------------
-  October 28th, 2016   - v2.0.3-alpha   - Initial commit (issue #65).
+  October 28th, 2016   - v2.0.3-alpha   - Fixed Uninitialized projects.txt File from rendering blank projects (issue #65).
   October 27th, 2016   - v2.0.3-alpha   - Removed references to hex values for ASCII, moved timerState to the correct location. (issue #98).
   October 26th, 2016   - v2.0.2-alpha   - Fixed Carriage Return LCD rendering problem (issue #92).
   September 5th, 2016  - v2.0.1-alpha   - Added seconds to heartbeat resolution (issue #90).
@@ -97,6 +97,7 @@ void setup() {
   } else { // Set projectName to Project1 - Project6 if SD card contains no projects.txt file
     for (uint8_t x = 0; x < 6; x++) {
       strcpy(projectName[x], "Project");
+      projectName[x][7] = 49 + x;
     }
   }
   projects.close();
