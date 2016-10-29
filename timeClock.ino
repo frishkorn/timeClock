@@ -94,7 +94,9 @@ void setup() {
       }
     }
   } else { // Set projectName to Project1 - Project6 if SD card contains no projects.txt file
-    Serial.println("This is a test.");
+    for (uint8_t x = 0; x < 6; x++) {
+      strcpy(projectName[x], "Project");
+    }
   }
   projects.close();
   delay(TIME_OUT); // Delay before opening another file.
@@ -103,8 +105,8 @@ void setup() {
   // LCD cannot render ASCII character 13 (CR), replace with 32 (SPACE).
   for (uint8_t a = 0; a < 6; a++) {
     for (uint8_t b = 0; b < 8; b++) {
-      if (projectName [a][b] == 13) {
-        projectName [a][b] = 32;
+      if (projectName[a][b] == 13) {
+        projectName[a][b] = 32;
       }
     }
   }
