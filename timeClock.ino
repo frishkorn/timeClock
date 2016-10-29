@@ -7,7 +7,8 @@
 
   Version Tracking
   -----------------------
-  October 27th, 2016   - v2.0.3-alpha   - Removed references to hex values for ASCII, moved timerState to the correct location. (issue #98).
+  October 28th, 2016   - v2.0.3-alpha   - Fixed Uninitialized projects.txt File from rendering blank projects (issue #65).
+  October 27th, 2016   - v2.0.3-alpha   - Removed references to hex values for ASCII, moved timerState to the correct location.
   October 26th, 2016   - v2.0.2-alpha   - Fixed Carriage Return LCD rendering problem (issue #92).
   September 5th, 2016  - v2.0.1-alpha   - Added seconds to heartbeat resolution (issue #90).
   August 23rd, 2016    - v2.0.0-release - Released version 2.0.
@@ -93,6 +94,11 @@ void setup() {
         line.toCharArray(projectName[h], 9);
       }
     }
+  } else { // Set projectName to Project1 - Project6 if SD card contains no projects.txt file
+    for (uint8_t x = 0; x < 6; x++) {
+      strcpy(projectName[x], "Project");
+      projectName[x][7] = 49 + x;
+    }
   }
   projects.close();
   delay(TIME_OUT); // Delay before opening another file.
@@ -101,8 +107,8 @@ void setup() {
   // LCD cannot render ASCII character 13 (CR), replace with 32 (SPACE).
   for (uint8_t a = 0; a < 6; a++) {
     for (uint8_t b = 0; b < 8; b++) {
-      if (projectName [a][b] == 13) {
-        projectName [a][b] = 32;
+      if (projectName[a][b] == 13) {
+        projectName[a][b] = 32;
       }
     }
   }
@@ -577,7 +583,7 @@ void loop() {
   syncTime = millis();
   logFile.flush();
 
-  // Write heartbeat to NV_SRAM.
+  // Write heartbeat and user time selection to NV_SRAM.
   DateTime now = RTC.now(); // Get current time and date from RTC.
   RTC.writenvram(2, now.month());
   RTC.writenvram(3, now.day());
