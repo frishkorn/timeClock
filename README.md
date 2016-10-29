@@ -20,7 +20,7 @@ Version Tracking
 ---
 **October 28th, 2016  - v2.0.3-alpha   -** *Fixed Uninitialized projects.txt File from rendering blank projects (issue #65).*
 
-**October 27th, 2016  - v2.0.3-alpha   -** *Removed references to hex values for ASCII, moved timerState to the correct location. (issue #98).*
+**October 27th, 2016  - v2.0.3-alpha   -** *Removed references to hex values for ASCII, moved timerState to the correct location.*
 
 **October 26th, 2016  - v2.0.2-alpha   -** *Fixed Carriage Return LCD rendering problem (issue #92).*
 
