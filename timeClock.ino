@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 2.0.3-alpha by Chris Frishkorn.
+  Current version 2.0.4-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  October 30th, 2016   - v2.0.4-alpha   - 0 added to seconds in logFile heartbeat (issue #101).
   October 28th, 2016   - v2.0.3-alpha   - Fixed Uninitialized projects.txt File from rendering blank projects (issue #65).
   October 27th, 2016   - v2.0.3-alpha   - Removed references to hex values for ASCII, moved timerState to the correct location.
   October 26th, 2016   - v2.0.2-alpha   - Fixed Carriage Return LCD rendering problem (issue #92).
@@ -66,9 +67,9 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock")); // Version splash screen.
   LCD.setCursor(7, 1);
-  LCD.print(F("v2.0.3a"));
+  LCD.print(F("v2.0.4a"));
   Serial.println(F("----------------------"));
-  Serial.println(F("timeClock v2.0.3-alpha"));
+  Serial.println(F("timeClock v2.0.4-alpha"));
   Serial.println(F("----------------------"));
   if (!RTC.isrunning()) {
     error("RTC Not Set");
@@ -170,6 +171,9 @@ void setup() {
     }
     logFile.print(RTC.readnvram(7), DEC); // Print Minute to log-file.
     logFile.print(":");
+    if (RTC.readnvram(8) < 10) {
+      logFile.print("0");
+    }
     logFile.println(RTC.readnvram(8), DEC); // Print Second to log-file.
   }
   else {
@@ -214,8 +218,8 @@ void loop() {
         LCD.setBacklight(colorSelect);
         LCD.clear();
         LCD.setCursor(2, 0);
-        uint8_t i = projectSelect - 1;
-        LCD.print(projectName[i]);
+        uint8_t k = projectSelect - 1;
+        LCD.print(projectName[k]);
         LCD.setCursor(6, 1);
         LCD.print(F("Selected"));
         delay(TIME_OUT);
@@ -236,8 +240,8 @@ void loop() {
         LCD.setBacklight(colorSelect);
         LCD.clear();
         LCD.setCursor(2, 0);
-        uint8_t i = projectSelect - 1;
-        LCD.print(projectName[i]);
+        uint8_t k = projectSelect - 1;
+        LCD.print(projectName[k]);
         LCD.setCursor(6, 1);
         LCD.print(F("Selected"));
         delay(TIME_OUT);
@@ -275,8 +279,8 @@ void loop() {
     }
     logFile.print(now.second(), DEC);
     logFile.print(",");
-    uint8_t i = projectSelect - 1;
-    logFile.println(projectName[i]);
+    uint8_t k = projectSelect - 1;
+    logFile.println(projectName[k]);
     LCD.clear();
     LCD.setCursor(1, 0);
     LCD.print(F("Data logged to"));
@@ -358,7 +362,7 @@ void loop() {
       }
       Serial.print(ss, DEC);
       Serial.print(F(" - "));
-      Serial.println(projectName[i]);
+      Serial.println(projectName[k]);
       Serial.println("---");
     }
     prevState = timerState;
@@ -369,8 +373,8 @@ void loop() {
   if (buttons & BUTTON_LEFT) {
     LCD.clear();
     LCD.setCursor(2, 0);
-    uint8_t i = projectSelect - 1;
-    LCD.print(projectName[i]);
+    uint8_t k = projectSelect - 1;
+    LCD.print(projectName[k]);
     LCD.setCursor(6, 1);
     LCD.print(F("Selected"));
     delay(TIME_OUT);
@@ -380,7 +384,7 @@ void loop() {
   if (timerState == 1) {
     if (buttons & BUTTON_RIGHT) {
       LCD.clear();
-      for (uint8_t i = 0; i < 25; i++) { // Refresh display fast enough to show counting seconds for ~5 seconds.
+      for (uint8_t g = 0; g < 25; g++) { // Refresh display fast enough to show counting seconds for ~5 seconds.
         DateTime now = RTC.now(); // Get current time and date from RTC.
         LCD.setCursor(0, 0);
         LCD.print(F("Elapsed "));
@@ -448,8 +452,8 @@ void loop() {
       }
       logFile.print(now.second(), DEC);
       logFile.print(",");
-      uint8_t i = projectSelect - 1;
-      logFile.println(projectName[i]);
+      uint8_t k = projectSelect - 1;
+      logFile.println(projectName[k]);
       logFile.print(F("Timer"));
       logFile.print(",");
       logFile.print(F("hh:mm:ss"));
@@ -473,7 +477,7 @@ void loop() {
       LCD.setCursor(2, 0);
       LCD.print(F("Timer Maxed!"));
       LCD.setCursor(4, 1);
-      LCD.print(projectName[i]);
+      LCD.print(projectName[k]);
       delay(TIME_OUT);
       timerState = 0;
       prevState = 0;
