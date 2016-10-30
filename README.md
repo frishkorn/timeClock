@@ -18,7 +18,7 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
-**October 30th, 2016  - v2.0.4-alpha   -** *Initial commmit (issue #101).*
+**October 30th, 2016  - v2.0.4-alpha   -** *0 added to seconds in logFile heartbeat (issue #101).*
 
 **October 28th, 2016  - v2.0.3-alpha   -** *Fixed Uninitialized projects.txt File from rendering blank projects (issue #65).*
 
