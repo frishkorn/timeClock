@@ -299,6 +299,8 @@ void loop() {
       LCD.print(F("Timer"));
       LCD.setCursor(5, 1);
       LCD.print(F("Started!"));
+      Serial.println(projectName[k]);
+      Serial.println(F("--------"));
       Serial.print(F("Timer Started: "));
       if (now.hour() < 10) {
         Serial.print("0");
@@ -348,6 +350,23 @@ void loop() {
       LCD.print(F("Timer"));
       LCD.setCursor(5, 1);
       LCD.print(F("Stopped!"));
+      Serial.print(F("Timer Stopped: "));
+      if (now.hour() < 10) {
+        Serial.print("0");
+      }
+      Serial.print(now.hour(), DEC);
+      Serial.print(":");
+      if (now.minute() < 10) {
+        Serial.print("0");
+      }
+      Serial.print(now.minute(), DEC);
+      Serial.print(":");
+      if (now.second() < 10) {
+        Serial.print("0");
+      }
+      Serial.println(now.second(), DEC);
+      Serial.println(F("-"));
+      Serial.print(F("Elapsed Timer: "));
       if (hh < 10) {
         Serial.print("0");
       }
@@ -361,10 +380,8 @@ void loop() {
       if (ss < 10) {
         Serial.print("0");
       }
-      Serial.print(ss, DEC);
-      Serial.print(F(" - "));
-      Serial.println(projectName[k]);
-      Serial.println("---");
+      Serial.println(ss, DEC);
+      Serial.println("--------+");
     }
     prevState = timerState;
     delay(TIME_OUT);
