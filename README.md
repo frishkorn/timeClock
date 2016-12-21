@@ -18,7 +18,7 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
-**December 20th, 2016  - v2.0.5-alpha   -** *Started work on issue #96.*
+**December 20th, 2016  - v2.0.5-alpha   -** *Updated serial output and log file formatting (issue #96).*
 
 **October 30th, 2016  - v2.0.4-alpha   -** *0 added to seconds in logFile heartbeat (issue #101).*
 

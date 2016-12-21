@@ -7,7 +7,7 @@
 
   Version Tracking
   -----------------------
-  December 20th, 2016  - v2.0.5-alpha   - Started work on issue #96.
+  December 20th, 2016  - v2.0.5-alpha   - Updated serial output and log file formatting (issue #96).
   October 30th, 2016   - v2.0.4-alpha   - 0 added to seconds in logFile heartbeat (issue #101).
   October 28th, 2016   - v2.0.3-alpha   - Fixed Uninitialized projects.txt File from rendering blank projects (issue #65).
   October 27th, 2016   - v2.0.3-alpha   - Removed references to hex values for ASCII, moved timerState to the correct location.
@@ -180,7 +180,6 @@ void setup() {
   else {
     logFile.println(F("None"));
   }
-  logFile.println(F("Date,Time,Project"));
   delay(TIME_OUT);
   LCD.clear();
 
@@ -252,6 +251,7 @@ void loop() {
 
   // Log date and time information if the SELECT button is pressed.
   if (buttons & BUTTON_SELECT) {
+    uint8_t k = projectSelect - 1;
     DateTime now = RTC.now(); // Get current time and date from RTC.
     if (now.month() < 10) {
       logFile.print("0");
@@ -278,10 +278,7 @@ void loop() {
     if (now.second() < 10) {
       logFile.print("0");
     }
-    logFile.print(now.second(), DEC);
-    logFile.print(",");
-    uint8_t k = projectSelect - 1;
-    logFile.println(projectName[k]);
+    logFile.println(now.second(), DEC);
     LCD.clear();
     LCD.setCursor(1, 0);
     LCD.print(F("Data logged to"));
@@ -325,9 +322,7 @@ void loop() {
       uint8_t ss = timerTime % 60;
       uint8_t mm = (timerTime / 60) % 60;
       uint8_t hh = (timerTime / 3600);
-      logFile.print(F("Timer"));
-      logFile.print(",");
-      logFile.print(F("hh:mm:ss"));
+      logFile.print(projectName[k]);
       logFile.print(",");
       if (hh < 10) {
         logFile.print("0");
