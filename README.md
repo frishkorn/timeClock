@@ -18,20 +18,22 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
-**January 22nd, 2016   - v2.0.6-alpha   -** *Started work on issue #106 & #95.* 
+**January 22nd, 2016  - v2.0.6-alpha   -** *Started work on issues #106 & #95.*
 
-**December 20th, 2016  - v2.0.5-alpha   -** *Updated serial output and log file formatting (issue #96).*
+**January 22nd, 2016  - v2.0.6-alpha   -** *Updated serialOutput.txt and projects.txt (issues #107 & #108).* 
 
-**October 30th, 2016   - v2.0.4-alpha   -** *0 added to seconds in logFile heartbeat (issue #101).*
+**December 20th, 2016 - v2.0.5-alpha   -** *Updated serial output and log file formatting (issue #96).*
 
-**October 28th, 2016   - v2.0.3-alpha   -** *Fixed Uninitialized projects.txt File from rendering blank projects (issue #65).*
+**October 30th, 2016  - v2.0.4-alpha   -** *0 added to seconds in logFile heartbeat (issue #101).*
 
-**October 27th, 2016   - v2.0.3-alpha   -** *Removed references to hex values for ASCII, moved timerState to the correct location.*
+**October 28th, 2016  - v2.0.3-alpha   -** *Fixed Uninitialized projects.txt File from rendering blank projects (issue #65).*
 
-**October 26th, 2016   - v2.0.2-alpha   -** *Fixed Carriage Return LCD rendering problem (issue #92).*
+**October 27th, 2016  - v2.0.3-alpha   -** *Removed references to hex values for ASCII, moved timerState to the correct location.*
 
-**September 5th, 2016  - v2.0.1-alpha   -** *Added seconds to heartbeat resolution (issue #90).*
+**October 26th, 2016  - v2.0.2-alpha   -** *Fixed Carriage Return LCD rendering problem (issue #92).*
 
-**August 23rd, 2016    - v2.0.0-release -** *Released version 2.0.*
+**September 5th, 2016 - v2.0.1-alpha   -** *Added seconds to heartbeat resolution (issue #90).*
+
+**August 23rd, 2016   - v2.0.0-release -** *Released version 2.0.*
 
 - See GitHub commit history for full version tracking notes.
