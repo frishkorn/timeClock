@@ -18,9 +18,9 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
-**January 22nd, 2016  - v2.0.6-alpha   -** *Removed file timeExample.xlsm (issue #110). Started work on issues #106 & #95.*
+**January 22nd, 2016  - v2.0.6-alpha   -** *Removed file timeExample.xlsm (issue #110). Started work on issue #95..*
 
-**January 22nd, 2016  - v2.0.6-alpha   -** *Updated serialOutput.txt and projects.txt (issues #107 & #108).* 
+**January 22nd, 2016  - v2.0.6-alpha   -** *Updated serialOutput.txt, projects.txt, and fixed README.md (issues #107, #108 & #106).* 
 
 **December 20th, 2016 - v2.0.5-alpha   -** *Updated serial output and log file formatting (issue #96).*
 

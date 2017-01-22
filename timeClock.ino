@@ -1,12 +1,14 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 2.0.5-alpha by Chris Frishkorn.
+  Current version 2.0.6-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  January 22nd, 2016   - v2.0.6-alpha   - Removed file timeExample.xlsm (issue #110). Started work on issue #95.
+  January 22nd, 2016   - v2.0.6-alpha   - Updated serialOutput.txt, projects.txt, and fixed README.md (issues #107, #108 & #106).
   December 20th, 2016  - v2.0.5-alpha   - Updated serial output and log file formatting (issue #96).
   October 30th, 2016   - v2.0.4-alpha   - 0 added to seconds in logFile heartbeat (issue #101).
   October 28th, 2016   - v2.0.3-alpha   - Fixed Uninitialized projects.txt File from rendering blank projects (issue #65).
@@ -68,9 +70,9 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock")); // Version splash screen.
   LCD.setCursor(7, 1);
-  LCD.print(F("v2.0.5a"));
+  LCD.print(F("v2.0.6a"));
   Serial.println(F("----------------------"));
-  Serial.println(F("timeClock v2.0.5-alpha"));
+  Serial.println(F("timeClock v2.0.6-alpha"));
   Serial.println(F("----------------------"));
   if (!RTC.isrunning()) {
     error("RTC Not Set");
@@ -78,13 +80,13 @@ void setup() {
   }
 
   // See if the SD card is readable.
-  Serial.print(F("SD card initializing... "));
-  pinMode(10, OUTPUT);
-  if (!SD.begin(chipSelect)) {
+  /*Serial.print(F("SD card initializing... ")); // Commented out, SD stops working and no card reader to troubleshoot.
+    pinMode(10, OUTPUT);
+    if (!SD.begin(chipSelect)) {
     error("Card Read Error");
-  }
-  delay(TIME_OUT); // Delay before reading files.
-  Serial.println(F("Done."));
+    }
+    delay(TIME_OUT); // Delay before reading files.
+    Serial.println(F("Done."));*/
 
   // Read from projects.txt file and set Project Names
   File projects = SD.open("projects.txt");
@@ -116,9 +118,9 @@ void setup() {
   }
 
   // Create logfile.
-  SdFile::dateTimeCallback(dateTime); // Set file date / time from RTC for SD card.
-  char filename[] = "RECORD00.CSV";
-  for (uint8_t i = 1; i < 100; i++) {
+  /*SdFile::dateTimeCallback(dateTime); // Set file date / time from RTC for SD card. Commented out, SD stops working and no card reader to troubleshoot.
+    char filename[] = "RECORD00.CSV";
+    for (uint8_t i = 1; i < 100; i++) {
     filename[6] = i / 10 + '0';
     filename[7] = i % 10 + '0';
     if (!SD.exists(filename)) {
@@ -130,10 +132,10 @@ void setup() {
       Serial.println(F("Done."));
       break;
     }
-  }
-  if (!logFile) {
+    }
+    if (!logFile) {
     error("File Write Error");
-  }
+    }*/
 
   // Print Date over Serial Interface
   DateTime now = RTC.now(); // Get current time and date from RTC.
@@ -299,20 +301,7 @@ void loop() {
       Serial.println(projectName[k]);
       Serial.println(F("--------"));
       Serial.print(F("Timer Started: "));
-      if (now.hour() < 10) {
-        Serial.print("0");
-      }
-      Serial.print(now.hour(), DEC);
-      Serial.print(":");
-      if (now.minute() < 10) {
-        Serial.print("0");
-      }
-      Serial.print(now.minute(), DEC);
-      Serial.print(":");
-      if (now.second() < 10) {
-        Serial.print("0");
-      }
-      Serial.println(now.second(), DEC);
+      serialTime();
     }
 
     // Timer stops with the second press of the SELECT BUTTON.
@@ -346,20 +335,7 @@ void loop() {
       LCD.setCursor(5, 1);
       LCD.print(F("Stopped!"));
       Serial.print(F("Timer Stopped: "));
-      if (now.hour() < 10) {
-        Serial.print("0");
-      }
-      Serial.print(now.hour(), DEC);
-      Serial.print(":");
-      if (now.minute() < 10) {
-        Serial.print("0");
-      }
-      Serial.print(now.minute(), DEC);
-      Serial.print(":");
-      if (now.second() < 10) {
-        Serial.print("0");
-      }
-      Serial.println(now.second(), DEC);
+      serialTime();
       Serial.println(F("-"));
       Serial.print(F("Elapsed Timer: "));
       if (hh < 10) {
@@ -615,3 +591,20 @@ void loop() {
   RTC.writenvram(9, timeFormat);
 }
 
+void serialTime() {
+  DateTime now = RTC.now();
+  if (now.hour() < 10) {
+    Serial.print("0");
+  }
+  Serial.print(now.hour(), DEC);
+  Serial.print(":");
+  if (now.minute() < 10) {
+    Serial.print("0");
+  }
+  Serial.print(now.minute(), DEC);
+  Serial.print(":");
+  if (now.second() < 10) {
+    Serial.print("0");
+  }
+  Serial.println(now.second(), DEC);
+}
