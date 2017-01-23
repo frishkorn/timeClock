@@ -1,12 +1,14 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 2.0.5-alpha by Chris Frishkorn.
+  Current version 2.0.6-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  January 22nd, 2016   - v2.0.6-alpha   - Removed file timeExample.xlsm (issue #110). Started work on issue #95.
+  January 22nd, 2016   - v2.0.6-alpha   - Updated serialOutput.txt, projects.txt, and fixed README.md (issues #107, #108, & #106).
   December 20th, 2016  - v2.0.5-alpha   - Updated serial output and log file formatting (issue #96).
   October 30th, 2016   - v2.0.4-alpha   - 0 added to seconds in logFile heartbeat (issue #101).
   October 28th, 2016   - v2.0.3-alpha   - Fixed Uninitialized projects.txt File from rendering blank projects (issue #65).
@@ -47,7 +49,7 @@ void dateTime(uint16_t *date, uint16_t *time) {
 }
 
 void error(const char *str) {
-  // Display error messages to LCD and over serial interface.
+  // Display error messages to LCD and over Serial interface.
   LCD.clear();
   LCD.print(F("System Error!"));
   LCD.setCursor(0, 1);
@@ -66,24 +68,24 @@ void setup() {
   LCD.clear();
   LCD.setBacklight(colorSelect);
   LCD.setCursor(2, 0);
-  LCD.print(F("timeClock")); // Version splash screen.
+  LCD.print(F("timeClock"));
   LCD.setCursor(7, 1);
-  LCD.print(F("v2.0.5a"));
+  LCD.print(F("v2.0.6a"));
   Serial.println(F("----------------------"));
-  Serial.println(F("timeClock v2.0.5-alpha"));
+  Serial.println(F("timeClock v2.0.6-alpha"));
   Serial.println(F("----------------------"));
   if (!RTC.isrunning()) {
     error("RTC Not Set");
     Serial.println(F("RTC is NOT running!"));
   }
 
-  // See if the SD card is readable.
+  // Check if the SD card is functional.
   Serial.print(F("SD card initializing... "));
   pinMode(10, OUTPUT);
   if (!SD.begin(chipSelect)) {
     error("Card Read Error");
   }
-  delay(TIME_OUT); // Delay before reading files.
+  delay(TIME_OUT);
   Serial.println(F("Done."));
 
   // Read from projects.txt file and set Project Names
@@ -96,14 +98,15 @@ void setup() {
         line.toCharArray(projectName[h], 9);
       }
     }
-  } else { // Set projectName to Project1 - Project6 if SD card contains no projects.txt file
+  } else {
+    // Set projectName to Project1 - Project6 if SD card contains no projects.txt file.
     for (uint8_t x = 0; x < 6; x++) {
       strcpy(projectName[x], "Project");
       projectName[x][7] = 49 + x;
     }
   }
   projects.close();
-  delay(TIME_OUT); // Delay before opening another file.
+  delay(TIME_OUT);
   Serial.println(F("Done."));
 
   // LCD cannot render ASCII character 13 (CR), replace with 32 (SPACE).
@@ -115,7 +118,7 @@ void setup() {
     }
   }
 
-  // Create logfile.
+  // Create log file.
   SdFile::dateTimeCallback(dateTime); // Set file date / time from RTC for SD card.
   char filename[] = "RECORD00.CSV";
   for (uint8_t i = 1; i < 100; i++) {
@@ -126,25 +129,26 @@ void setup() {
       Serial.print(filename);
       Serial.print(F("... "));
       logFile = SD.open(filename, FILE_WRITE);
-      delay(TIME_OUT); // Delay before writing another file.
+      delay(TIME_OUT);
       Serial.println(F("Done."));
       break;
     }
   }
+  // Check if log file was sucessfully written to SD card.
   if (!logFile) {
     error("File Write Error");
   }
 
-  // Print Date over Serial Interface
-  DateTime now = RTC.now(); // Get current time and date from RTC.
+  // Print Date over Serial Interface.
+  DateTime now = RTC.now();
   Serial.println(F("----------------"));
   Serial.print(F("Date: "));
-  if (now.month() < 10) { // If month is a single digit precede with a zero.
+  if (now.month() < 10) {
     Serial.print("0");
   }
   Serial.print(now.month(), DEC);
   Serial.print('/');
-  if (now.day() < 10) { // If day is a single digit precede with a zero.
+  if (now.day() < 10) {
     Serial.print("0");
   }
   Serial.print(now.day(), DEC);
@@ -183,7 +187,7 @@ void setup() {
   delay(TIME_OUT);
   LCD.clear();
 
-  // Read first byte of NV_SRAM set colorSelect and projectSelect.
+  // Read first byte of NV_SRAM, set colorSelect and projectSelect.
   colorSelect = RTC.readnvram(0);
   projectSelect = RTC.readnvram(1);
   if (colorSelect == 255 && projectSelect == 255) { // Set to defaults if RTC has been recently set and NV_SRAM wiped.
@@ -192,7 +196,7 @@ void setup() {
   }
   LCD.setBacklight(colorSelect);
 
-  // Read previously set timeFormat.
+  // Read previously user set timeFormat.
   timeFormat = RTC.readnvram(9);
   if (timeFormat > 1) {
     timeFormat = 0;
@@ -213,16 +217,7 @@ void loop() {
       else {
         colorSelect++;
         projectSelect--;
-        RTC.writenvram(0, colorSelect);
-        RTC.writenvram(1, projectSelect);
-        LCD.setBacklight(colorSelect);
-        LCD.clear();
-        LCD.setCursor(2, 0);
-        uint8_t k = projectSelect - 1;
-        LCD.print(projectName[k]);
-        LCD.setCursor(6, 1);
-        LCD.print(F("Selected"));
-        delay(TIME_OUT);
+        mainShowProject();
       }
     }
     if (buttons & BUTTON_DOWN) {
@@ -235,16 +230,7 @@ void loop() {
       else {
         colorSelect--;
         projectSelect++;
-        RTC.writenvram(0, colorSelect);
-        RTC.writenvram(1, projectSelect);
-        LCD.setBacklight(colorSelect);
-        LCD.clear();
-        LCD.setCursor(2, 0);
-        uint8_t k = projectSelect - 1;
-        LCD.print(projectName[k]);
-        LCD.setCursor(6, 1);
-        LCD.print(F("Selected"));
-        delay(TIME_OUT);
+        mainShowProject();
       }
     }
   }
@@ -252,7 +238,7 @@ void loop() {
   // Log date and time information if the SELECT button is pressed.
   if (buttons & BUTTON_SELECT) {
     uint8_t k = projectSelect - 1;
-    DateTime now = RTC.now(); // Get current time and date from RTC.
+    DateTime now = RTC.now();
     if (now.month() < 10) {
       logFile.print("0");
     }
@@ -299,20 +285,7 @@ void loop() {
       Serial.println(projectName[k]);
       Serial.println(F("--------"));
       Serial.print(F("Timer Started: "));
-      if (now.hour() < 10) {
-        Serial.print("0");
-      }
-      Serial.print(now.hour(), DEC);
-      Serial.print(":");
-      if (now.minute() < 10) {
-        Serial.print("0");
-      }
-      Serial.print(now.minute(), DEC);
-      Serial.print(":");
-      if (now.second() < 10) {
-        Serial.print("0");
-      }
-      Serial.println(now.second(), DEC);
+      serialTime();
     }
 
     // Timer stops with the second press of the SELECT BUTTON.
@@ -346,20 +319,7 @@ void loop() {
       LCD.setCursor(5, 1);
       LCD.print(F("Stopped!"));
       Serial.print(F("Timer Stopped: "));
-      if (now.hour() < 10) {
-        Serial.print("0");
-      }
-      Serial.print(now.hour(), DEC);
-      Serial.print(":");
-      if (now.minute() < 10) {
-        Serial.print("0");
-      }
-      Serial.print(now.minute(), DEC);
-      Serial.print(":");
-      if (now.second() < 10) {
-        Serial.print("0");
-      }
-      Serial.println(now.second(), DEC);
+      serialTime();
       Serial.println(F("-"));
       Serial.print(F("Elapsed Timer: "));
       if (hh < 10) {
@@ -384,13 +344,7 @@ void loop() {
 
   // Show Project Name on LCD when user presses LEFT BUTTON.
   if (buttons & BUTTON_LEFT) {
-    LCD.clear();
-    LCD.setCursor(2, 0);
-    uint8_t k = projectSelect - 1;
-    LCD.print(projectName[k]);
-    LCD.setCursor(6, 1);
-    LCD.print(F("Selected"));
-    delay(TIME_OUT);
+    mainShowProject();
   }
 
   // Show Elapsed Timer time on LCD when user presses RIGHT BUTTON, only while timer is running.
@@ -398,7 +352,7 @@ void loop() {
     if (buttons & BUTTON_RIGHT) {
       LCD.clear();
       for (uint8_t g = 0; g < 25; g++) { // Refresh display fast enough to show counting seconds for ~5 seconds.
-        DateTime now = RTC.now(); // Get current time and date from RTC.
+        DateTime now = RTC.now();
         LCD.setCursor(0, 0);
         LCD.print(F("Elapsed "));
         uint32_t timerStop = now.secondstime();
@@ -507,15 +461,15 @@ void loop() {
 
   // Display Date and Time on LCD in 24 hour format.
   if (timeFormat == 1) {
-    DateTime now = RTC.now(); // Get current time and date from RTC.
+    DateTime now = RTC.now();
     LCD.setCursor(0, 0);
     LCD.print(F("Date "));
-    if (now.month() < 10) { // If month is a single digit precede with a zero.
+    if (now.month() < 10) {
       LCD.print("0");
     }
     LCD.print(now.month(), DEC);
     LCD.print('/');
-    if (now.day() < 10) { // If day is a single digit precede with a zero.
+    if (now.day() < 10) {
       LCD.print("0");
     }
     LCD.print(now.day(), DEC);
@@ -541,15 +495,15 @@ void loop() {
   }
   else {
     // Display Date and Time on LCD in 12 hour format.
-    DateTime now = RTC.now(); // Get current time and date from RTC.
+    DateTime now = RTC.now();
     LCD.setCursor(0, 0);
     LCD.print(F("Date "));
-    if (now.month() < 10) { // If month is a single digit precede with a zero.
+    if (now.month() < 10) {
       LCD.print("0");
     }
     LCD.print(now.month(), DEC);
     LCD.print('/');
-    if (now.day() < 10) { // If day is a single digit precede with a zero.
+    if (now.day() < 10) {
       LCD.print("0");
     }
     LCD.print(now.day(), DEC);
@@ -578,12 +532,12 @@ void loop() {
       }
     }
     LCD.print(':');
-    if (now.minute() < 10) { // If minute is a single digit precede with a zero.
+    if (now.minute() < 10) {
       LCD.print("0");
     }
     LCD.print(now.minute(), DEC);
     LCD.print(':');
-    if (now.second() < 10) { // If second is a single digit precede with a zero.
+    if (now.second() < 10) {
       LCD.print("0");
     }
     LCD.print(now.second(), DEC);
@@ -615,3 +569,33 @@ void loop() {
   RTC.writenvram(9, timeFormat);
 }
 
+void mainShowProject() {
+  RTC.writenvram(0, colorSelect);
+  RTC.writenvram(1, projectSelect);
+  LCD.setBacklight(colorSelect);
+  LCD.clear();
+  LCD.setCursor(2, 0);
+  uint8_t k = projectSelect - 1;
+  LCD.print(projectName[k]);
+  LCD.setCursor(6, 1);
+  LCD.print(F("Selected"));
+  delay(TIME_OUT);
+}
+
+void serialTime() {
+  DateTime now = RTC.now();
+  if (now.hour() < 10) {
+    Serial.print("0");
+  }
+  Serial.print(now.hour(), DEC);
+  Serial.print(":");
+  if (now.minute() < 10) {
+    Serial.print("0");
+  }
+  Serial.print(now.minute(), DEC);
+  Serial.print(":");
+  if (now.second() < 10) {
+    Serial.print("0");
+  }
+  Serial.println(now.second(), DEC);
+}

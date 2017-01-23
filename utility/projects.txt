@@ -1,6 +1,6 @@
-Process
 Meeting
-Training
-Panda
-Elephant
+Software
+Hardware
+Wireless
+Break
 Lunch

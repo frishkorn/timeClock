@@ -1,27 +1,51 @@
------------------
-timeClock v1.6.4b
------------------
+----------------------
+timeClock v2.0.5-alpha
+----------------------
 SD card initializing... Done.
 Reading projects.txt file... Done.
-Creating file RECORD01.CSV... Done.
+Creating file RECORD07.CSV... Done.
 ----------------
-Date: 07/31/2016
+Date: 01/22/2017
 ----------------
-Timer Started: 20:49:35
-00:01:48 - Process
----
-Timer Started: 20:51:35
-00:02:55 - Meeting
----
-Timer Started: 20:54:38
-00:14:21 - Training
----
-Timer Started: 21:09:31
-00:25:02 - Panda
----
-Timer Started: 21:34:46
-00:39:04 - Elephant
----
-Timer Started: 22:14:02
-01:14:47 - Lunch
----
+Meeting 
+--------
+Timer Started: 13:41:56
+Timer Stopped: 13:43:48
+-
+Elapsed Timer: 00:01:52
+--------+
+Software
+--------
+Timer Started: 13:44:03
+Timer Stopped: 13:48:11
+-
+Elapsed Timer: 00:04:08
+--------+
+Hardware
+--------
+Timer Started: 13:48:57
+Timer Stopped: 14:00:54
+-
+Elapsed Timer: 00:11:57
+--------+
+Wireless
+--------
+Timer Started: 14:01:11
+Timer Stopped: 14:11:43
+-
+Elapsed Timer: 00:10:32
+--------+
+Break 
+--------
+Timer Started: 14:12:54
+Timer Stopped: 14:16:13
+-
+Elapsed Timer: 00:03:19
+--------+
+Lunch 
+--------
+Timer Started: 14:16:22
+Timer Stopped: 14:20:46
+-
+Elapsed Timer: 00:04:24
+--------+
