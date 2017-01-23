@@ -217,16 +217,7 @@ void loop() {
       else {
         colorSelect++;
         projectSelect--;
-        RTC.writenvram(0, colorSelect);
-        RTC.writenvram(1, projectSelect);
-        LCD.setBacklight(colorSelect);
-        LCD.clear();
-        LCD.setCursor(2, 0);
-        uint8_t k = projectSelect - 1;
-        LCD.print(projectName[k]);
-        LCD.setCursor(6, 1);
-        LCD.print(F("Selected"));
-        delay(TIME_OUT);
+        mainShowProject();
       }
     }
     if (buttons & BUTTON_DOWN) {
@@ -239,16 +230,7 @@ void loop() {
       else {
         colorSelect--;
         projectSelect++;
-        RTC.writenvram(0, colorSelect);
-        RTC.writenvram(1, projectSelect);
-        LCD.setBacklight(colorSelect);
-        LCD.clear();
-        LCD.setCursor(2, 0);
-        uint8_t k = projectSelect - 1;
-        LCD.print(projectName[k]);
-        LCD.setCursor(6, 1);
-        LCD.print(F("Selected"));
-        delay(TIME_OUT);
+        mainShowProject();
       }
     }
   }
@@ -362,13 +344,7 @@ void loop() {
 
   // Show Project Name on LCD when user presses LEFT BUTTON.
   if (buttons & BUTTON_LEFT) {
-    LCD.clear();
-    LCD.setCursor(2, 0);
-    uint8_t k = projectSelect - 1;
-    LCD.print(projectName[k]);
-    LCD.setCursor(6, 1);
-    LCD.print(F("Selected"));
-    delay(TIME_OUT);
+    mainShowProject();
   }
 
   // Show Elapsed Timer time on LCD when user presses RIGHT BUTTON, only while timer is running.
@@ -376,7 +352,7 @@ void loop() {
     if (buttons & BUTTON_RIGHT) {
       LCD.clear();
       for (uint8_t g = 0; g < 25; g++) { // Refresh display fast enough to show counting seconds for ~5 seconds.
-        DateTime now = RTC.now(); // Get current time and date from RTC.
+        DateTime now = RTC.now();
         LCD.setCursor(0, 0);
         LCD.print(F("Elapsed "));
         uint32_t timerStop = now.secondstime();
@@ -519,15 +495,15 @@ void loop() {
   }
   else {
     // Display Date and Time on LCD in 12 hour format.
-    DateTime now = RTC.now(); // Get current time and date from RTC.
+    DateTime now = RTC.now();
     LCD.setCursor(0, 0);
     LCD.print(F("Date "));
-    if (now.month() < 10) { // If month is a single digit precede with a zero.
+    if (now.month() < 10) {
       LCD.print("0");
     }
     LCD.print(now.month(), DEC);
     LCD.print('/');
-    if (now.day() < 10) { // If day is a single digit precede with a zero.
+    if (now.day() < 10) {
       LCD.print("0");
     }
     LCD.print(now.day(), DEC);
@@ -556,12 +532,12 @@ void loop() {
       }
     }
     LCD.print(':');
-    if (now.minute() < 10) { // If minute is a single digit precede with a zero.
+    if (now.minute() < 10) {
       LCD.print("0");
     }
     LCD.print(now.minute(), DEC);
     LCD.print(':');
-    if (now.second() < 10) { // If second is a single digit precede with a zero.
+    if (now.second() < 10) {
       LCD.print("0");
     }
     LCD.print(now.second(), DEC);
@@ -591,6 +567,19 @@ void loop() {
   RTC.writenvram(7, now.minute());
   RTC.writenvram(8, now.second());
   RTC.writenvram(9, timeFormat);
+}
+
+void mainShowProject() {
+  RTC.writenvram(0, colorSelect);
+  RTC.writenvram(1, projectSelect);
+  LCD.setBacklight(colorSelect);
+  LCD.clear();
+  LCD.setCursor(2, 0);
+  uint8_t k = projectSelect - 1;
+  LCD.print(projectName[k]);
+  LCD.setCursor(6, 1);
+  LCD.print(F("Selected"));
+  delay(TIME_OUT);
 }
 
 void serialTime() {
