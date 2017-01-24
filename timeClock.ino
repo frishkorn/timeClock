@@ -7,7 +7,7 @@
 
   Version Tracking
   -----------------------
-  January 23rd, 2016   - v2.0.7-alpha   - Fixed Project Selection Screen error (issue #113). Continued work on issue #95.
+  January 23rd, 2016   - v2.0.7-alpha   - Fixed Project Selection Screen error (issue #113). Moved some code into functions (issue #95).
   January 22nd, 2016   - v2.0.6-alpha   - Removed file timeExample.xlsm (issue #110). Started work on issue #95, two functions added.
   January 22nd, 2016   - v2.0.6-alpha   - Updated serialOutput.txt, projects.txt, and fixed README.md (issues #107, #108, & #106).
   December 20th, 2016  - v2.0.5-alpha   - Updated serial output and log file formatting (issue #96).
@@ -141,9 +141,9 @@ void setup() {
   }
 
   // Print Date over Serial Interface.
-  DateTime now = RTC.now();
   Serial.println(F("----------------"));
   Serial.print(F("Date: "));
+  DateTime now = RTC.now();
   if (now.month() < 10) {
     Serial.print("0");
   }
@@ -359,9 +359,9 @@ void loop() {
     if (buttons & BUTTON_RIGHT) {
       LCD.clear();
       for (uint8_t g = 0; g < 25; g++) { // Refresh display fast enough to show counting seconds for ~5 seconds.
-        DateTime now = RTC.now();
         LCD.setCursor(0, 0);
         LCD.print(F("Elapsed "));
+        DateTime now = RTC.now();
         uint32_t timerStop = now.secondstime();
         uint32_t timerTime = timerStop - timerStart;
         uint8_t ss = timerTime % 60;
@@ -468,22 +468,10 @@ void loop() {
 
   // Display Date and Time on LCD in 24 hour format.
   if (timeFormat == 1) {
-    DateTime now = RTC.now();
-    LCD.setCursor(0, 0);
-    LCD.print(F("Date "));
-    if (now.month() < 10) {
-      LCD.print("0");
-    }
-    LCD.print(now.month(), DEC);
-    LCD.print('/');
-    if (now.day() < 10) {
-      LCD.print("0");
-    }
-    LCD.print(now.day(), DEC);
-    LCD.print('/');
-    LCD.print(now.year(), DEC);
+    LCDprintDate();
     LCD.setCursor(0, 1);
     LCD.print(F("Time "));
+    DateTime now = RTC.now();
     if (now.hour() < 10) {
       LCD.print("0");
     }
@@ -502,22 +490,10 @@ void loop() {
   }
   else {
     // Display Date and Time on LCD in 12 hour format.
-    DateTime now = RTC.now();
-    LCD.setCursor(0, 0);
-    LCD.print(F("Date "));
-    if (now.month() < 10) {
-      LCD.print("0");
-    }
-    LCD.print(now.month(), DEC);
-    LCD.print('/');
-    if (now.day() < 10) {
-      LCD.print("0");
-    }
-    LCD.print(now.day(), DEC);
-    LCD.print('/');
-    LCD.print(now.year(), DEC);
+    LCDprintDate();
     LCD.setCursor(0, 1);
     LCD.print(F("Time "));
+    DateTime now = RTC.now();
     if (now.hour() > 12) { // RTC is in 24 hour format, subtract 12 for 12 hour time.
       if (now.hour() < 22) { // Don't precede with a zero for 10:00 & 11:00 PM.
         LCD.print("0");
@@ -602,4 +578,21 @@ void serialTime() {
     Serial.print("0");
   }
   Serial.println(now.second(), DEC);
+}
+
+void LCDprintDate() {
+  LCD.setCursor(0, 0);
+  LCD.print(F("Date "));
+  DateTime now = RTC.now();
+  if (now.month() < 10) {
+    LCD.print("0");
+  }
+  LCD.print(now.month(), DEC);
+  LCD.print('/');
+  if (now.day() < 10) {
+    LCD.print("0");
+  }
+  LCD.print(now.day(), DEC);
+  LCD.print('/');
+  LCD.print(now.year(), DEC);
 }

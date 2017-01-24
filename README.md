@@ -18,7 +18,7 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
-**January 23rd, 2016  - v2.0.7-alpha   -** *Fixed Project Selection Screen error (issue #113). Continued work on issue #95.*
+**January 23rd, 2016  - v2.0.7-alpha   -** *Fixed Project Selection Screen error (issue #113). Moved some code into functions (issue #95).*
 
 **January 22nd, 2016  - v2.0.6-alpha   -** *Removed file timeExample.xlsm (issue #110). Started work on issue #95, two functions added.*
 
