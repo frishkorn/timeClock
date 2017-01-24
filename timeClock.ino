@@ -1,13 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 2.0.6-alpha by Chris Frishkorn.
+  Current version 2.0.7-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
-  January 23rd, 2016   - v2.0.7-alpha   - Started work on issue #113.
+  January 23rd, 2016   - v2.0.7-alpha   - Fixed Project Selection Screen error (issue #113). Continued work on issue #95.
   January 22nd, 2016   - v2.0.6-alpha   - Removed file timeExample.xlsm (issue #110). Started work on issue #95, two functions added.
   January 22nd, 2016   - v2.0.6-alpha   - Updated serialOutput.txt, projects.txt, and fixed README.md (issues #107, #108, & #106).
   December 20th, 2016  - v2.0.5-alpha   - Updated serial output and log file formatting (issue #96).
@@ -71,9 +71,9 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock"));
   LCD.setCursor(7, 1);
-  LCD.print(F("v2.0.6a"));
+  LCD.print(F("v2.0.7a"));
   Serial.println(F("----------------------"));
-  Serial.println(F("timeClock v2.0.6-alpha"));
+  Serial.println(F("timeClock v2.0.7-alpha"));
   Serial.println(F("----------------------"));
   if (!RTC.isrunning()) {
     error("RTC Not Set");
@@ -218,6 +218,9 @@ void loop() {
       else {
         colorSelect++;
         projectSelect--;
+        RTC.writenvram(0, colorSelect);
+        RTC.writenvram(1, projectSelect);
+        LCD.setBacklight(colorSelect);
         mainShowProject();
       }
     }
@@ -231,6 +234,9 @@ void loop() {
       else {
         colorSelect--;
         projectSelect++;
+        RTC.writenvram(0, colorSelect);
+        RTC.writenvram(1, projectSelect);
+        LCD.setBacklight(colorSelect);
         mainShowProject();
       }
     }
@@ -276,6 +282,10 @@ void loop() {
     // Timer starts with the first press of the SELECT BUTTON.
     if (timerState == 1 && prevState == 0) {
       timerStart = now.secondstime(); // Time from RTC in seconds since 1/1/2000.
+      Serial.println(projectName[k]);
+      Serial.println(F("--------"));
+      Serial.print(F("Timer Started: "));
+      serialTime();
       delay(TIME_OUT);
       LCD.setBacklight(1);
       LCD.clear();
@@ -283,10 +293,6 @@ void loop() {
       LCD.print(F("Timer"));
       LCD.setCursor(5, 1);
       LCD.print(F("Started!"));
-      Serial.println(projectName[k]);
-      Serial.println(F("--------"));
-      Serial.print(F("Timer Started: "));
-      serialTime();
     }
 
     // Timer stops with the second press of the SELECT BUTTON.
@@ -312,6 +318,8 @@ void loop() {
         logFile.print("0");
       }
       logFile.println(ss, DEC);
+      Serial.print(F("Timer Stopped: "));
+      serialTime();
       delay(TIME_OUT);
       LCD.setBacklight(colorSelect);
       LCD.clear();
@@ -319,8 +327,6 @@ void loop() {
       LCD.print(F("Timer"));
       LCD.setCursor(5, 1);
       LCD.print(F("Stopped!"));
-      Serial.print(F("Timer Stopped: "));
-      serialTime();
       Serial.println(F("-"));
       Serial.print(F("Elapsed Timer: "));
       if (hh < 10) {
@@ -556,7 +562,7 @@ void loop() {
   logFile.flush();
 
   // Write heartbeat and user time selection to NV_SRAM.
-  DateTime now = RTC.now(); // Get current time and date from RTC.
+  DateTime now = RTC.now();
   RTC.writenvram(2, now.month());
   RTC.writenvram(3, now.day());
   uint16_t fyear = now.year();
@@ -571,9 +577,6 @@ void loop() {
 }
 
 void mainShowProject() {
-  RTC.writenvram(0, colorSelect);
-  RTC.writenvram(1, projectSelect);
-  LCD.setBacklight(colorSelect);
   LCD.clear();
   LCD.setCursor(2, 0);
   uint8_t k = projectSelect - 1;
