@@ -18,7 +18,7 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
-**March 1st, 2017     - v2.0.8-alpha   -** *Optimzed memory by moving strings into for loops (issue #114)*
+**March 1st, 2017     - v2.0.8-alpha   -** *Optimized memory by moving dashed line strings into for loops (issue #114)*
 
 **January 23rd, 2016  - v2.0.7-alpha   -** *Fixed Project Selection Screen error (issue #113). Moved some code into functions (issue #95).*
 
