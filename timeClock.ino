@@ -1,15 +1,16 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 2.0.7-alpha by Chris Frishkorn.
+  Current version 2.0.8-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
-  January 23rd, 2016   - v2.0.7-alpha   - Fixed Project Selection Screen error (issue #113). Moved some code into functions (issue #95).
-  January 22nd, 2016   - v2.0.6-alpha   - Removed file timeExample.xlsm (issue #110). Started work on issue #95, two functions added.
-  January 22nd, 2016   - v2.0.6-alpha   - Updated serialOutput.txt, projects.txt, and fixed README.md (issues #107, #108, & #106).
+  March 1st, 2017      - v2.0.8-alpha   - Optimized memory by moving dashed line strings into for loops (issue #114).
+  January 23rd, 2017   - v2.0.7-alpha   - Fixed Project Selection Screen error (issue #113). Moved some code into functions (issue #95).
+  January 22nd, 2017   - v2.0.6-alpha   - Removed file timeExample.xlsm (issue #110). Started work on issue #95, two functions added.
+  January 22nd, 2017   - v2.0.6-alpha   - Updated serialOutput.txt, projects.txt, and fixed README.md (issues #107, #108, & #106).
   December 20th, 2016  - v2.0.5-alpha   - Updated serial output and log file formatting (issue #96).
   October 30th, 2016   - v2.0.4-alpha   - 0 added to seconds in logFile heartbeat (issue #101).
   October 28th, 2016   - v2.0.3-alpha   - Fixed Uninitialized projects.txt File from rendering blank projects (issue #65).
@@ -71,10 +72,10 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock"));
   LCD.setCursor(7, 1);
-  LCD.print(F("v2.0.7a"));
-  Serial.println(F("----------------------"));
-  Serial.println(F("timeClock v2.0.7-alpha"));
-  Serial.println(F("----------------------"));
+  LCD.print(F("v2.0.8a"));
+  printLineLong();
+  Serial.println(F("timeClock v2.0.8-alpha"));
+  printLineLong();
   if (!RTC.isrunning()) {
     error("RTC Not Set");
     Serial.println(F("RTC is NOT running!"));
@@ -141,7 +142,7 @@ void setup() {
   }
 
   // Print Date over Serial Interface.
-  Serial.println(F("----------------"));
+  printLineMed();
   Serial.print(F("Date: "));
   DateTime now = RTC.now();
   if (now.month() < 10) {
@@ -155,7 +156,7 @@ void setup() {
   Serial.print(now.day(), DEC);
   Serial.print('/');
   Serial.println(now.year(), DEC);
-  Serial.println(F("----------------"));
+  printLineMed();
 
   // Read last heartbeat from NV_SRAM and write header to top of log-file.
   logFile.print(F("Last heartbeat detected: "));
@@ -283,7 +284,7 @@ void loop() {
     if (timerState == 1 && prevState == 0) {
       timerStart = now.secondstime(); // Time from RTC in seconds since 1/1/2000.
       Serial.println(projectName[k]);
-      Serial.println(F("--------"));
+      printLineShort();
       Serial.print(F("Timer Started: "));
       serialTime();
       delay(TIME_OUT);
@@ -327,7 +328,7 @@ void loop() {
       LCD.print(F("Timer"));
       LCD.setCursor(5, 1);
       LCD.print(F("Stopped!"));
-      Serial.println(F("-"));
+      printLineShort();
       Serial.print(F("Elapsed Timer: "));
       if (hh < 10) {
         Serial.print("0");
@@ -343,7 +344,7 @@ void loop() {
         Serial.print("0");
       }
       Serial.println(ss, DEC);
-      Serial.println("--------+");
+      printLineShort();
     }
     prevState = timerState;
     delay(TIME_OUT);
@@ -532,7 +533,7 @@ void loop() {
     }
   }
 
-  // Write data to card, only if 5 seconds has elasped since last write.
+  // Write data to card, only if 5 seconds has elapsed since last write.
   if ((millis() - syncTime) < SYNC_INTERVAL) return;
   syncTime = millis();
   logFile.flush();
@@ -596,3 +597,25 @@ void LCDprintDate() {
   LCD.print('/');
   LCD.print(now.year(), DEC);
 }
+
+void printLineLong() {
+  for (uint8_t l = 0; l < 21; l++) {
+    Serial.print("-");
+  }
+  Serial.println("-");
+}
+
+void printLineMed() {
+  for (uint8_t l = 0; l < 15; l++) {
+    Serial.print("-");
+  }
+  Serial.println("-");
+}
+
+void printLineShort() {
+  for (uint8_t l = 0; l < 7; l++) {
+    Serial.print("-");
+  }
+  Serial.println("-");
+}
+
