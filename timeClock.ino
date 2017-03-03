@@ -7,7 +7,7 @@
 
   Version Tracking
   -----------------------
-  March 2nd, 2017      - v2.0.9-alpha   - Started work on issue #116.
+  March 2nd, 2017      - v2.0.9-alpha   - Date change now prints new date to serial interface (issue #116).
   March 1st, 2017      - v2.0.8-alpha   - Optimized memory by moving dashed line strings into for loops (issue #114).
   January 23rd, 2017   - v2.0.7-alpha   - Fixed Project Selection Screen error (issue #113). Moved some code into functions (issue #95).
   January 22nd, 2017   - v2.0.6-alpha   - Removed file timeExample.xlsm (issue #110). Started work on issue #95, two functions added.
@@ -36,7 +36,7 @@
 #define PAUSE 100
 
 uint32_t syncTime, timerStart;
-uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState, timeFormat;
+uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState, timeFormat, rollOver;
 const uint8_t chipSelect = 10;
 char projectName[7][9];
 
@@ -524,9 +524,13 @@ void loop() {
   if (timerState == 0) {
     DateTime now = RTC.now();
     if (now.hour() == 0 && now.minute() == 0) {
-      if (millis() > 60000) { // Prevent the rare condition of printing date twice if device is booted right after midnight.
+      if (millis() > 60000 && rollOver == 0) { // Prevent the rare condition of printing date twice if device is booted right after midnight.
         serialDate();
+        rollOver = 1 + rollOver;
       }
+    }
+    if (now.hour() == 0 && now.minute() == 1) {
+      rollOver = 0;
     }
   }
 
