@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 2.0.8-alpha by Chris Frishkorn.
+  Current version 2.0.9-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  March 2nd, 2017      - v2.0.9-alpha   - Date change now prints new date to serial interface (issue #116).
   March 1st, 2017      - v2.0.8-alpha   - Optimized memory by moving dashed line strings into for loops (issue #114).
   January 23rd, 2017   - v2.0.7-alpha   - Fixed Project Selection Screen error (issue #113). Moved some code into functions (issue #95).
   January 22nd, 2017   - v2.0.6-alpha   - Removed file timeExample.xlsm (issue #110). Started work on issue #95, two functions added.
@@ -35,7 +36,7 @@
 #define PAUSE 100
 
 uint32_t syncTime, timerStart;
-uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState, timeFormat;
+uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState, timeFormat, rollOver;
 const uint8_t chipSelect = 10;
 char projectName[7][9];
 
@@ -72,9 +73,9 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock"));
   LCD.setCursor(7, 1);
-  LCD.print(F("v2.0.8a"));
+  LCD.print(F("v2.0.9a"));
   printLineLong();
-  Serial.println(F("timeClock v2.0.8-alpha"));
+  Serial.println(F("timeClock v2.0.9-alpha"));
   printLineLong();
   if (!RTC.isrunning()) {
     error("RTC Not Set");
@@ -142,21 +143,7 @@ void setup() {
   }
 
   // Print Date over Serial Interface.
-  printLineMed();
-  Serial.print(F("Date: "));
-  DateTime now = RTC.now();
-  if (now.month() < 10) {
-    Serial.print("0");
-  }
-  Serial.print(now.month(), DEC);
-  Serial.print('/');
-  if (now.day() < 10) {
-    Serial.print("0");
-  }
-  Serial.print(now.day(), DEC);
-  Serial.print('/');
-  Serial.println(now.year(), DEC);
-  printLineMed();
+  serialDate();
 
   // Read last heartbeat from NV_SRAM and write header to top of log-file.
   logFile.print(F("Last heartbeat detected: "));
@@ -533,6 +520,20 @@ void loop() {
     }
   }
 
+  // Print Date over Serial Interface if Date increases by 1 day only if timer is not recording.
+  if (timerState == 0) {
+    DateTime now = RTC.now();
+    if (now.hour() == 0 && now.minute() == 0) {
+      if (millis() > 60000 && rollOver == 0) { // Prevent the rare condition of printing date twice if device is booted right after midnight.
+        serialDate();
+        rollOver = 1 + rollOver;
+      }
+    }
+    if (now.hour() == 0 && now.minute() == 1) {
+      rollOver = 0;
+    }
+  }
+
   // Write data to card, only if 5 seconds has elapsed since last write.
   if ((millis() - syncTime) < SYNC_INTERVAL) return;
   syncTime = millis();
@@ -561,6 +562,24 @@ void mainShowProject() {
   LCD.setCursor(6, 1);
   LCD.print(F("Selected"));
   delay(TIME_OUT);
+}
+
+void serialDate() {
+  printLineMed();
+  Serial.print(F("Date: "));
+  DateTime now = RTC.now();
+  if (now.month() < 10) {
+    Serial.print("0");
+  }
+  Serial.print(now.month(), DEC);
+  Serial.print('/');
+  if (now.day() < 10) {
+    Serial.print("0");
+  }
+  Serial.print(now.day(), DEC);
+  Serial.print('/');
+  Serial.println(now.year(), DEC);
+  printLineMed();
 }
 
 void serialTime() {
