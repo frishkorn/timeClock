@@ -143,21 +143,7 @@ void setup() {
   }
 
   // Print Date over Serial Interface.
-  printLineMed();
-  Serial.print(F("Date: "));
-  DateTime now = RTC.now();
-  if (now.month() < 10) {
-    Serial.print("0");
-  }
-  Serial.print(now.month(), DEC);
-  Serial.print('/');
-  if (now.day() < 10) {
-    Serial.print("0");
-  }
-  Serial.print(now.day(), DEC);
-  Serial.print('/');
-  Serial.println(now.year(), DEC);
-  printLineMed();
+  serialDate();
 
   // Read last heartbeat from NV_SRAM and write header to top of log-file.
   logFile.print(F("Last heartbeat detected: "));
@@ -534,6 +520,16 @@ void loop() {
     }
   }
 
+  // Print Date over Serial Interface if Date increases by 1 day only if timer is not recording.
+  if (timerState == 0) {
+    DateTime now = RTC.now();
+    if (now.hour() == 0 && now.minute() == 0) {
+      if (millis() > 60000) { // Prevent the rare condition of printing date twice if device is booted right after midnight.
+        serialDate();
+      }
+    }
+  }
+
   // Write data to card, only if 5 seconds has elapsed since last write.
   if ((millis() - syncTime) < SYNC_INTERVAL) return;
   syncTime = millis();
@@ -562,6 +558,24 @@ void mainShowProject() {
   LCD.setCursor(6, 1);
   LCD.print(F("Selected"));
   delay(TIME_OUT);
+}
+
+void serialDate() {
+  printLineMed();
+  Serial.print(F("Date: "));
+  DateTime now = RTC.now();
+  if (now.month() < 10) {
+    Serial.print("0");
+  }
+  Serial.print(now.month(), DEC);
+  Serial.print('/');
+  if (now.day() < 10) {
+    Serial.print("0");
+  }
+  Serial.print(now.day(), DEC);
+  Serial.print('/');
+  Serial.println(now.year(), DEC);
+  printLineMed();
 }
 
 void serialTime() {
