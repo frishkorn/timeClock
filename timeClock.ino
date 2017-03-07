@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 2.0.9-alpha by Chris Frishkorn.
+  Current version 2.0.10-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  March 6th, 2017      - v2.0.10-alpha  - Uninitialized projects.txt now reports status  (issue #102).
   March 2nd, 2017      - v2.0.9-alpha   - Date change now prints new date to serial interface (issue #116).
   March 1st, 2017      - v2.0.8-alpha   - Optimized memory by moving dashed line strings into for loops (issue #114).
   January 23rd, 2017   - v2.0.7-alpha   - Fixed Project Selection Screen error (issue #113). Moved some code into functions (issue #95).
@@ -72,10 +73,10 @@ void setup() {
   LCD.setBacklight(colorSelect);
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock"));
-  LCD.setCursor(7, 1);
-  LCD.print(F("v2.0.9a"));
+  LCD.setCursor(6, 1);
+  LCD.print(F("v2.0.10a"));
   printLineLong();
-  Serial.println(F("timeClock v2.0.9-alpha"));
+  Serial.println(F("timeClock v2.0.10-alpha"));
   printLineLong();
   if (!RTC.isrunning()) {
     error("RTC Not Set");
@@ -101,16 +102,18 @@ void setup() {
         line.toCharArray(projectName[h], 9);
       }
     }
+    delay(TIME_OUT);
+    Serial.println(F("Done."));
   } else {
     // Set projectName to Project1 - Project6 if SD card contains no projects.txt file.
     for (uint8_t x = 0; x < 6; x++) {
       strcpy(projectName[x], "Project");
       projectName[x][7] = 49 + x;
     }
+    delay(TIME_OUT);
+    Serial.println(F("Not found!"));
   }
   projects.close();
-  delay(TIME_OUT);
-  Serial.println(F("Done."));
 
   // LCD cannot render ASCII character 13 (CR), replace with 32 (SPACE).
   for (uint8_t a = 0; a < 6; a++) {
@@ -618,7 +621,7 @@ void LCDprintDate() {
 }
 
 void printLineLong() {
-  for (uint8_t l = 0; l < 21; l++) {
+  for (uint8_t l = 0; l < 22; l++) {
     Serial.print("-");
   }
   Serial.println("-");
