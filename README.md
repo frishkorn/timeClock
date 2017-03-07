@@ -18,7 +18,7 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
-**March 6th, 2017     - v2.0.10-alpha  -** *Started work on issue #102.*
+**March 6th, 2017     - v2.0.10-alpha  -** *Uninitialized projects.txt now reports status  (issue #102)*
 
 **March 2nd, 2017     - v2.0.9-alpha   -** *Date change now prints new date to serial interface (issue #116).*
 
