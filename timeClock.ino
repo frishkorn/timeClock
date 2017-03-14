@@ -1,13 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Current version 2.0.11-alpha by Chris Frishkorn.
+  Version 2.1.0-beta by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
-  March 13th, 2017     - v2.0.11-alpha  - Started work on issue #75.
+  March 13th, 2017     - v2.1.0-beta    - Added Interval Flash every 15 minutes (issue #75).
   March 6th, 2017      - v2.0.10-alpha  - Uninitialized projects.txt now reports status  (issue #102).
   March 2nd, 2017      - v2.0.9-alpha   - Date change now prints new date to serial interface (issue #116).
   March 1st, 2017      - v2.0.8-alpha   - Optimized memory by moving dashed line strings into for loops (issue #114).
@@ -32,13 +32,15 @@
 #include <RTClib.h>
 #include <Adafruit_RGBLCDShield.h>
 
-#define MAX_INTERVAL 360000
-#define SYNC_INTERVAL 5000
+#define MAX_INTERVAL 360000 // seconds
+#define NOTIFY_INTERVAL 900
+#define SYNC_INTERVAL 5000 // milli-seconds
 #define TIME_OUT 1500
+#define BLINK 1000
 #define PAUSE 100
 
-uint32_t syncTime, timerStart;
-uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState, timeFormat, rollOver;
+uint32_t syncTime, timerStart, blinkStart;
+uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState, timeFormat, rollOver, blinkCount;
 const uint8_t chipSelect = 10;
 char projectName[7][9];
 
@@ -74,10 +76,10 @@ void setup() {
   LCD.setBacklight(colorSelect);
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock"));
-  LCD.setCursor(6, 1);
-  LCD.print(F("v2.0.11a"));
+  LCD.setCursor(7, 1);
+  LCD.print(F("v2.1.0b"));
   printLineLong();
-  Serial.println(F("timeClock v2.0.11-alpha"));
+  Serial.println(F("timeClock v2.1.0-beta"));
   printLineLong();
   if (!RTC.isrunning()) {
     error("RTC Not Set");
@@ -274,6 +276,7 @@ void loop() {
     // Timer starts with the first press of the SELECT BUTTON.
     if (timerState == 1 && prevState == 0) {
       timerStart = now.secondstime(); // Time from RTC in seconds since 1/1/2000.
+      blinkStart = now.secondstime();
       Serial.println(projectName[k]);
       printLineShort();
       Serial.print(F("Timer Started: "));
@@ -338,6 +341,7 @@ void loop() {
       printLineShort();
     }
     prevState = timerState;
+    blinkCount = 0;
     delay(TIME_OUT);
   }
 
@@ -538,6 +542,23 @@ void loop() {
     }
   }
 
+  // If timer is active, for every 15 minute interval that has elapsed, blink screen that number of times.
+  if (timerState == 1) {
+    DateTime now = RTC.now();
+    uint32_t blinkTimer = now.secondstime();
+    if ((blinkTimer - blinkStart) == NOTIFY_INTERVAL) {
+      blinkStart = blinkTimer;
+      for (uint8_t n = 0; n < 3; n++) {
+        blinkLCD();
+      }
+      delay(TIME_OUT);
+      for (uint8_t c = 0; c <= blinkCount; c++) {
+        blinkLCD();
+      }
+      blinkCount++;
+    }
+  }
+
   // Write data to card, only if 5 seconds has elapsed since last write.
   if ((millis() - syncTime) < SYNC_INTERVAL) return;
   syncTime = millis();
@@ -621,8 +642,15 @@ void LCDprintDate() {
   LCD.print(now.year(), DEC);
 }
 
+void blinkLCD() {
+  LCD.setBacklight(0);
+  delay(BLINK);
+  LCD.setBacklight(1);
+  delay(BLINK);
+}
+
 void printLineLong() {
-  for (uint8_t l = 0; l < 22; l++) {
+  for (uint8_t l = 0; l < 20; l++) {
     Serial.print("-");
   }
   Serial.println("-");
