@@ -20,7 +20,7 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
-**March 13th, 2017    - v2.1.0-beta    -** *Started work on issue #75.*
+**March 13th, 2017    - v2.1.0-beta    -** *Added Interval Flash every 15 minutes (issue #75)*
 
 **March 6th, 2017     - v2.0.10-alpha  -** *Uninitialized projects.txt now reports status  (issue #102)*
 
