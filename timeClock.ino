@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Version 2.1.0-beta by Chris Frishkorn.
+  Version 2.1.1-release by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  March 15th, 2017     - v2.1.1-release - Released version 2.1.1.
   March 13th, 2017     - v2.1.0-beta    - Added Interval Flash every 15 minutes (issue #75).
   March 6th, 2017      - v2.0.10-alpha  - Uninitialized projects.txt now reports status  (issue #102).
   March 2nd, 2017      - v2.0.9-alpha   - Date change now prints new date to serial interface (issue #116).
@@ -76,10 +77,10 @@ void setup() {
   LCD.setBacklight(colorSelect);
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock"));
-  LCD.setCursor(7, 1);
-  LCD.print(F("v2.1.0b"));
+  LCD.setCursor(8, 1);
+  LCD.print(F("v2.1.1"));
   printLineLong();
-  Serial.println(F("timeClock v2.1.0-beta"));
+  Serial.println(F("timeClock v2.1.1-release"));
   printLineLong();
   if (!RTC.isrunning()) {
     error("RTC Not Set");
@@ -546,7 +547,7 @@ void loop() {
   if (timerState == 1) {
     DateTime now = RTC.now();
     uint32_t blinkTimer = now.secondstime();
-    if ((blinkTimer - blinkStart) == NOTIFY_INTERVAL) {
+    if ((blinkTimer - blinkStart) >= NOTIFY_INTERVAL) {
       blinkStart = blinkTimer;
       for (uint8_t n = 0; n < 3; n++) {
         blinkLCD();
@@ -650,7 +651,7 @@ void blinkLCD() {
 }
 
 void printLineLong() {
-  for (uint8_t l = 0; l < 20; l++) {
+  for (uint8_t l = 0; l < 23; l++) {
     Serial.print("-");
   }
   Serial.println("-");

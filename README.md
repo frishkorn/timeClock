@@ -1,6 +1,6 @@
-##timeClock - v2.1.0-beta
+timeClock - v2.1.1-release
 ---
-###An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
+An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
 
 *Arduino Uno, SD Shield, and RGB LCD Shield are required. There is a timeUtility.ino file in the utility folder you can run once to set the RTC and clear the devices onboard memory.*
 
@@ -20,6 +20,8 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
+**March 15th, 2017    - v2.1.1-release -** *Released version 2.1.1.*
+
 **March 13th, 2017    - v2.1.0-beta    -** *Added Interval Flash every 15 minutes (issue #75)*
 
 **March 6th, 2017     - v2.0.10-alpha  -** *Uninitialized projects.txt now reports status  (issue #102)*
