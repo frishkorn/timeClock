@@ -1,51 +1,58 @@
-----------------------
-timeClock v2.0.5-alpha
-----------------------
+------------------------
+timeClock v2.1.0-release
+------------------------
 SD card initializing... Done.
 Reading projects.txt file... Done.
-Creating file RECORD07.CSV... Done.
+Creating file RECORD40.CSV... Done.
 ----------------
-Date: 01/22/2017
+Date: 03/15/2017
 ----------------
 Meeting 
 --------
-Timer Started: 13:41:56
-Timer Stopped: 13:43:48
--
-Elapsed Timer: 00:01:52
---------+
-Software
+Timer Started: 09:08:52
+Timer Stopped: 09:39:14
 --------
-Timer Started: 13:44:03
-Timer Stopped: 13:48:11
--
-Elapsed Timer: 00:04:08
---------+
-Hardware
+Elapsed Timer: 00:30:21
 --------
-Timer Started: 13:48:57
-Timer Stopped: 14:00:54
--
-Elapsed Timer: 00:11:57
---------+
-Wireless
---------
-Timer Started: 14:01:11
-Timer Stopped: 14:11:43
--
-Elapsed Timer: 00:10:32
---------+
 Break 
 --------
-Timer Started: 14:12:54
-Timer Stopped: 14:16:13
--
-Elapsed Timer: 00:03:19
---------+
-Lunch 
+Timer Started: 09:40:00
+Timer Stopped: 09:55:13
 --------
-Timer Started: 14:16:22
-Timer Stopped: 14:20:46
--
-Elapsed Timer: 00:04:24
---------+
+Elapsed Timer: 00:15:13
+--------
+Software
+--------
+Timer Started: 09:55:34
+Timer Stopped: 11:41:31
+--------
+Elapsed Timer: 01:45:56
+--------
+Lunch
+--------
+Timer Started: 11:42:00
+Timer Stopped: 13:16:50
+--------
+Elapsed Timer: 01:34:50
+--------
+Hardware
+--------
+Timer Started: 13:18:00
+Timer Stopped: 15:28:05
+--------
+Elapsed Timer: 02:10:05
+--------
+Break 
+--------
+Timer Started: 15:28:25
+Timer Stopped: 15:43:40
+--------
+Elapsed Timer: 00:15:15
+--------
+Wireless
+--------
+Timer Started: 15:44:00
+Timer Stopped: 18:46:22
+--------
+Elapsed Timer: 03:02:22
+--------
