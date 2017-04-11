@@ -1,27 +1,14 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Version 2.1.1-release by Chris Frishkorn.
+  Version 2.2.0-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  April 10th, 2017     - v2.2.0-alpha   - Started work on issue #127.
   March 15th, 2017     - v2.1.1-release - Released version 2.1.1.
-  March 13th, 2017     - v2.1.0-beta    - Added Interval Flash every 15 minutes (issue #75).
-  March 6th, 2017      - v2.0.10-alpha  - Uninitialized projects.txt now reports status  (issue #102).
-  March 2nd, 2017      - v2.0.9-alpha   - Date change now prints new date to serial interface (issue #116).
-  March 1st, 2017      - v2.0.8-alpha   - Optimized memory by moving dashed line strings into for loops (issue #114).
-  January 23rd, 2017   - v2.0.7-alpha   - Fixed Project Selection Screen error (issue #113). Moved some code into functions (issue #95).
-  January 22nd, 2017   - v2.0.6-alpha   - Removed file timeExample.xlsm (issue #110). Started work on issue #95, two functions added.
-  January 22nd, 2017   - v2.0.6-alpha   - Updated serialOutput.txt, projects.txt, and fixed README.md (issues #107, #108, & #106).
-  December 20th, 2016  - v2.0.5-alpha   - Updated serial output and log file formatting (issue #96).
-  October 30th, 2016   - v2.0.4-alpha   - 0 added to seconds in logFile heartbeat (issue #101).
-  October 28th, 2016   - v2.0.3-alpha   - Fixed Uninitialized projects.txt File from rendering blank projects (issue #65).
-  October 27th, 2016   - v2.0.3-alpha   - Removed references to hex values for ASCII, moved timerState to the correct location.
-  October 26th, 2016   - v2.0.2-alpha   - Fixed Carriage Return LCD rendering problem (issue #92).
-  September 5th, 2016  - v2.0.1-alpha   - Added seconds to heartbeat resolution (issue #90).
-  August 23rd, 2016    - v2.0.0-release - Released version 2.0.
 
   - See GitHub for older version tracking notes.
 
@@ -45,13 +32,13 @@ uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState, timeFormat, r
 const uint8_t chipSelect = 10;
 char projectName[7][9];
 
-RTC_DS1307 RTC;
+RTC_DS1307 RTCA;
 File logFile;
 Adafruit_RGBLCDShield LCD = Adafruit_RGBLCDShield();
 
 void dateTime(uint16_t *date, uint16_t *time) {
   // Set file date / time from RTC for SD card FAT time.
-  DateTime now = RTC.now();
+  DateTime now = RTCA.now();
   *date = FAT_DATE(now.year(), now.month(), now.day());
   *time = FAT_TIME(now.hour(), now.minute(), now.second());
 }
@@ -71,18 +58,18 @@ void setup() {
   // Intialize Serial, I2C, LCD communications.
   Serial.begin(9600);
   Wire.begin();
-  RTC.begin();
+  RTCA.begin();
   LCD.begin(16, 2);
   LCD.clear();
   LCD.setBacklight(colorSelect);
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock"));
-  LCD.setCursor(8, 1);
-  LCD.print(F("v2.1.1"));
+  LCD.setCursor(7, 1);
+  LCD.print(F("v2.2.0a"));
   printLineLong();
-  Serial.println(F("timeClock v2.1.1-release"));
+  Serial.println(F("timeClock v2.2.0-alpha"));
   printLineLong();
-  if (!RTC.isrunning()) {
+  if (!RTCA.isrunning()) {
     error("RTC Not Set");
     Serial.println(F("RTC is NOT running!"));
   }
@@ -154,28 +141,28 @@ void setup() {
 
   // Read last heartbeat from NV_SRAM and write header to top of log-file.
   logFile.print(F("Last heartbeat detected: "));
-  if (RTC.readnvram(2) != 255 && RTC.readnvram(7) != 255) {
-    logFile.print(RTC.readnvram(2), DEC); // Print Month to log-file.
+  if (RTCA.readnvram(2) != 255 && RTCA.readnvram(7) != 255) {
+    logFile.print(RTCA.readnvram(2), DEC); // Print Month to log-file.
     logFile.print("/");
-    logFile.print(RTC.readnvram(3), DEC); // Print Day to log-file.
+    logFile.print(RTCA.readnvram(3), DEC); // Print Day to log-file.
     logFile.print("/");
-    logFile.print(RTC.readnvram(4), DEC); // Print Year to log-file.
-    logFile.print(RTC.readnvram(5), DEC);
+    logFile.print(RTCA.readnvram(4), DEC); // Print Year to log-file.
+    logFile.print(RTCA.readnvram(5), DEC);
     logFile.print(F(" @ "));
-    if (RTC.readnvram(6) < 10) {
+    if (RTCA.readnvram(6) < 10) {
       logFile.print("0");
     }
-    logFile.print(RTC.readnvram(6), DEC); // Print Hour to log-file.
+    logFile.print(RTCA.readnvram(6), DEC); // Print Hour to log-file.
     logFile.print(":");
-    if (RTC.readnvram(7) < 10) {
+    if (RTCA.readnvram(7) < 10) {
       logFile.print("0");
     }
-    logFile.print(RTC.readnvram(7), DEC); // Print Minute to log-file.
+    logFile.print(RTCA.readnvram(7), DEC); // Print Minute to log-file.
     logFile.print(":");
-    if (RTC.readnvram(8) < 10) {
+    if (RTCA.readnvram(8) < 10) {
       logFile.print("0");
     }
-    logFile.println(RTC.readnvram(8), DEC); // Print Second to log-file.
+    logFile.println(RTCA.readnvram(8), DEC); // Print Second to log-file.
   }
   else {
     logFile.println(F("None"));
@@ -184,8 +171,8 @@ void setup() {
   LCD.clear();
 
   // Read first byte of NV_SRAM, set colorSelect and projectSelect.
-  colorSelect = RTC.readnvram(0);
-  projectSelect = RTC.readnvram(1);
+  colorSelect = RTCA.readnvram(0);
+  projectSelect = RTCA.readnvram(1);
   if (colorSelect == 255 && projectSelect == 255) { // Set to defaults if RTC has been recently set and NV_SRAM wiped.
     colorSelect = 7;
     projectSelect = 1;
@@ -193,7 +180,7 @@ void setup() {
   LCD.setBacklight(colorSelect);
 
   // Read previously user set timeFormat.
-  timeFormat = RTC.readnvram(9);
+  timeFormat = RTCA.readnvram(9);
   if (timeFormat > 1) {
     timeFormat = 0;
   }
@@ -207,14 +194,14 @@ void loop() {
       if (colorSelect >= 7) {
         colorSelect = 7;
         projectSelect = 1;
-        RTC.writenvram(0, colorSelect);
-        RTC.writenvram(1, projectSelect);
+        RTCA.writenvram(0, colorSelect);
+        RTCA.writenvram(1, projectSelect);
       }
       else {
         colorSelect++;
         projectSelect--;
-        RTC.writenvram(0, colorSelect);
-        RTC.writenvram(1, projectSelect);
+        RTCA.writenvram(0, colorSelect);
+        RTCA.writenvram(1, projectSelect);
         LCD.setBacklight(colorSelect);
         mainShowProject();
       }
@@ -223,14 +210,14 @@ void loop() {
       if (colorSelect <= 2) {
         colorSelect = 2;
         projectSelect = 6;
-        RTC.writenvram(0, colorSelect);
-        RTC.writenvram(1, projectSelect);
+        RTCA.writenvram(0, colorSelect);
+        RTCA.writenvram(1, projectSelect);
       }
       else {
         colorSelect--;
         projectSelect++;
-        RTC.writenvram(0, colorSelect);
-        RTC.writenvram(1, projectSelect);
+        RTCA.writenvram(0, colorSelect);
+        RTCA.writenvram(1, projectSelect);
         LCD.setBacklight(colorSelect);
         mainShowProject();
       }
@@ -240,7 +227,7 @@ void loop() {
   // Log date and time information if the SELECT button is pressed.
   if (buttons & BUTTON_SELECT) {
     uint8_t k = projectSelect - 1;
-    DateTime now = RTC.now();
+    DateTime now = RTCA.now();
     if (now.month() < 10) {
       logFile.print("0");
     }
@@ -358,7 +345,7 @@ void loop() {
       for (uint8_t g = 0; g < 25; g++) { // Refresh display fast enough to show counting seconds for ~5 seconds.
         LCD.setCursor(0, 0);
         LCD.print(F("Elapsed "));
-        DateTime now = RTC.now();
+        DateTime now = RTCA.now();
         uint32_t timerStop = now.secondstime();
         uint32_t timerTime = timerStop - timerStart;
         uint8_t ss = timerTime % 60;
@@ -388,7 +375,7 @@ void loop() {
 
   // If Elapsed Timer reaches 99:59:59 stop timer.
   if (timerState == 1) {
-    DateTime now = RTC.now();
+    DateTime now = RTCA.now();
     uint32_t maxTimer = now.secondstime();
     if ((maxTimer - timerStart) >= MAX_INTERVAL) {
       uint32_t timerStop = now.secondstime();
@@ -468,7 +455,7 @@ void loop() {
     LCDprintDate();
     LCD.setCursor(0, 1);
     LCD.print(F("Time "));
-    DateTime now = RTC.now();
+    DateTime now = RTCA.now();
     if (now.hour() < 10) {
       LCD.print("0");
     }
@@ -490,7 +477,7 @@ void loop() {
     LCDprintDate();
     LCD.setCursor(0, 1);
     LCD.print(F("Time "));
-    DateTime now = RTC.now();
+    DateTime now = RTCA.now();
     if (now.hour() > 12) { // RTC is in 24 hour format, subtract 12 for 12 hour time.
       if (now.hour() < 22) { // Don't precede with a zero for 10:00 & 11:00 PM.
         LCD.print("0");
@@ -531,7 +518,7 @@ void loop() {
 
   // Print Date over Serial Interface if Date increases by 1 day only if timer is not recording.
   if (timerState == 0) {
-    DateTime now = RTC.now();
+    DateTime now = RTCA.now();
     if (now.hour() == 0 && now.minute() == 0) {
       if (millis() > 60000 && rollOver == 0) { // Prevent the rare condition of printing date twice if device is booted right after midnight.
         serialDate();
@@ -545,7 +532,7 @@ void loop() {
 
   // If timer is active, for every 15 minute interval that has elapsed, blink screen that number of times.
   if (timerState == 1) {
-    DateTime now = RTC.now();
+    DateTime now = RTCA.now();
     uint32_t blinkTimer = now.secondstime();
     if ((blinkTimer - blinkStart) >= NOTIFY_INTERVAL) {
       blinkStart = blinkTimer;
@@ -566,18 +553,18 @@ void loop() {
   logFile.flush();
 
   // Write heartbeat and user time selection to NV_SRAM.
-  DateTime now = RTC.now();
-  RTC.writenvram(2, now.month());
-  RTC.writenvram(3, now.day());
+  DateTime now = RTCA.now();
+  RTCA.writenvram(2, now.month());
+  RTCA.writenvram(3, now.day());
   uint16_t fyear = now.year();
   uint8_t hiyear = fyear / 100;
   uint8_t loyear = fyear - 2000;
-  RTC.writenvram(4, hiyear);
-  RTC.writenvram(5, loyear);
-  RTC.writenvram(6, now.hour());
-  RTC.writenvram(7, now.minute());
-  RTC.writenvram(8, now.second());
-  RTC.writenvram(9, timeFormat);
+  RTCA.writenvram(4, hiyear);
+  RTCA.writenvram(5, loyear);
+  RTCA.writenvram(6, now.hour());
+  RTCA.writenvram(7, now.minute());
+  RTCA.writenvram(8, now.second());
+  RTCA.writenvram(9, timeFormat);
 }
 
 void mainShowProject() {
@@ -593,7 +580,7 @@ void mainShowProject() {
 void serialDate() {
   printLineMed();
   Serial.print(F("Date: "));
-  DateTime now = RTC.now();
+  DateTime now = RTCA.now();
   if (now.month() < 10) {
     Serial.print("0");
   }
@@ -609,7 +596,7 @@ void serialDate() {
 }
 
 void serialTime() {
-  DateTime now = RTC.now();
+  DateTime now = RTCA.now();
   if (now.hour() < 10) {
     Serial.print("0");
   }
@@ -629,7 +616,7 @@ void serialTime() {
 void LCDprintDate() {
   LCD.setCursor(0, 0);
   LCD.print(F("Date "));
-  DateTime now = RTC.now();
+  DateTime now = RTCA.now();
   if (now.month() < 10) {
     LCD.print("0");
   }
