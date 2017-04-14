@@ -26,13 +26,15 @@
 #define TIME_OUT 1500
 #define BLINK 1000
 #define PAUSE 100
+#define Serial SerialUSB
 
 uint32_t syncTime, timerStart, blinkStart;
 uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState, timeFormat, rollOver, blinkCount;
 const uint8_t chipSelect = 10;
 char projectName[7][9];
+char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
-RTC_DS1307 RTCA;
+RTC_PCF8523 RTCA;
 File logFile;
 Adafruit_RGBLCDShield LCD = Adafruit_RGBLCDShield();
 
@@ -56,7 +58,8 @@ void error(const char *str) {
 
 void setup() {
   // Intialize Serial, I2C, LCD communications.
-  Serial.begin(9600);
+  while (!Serial);
+  Serial.begin(57600);
   Wire.begin();
   RTCA.begin();
   LCD.begin(16, 2);
@@ -69,7 +72,7 @@ void setup() {
   printLineLong();
   Serial.println(F("timeClock v2.2.0-alpha"));
   printLineLong();
-  if (!RTCA.isrunning()) {
+  if (!RTCA.initialized()) {
     error("RTC Not Set");
     Serial.println(F("RTC is NOT running!"));
   }
@@ -141,38 +144,38 @@ void setup() {
 
   // Read last heartbeat from NV_SRAM and write header to top of log-file.
   logFile.print(F("Last heartbeat detected: "));
-  if (RTCA.readnvram(2) != 255 && RTCA.readnvram(7) != 255) {
-    logFile.print(RTCA.readnvram(2), DEC); // Print Month to log-file.
-    logFile.print("/");
-    logFile.print(RTCA.readnvram(3), DEC); // Print Day to log-file.
-    logFile.print("/");
-    logFile.print(RTCA.readnvram(4), DEC); // Print Year to log-file.
-    logFile.print(RTCA.readnvram(5), DEC);
-    logFile.print(F(" @ "));
-    if (RTCA.readnvram(6) < 10) {
-      logFile.print("0");
+  /* DEBUG  if (RTCA.readnvram(2) != 255 && RTCA.readnvram(7) != 255) {
+      logFile.print(RTCA.readnvram(2), DEC); // Print Month to log-file.
+      logFile.print("/");
+      logFile.print(RTCA.readnvram(3), DEC); // Print Day to log-file.
+      logFile.print("/");
+      logFile.print(RTCA.readnvram(4), DEC); // Print Year to log-file.
+      logFile.print(RTCA.readnvram(5), DEC);
+      logFile.print(F(" @ "));
+      if (RTCA.readnvram(6) < 10) {
+        logFile.print("0");
+      }
+      logFile.print(RTCA.readnvram(6), DEC); // Print Hour to log-file.
+      logFile.print(":");
+      if (RTCA.readnvram(7) < 10) {
+        logFile.print("0");
+      }
+      logFile.print(RTCA.readnvram(7), DEC); // Print Minute to log-file.
+      logFile.print(":");
+     if (RTCA.readnvram(8) < 10) {
+        logFile.print("0");
+      }
+      logFile.println(RTCA.readnvram(8), DEC); // Print Second to log-file.
     }
-    logFile.print(RTCA.readnvram(6), DEC); // Print Hour to log-file.
-    logFile.print(":");
-    if (RTCA.readnvram(7) < 10) {
-      logFile.print("0");
-    }
-    logFile.print(RTCA.readnvram(7), DEC); // Print Minute to log-file.
-    logFile.print(":");
-    if (RTCA.readnvram(8) < 10) {
-      logFile.print("0");
-    }
-    logFile.println(RTCA.readnvram(8), DEC); // Print Second to log-file.
-  }
-  else {
-    logFile.println(F("None"));
-  }
+    else { */
+  logFile.println(F("None"));
+  //  }
   delay(TIME_OUT);
   LCD.clear();
 
   // Read first byte of NV_SRAM, set colorSelect and projectSelect.
-  colorSelect = RTCA.readnvram(0);
-  projectSelect = RTCA.readnvram(1);
+  // DEBUG  colorSelect = RTCA.readnvram(0);
+  // DEBUG  projectSelect = RTCA.readnvram(1);
   if (colorSelect == 255 && projectSelect == 255) { // Set to defaults if RTC has been recently set and NV_SRAM wiped.
     colorSelect = 7;
     projectSelect = 1;
@@ -180,7 +183,7 @@ void setup() {
   LCD.setBacklight(colorSelect);
 
   // Read previously user set timeFormat.
-  timeFormat = RTCA.readnvram(9);
+  // DEBUG  timeFormat = RTCA.readnvram(9);
   if (timeFormat > 1) {
     timeFormat = 0;
   }
@@ -194,14 +197,14 @@ void loop() {
       if (colorSelect >= 7) {
         colorSelect = 7;
         projectSelect = 1;
-        RTCA.writenvram(0, colorSelect);
-        RTCA.writenvram(1, projectSelect);
+        // DEBUG        RTCA.writenvram(0, colorSelect);
+        // DEBUG        RTCA.writenvram(1, projectSelect);
       }
       else {
         colorSelect++;
         projectSelect--;
-        RTCA.writenvram(0, colorSelect);
-        RTCA.writenvram(1, projectSelect);
+        // DEBUG        RTCA.writenvram(0, colorSelect);
+        // DEBUG        RTCA.writenvram(1, projectSelect);
         LCD.setBacklight(colorSelect);
         mainShowProject();
       }
@@ -210,14 +213,14 @@ void loop() {
       if (colorSelect <= 2) {
         colorSelect = 2;
         projectSelect = 6;
-        RTCA.writenvram(0, colorSelect);
-        RTCA.writenvram(1, projectSelect);
+        // DEBUG        RTCA.writenvram(0, colorSelect);
+        // DEBUG        RTCA.writenvram(1, projectSelect);
       }
       else {
         colorSelect--;
         projectSelect++;
-        RTCA.writenvram(0, colorSelect);
-        RTCA.writenvram(1, projectSelect);
+        // DEBUG        RTCA.writenvram(0, colorSelect);
+        // DEBUG        RTCA.writenvram(1, projectSelect);
         LCD.setBacklight(colorSelect);
         mainShowProject();
       }
@@ -553,18 +556,18 @@ void loop() {
   logFile.flush();
 
   // Write heartbeat and user time selection to NV_SRAM.
-  DateTime now = RTCA.now();
-  RTCA.writenvram(2, now.month());
-  RTCA.writenvram(3, now.day());
-  uint16_t fyear = now.year();
-  uint8_t hiyear = fyear / 100;
-  uint8_t loyear = fyear - 2000;
-  RTCA.writenvram(4, hiyear);
-  RTCA.writenvram(5, loyear);
-  RTCA.writenvram(6, now.hour());
-  RTCA.writenvram(7, now.minute());
-  RTCA.writenvram(8, now.second());
-  RTCA.writenvram(9, timeFormat);
+  /* DEBUG  DateTime now = RTCA.now();
+    RTCA.writenvram(2, now.month());
+    RTCA.writenvram(3, now.day());
+    uint16_t fyear = now.year();
+    uint8_t hiyear = fyear / 100;
+    uint8_t loyear = fyear - 2000;
+    RTCA.writenvram(4, hiyear);
+    RTCA.writenvram(5, loyear);
+    RTCA.writenvram(6, now.hour());
+    RTCA.writenvram(7, now.minute());
+    RTCA.writenvram(8, now.second());
+    RTCA.writenvram(9, timeFormat); */
 }
 
 void mainShowProject() {
@@ -638,7 +641,7 @@ void blinkLCD() {
 }
 
 void printLineLong() {
-  for (uint8_t l = 0; l < 23; l++) {
+  for (uint8_t l = 0; l < 21; l++) {
     Serial.print("-");
   }
   Serial.println("-");
