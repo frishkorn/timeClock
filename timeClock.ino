@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Version 2.2.1-alpha by Chris Frishkorn.
+  Version 2.2.2-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  April 15th, 2017     - v2.2.2-alpha   - Started work on issue #135.
   April 14th, 2017     - v2.2.1-alpha   - Fixed serial and reset hang (issue #136).
   April 13th, 2017     - v2.2.0-alpha   - New SD card is now working with code (issue #134).
   March 15th, 2017     - v2.1.1-release - Released version 2.1.1.
@@ -67,9 +68,9 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock"));
   LCD.setCursor(7, 1);
-  LCD.print(F("v2.2.1a"));
+  LCD.print(F("v2.2.2a"));
   printLineLong();
-  Serial.println(F("timeClock v2.2.1-alpha"));
+  Serial.println(F("timeClock v2.2.2-alpha"));
   printLineLong();
   if (!RTCA.initialized()) {
     error("RTC Not Set");
@@ -141,37 +142,6 @@ void setup() {
   // Print Date over Serial Interface.
   serialDate();
 
-  // Read last heartbeat from NV_SRAM and write header to top of log-file.
-  logFile.print(F("Last heartbeat detected: "));
-  /* DEBUG  if (RTCA.readnvram(2) != 255 && RTCA.readnvram(7) != 255) {
-      logFile.print(RTCA.readnvram(2), DEC); // Print Month to log-file.
-      logFile.print("/");
-      logFile.print(RTCA.readnvram(3), DEC); // Print Day to log-file.
-      logFile.print("/");
-      logFile.print(RTCA.readnvram(4), DEC); // Print Year to log-file.
-      logFile.print(RTCA.readnvram(5), DEC);
-      logFile.print(F(" @ "));
-      if (RTCA.readnvram(6) < 10) {
-        logFile.print("0");
-      }
-      logFile.print(RTCA.readnvram(6), DEC); // Print Hour to log-file.
-      logFile.print(":");
-      if (RTCA.readnvram(7) < 10) {
-        logFile.print("0");
-      }
-      logFile.print(RTCA.readnvram(7), DEC); // Print Minute to log-file.
-      logFile.print(":");
-     if (RTCA.readnvram(8) < 10) {
-        logFile.print("0");
-      }
-      logFile.println(RTCA.readnvram(8), DEC); // Print Second to log-file.
-    }
-    else { */
-  logFile.println(F("None"));
-  //  }
-  delay(TIME_OUT);
-  LCD.clear();
-
   // Read first byte of NV_SRAM, set colorSelect and projectSelect.
   // DEBUG  colorSelect = RTCA.readnvram(0);
   // DEBUG  projectSelect = RTCA.readnvram(1);
@@ -179,6 +149,7 @@ void setup() {
     colorSelect = 7;
     projectSelect = 1;
   }
+  LCD.clear();
   LCD.setBacklight(colorSelect);
 
   // Read previously user set timeFormat.
@@ -553,20 +524,7 @@ void loop() {
   if ((millis() - syncTime) < SYNC_INTERVAL) return;
   syncTime = millis();
   logFile.flush();
-
-  // Write heartbeat and user time selection to NV_SRAM.
-  /* DEBUG  DateTime now = RTCA.now();
-    RTCA.writenvram(2, now.month());
-    RTCA.writenvram(3, now.day());
-    uint16_t fyear = now.year();
-    uint8_t hiyear = fyear / 100;
-    uint8_t loyear = fyear - 2000;
-    RTCA.writenvram(4, hiyear);
-    RTCA.writenvram(5, loyear);
-    RTCA.writenvram(6, now.hour());
-    RTCA.writenvram(7, now.minute());
-    RTCA.writenvram(8, now.second());
-    RTCA.writenvram(9, timeFormat); */
+  
 }
 
 void mainShowProject() {
@@ -659,4 +617,3 @@ void printLineShort() {
   }
   Serial.println("-");
 }
-
