@@ -21,6 +21,7 @@
 #include <SD.h>
 #include <RTClib.h>
 #include <Adafruit_RGBLCDShield.h>
+#include <FlashAsEEPROM.h>
 
 #define MAX_INTERVAL 360000 // seconds
 #define NOTIFY_INTERVAL 900
@@ -30,6 +31,7 @@
 #define PAUSE 100
 
 uint32_t syncTime, timerStart, blinkStart;
+uint16_t flashCount;
 uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState, timeFormat, rollOver, blinkCount;
 const uint8_t chipSelect = 10;
 char projectName[7][9];
@@ -138,6 +140,12 @@ void setup() {
   if (!logFile) {
     error("File Write Error");
   }
+
+  // Read number of times flash has been written to.
+  flashCount = EEPROM.read(0);
+  Serial.print("EEPROM writes: ");
+  Serial.println(flashCount);
+
 
   // Print Date over Serial Interface.
   serialDate();
@@ -524,7 +532,7 @@ void loop() {
   if ((millis() - syncTime) < SYNC_INTERVAL) return;
   syncTime = millis();
   logFile.flush();
-  
+
 }
 
 void mainShowProject() {
