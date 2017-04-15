@@ -7,7 +7,7 @@
 
   Version Tracking
   -----------------------
-  April 14th, 2017     - v2.2.1-alpha   - Started work on issue #136.
+  April 14th, 2017     - v2.2.1-alpha   - Fixed serial and reset hang (issue #136).
   April 13th, 2017     - v2.2.0-alpha   - New SD card is now working with code (issue #134).
   March 15th, 2017     - v2.1.1-release - Released version 2.1.1.
 
@@ -27,7 +27,6 @@
 #define TIME_OUT 1500
 #define BLINK 1000
 #define PAUSE 100
-#define Serial SerialUSB
 
 uint32_t syncTime, timerStart, blinkStart;
 uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState, timeFormat, rollOver, blinkCount;
@@ -59,7 +58,6 @@ void error(const char *str) {
 
 void setup() {
   // Intialize Serial, I2C, LCD communications.
-  while (!Serial);
   Serial.begin(57600);
   Wire.begin();
   RTCA.begin();
