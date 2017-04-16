@@ -250,10 +250,11 @@ void loop() {
       LCD.print(F("Started!"));
 
       // Write colorSelect and projectSelect to Flash EEPROM once Timer starts.
+      EEPROM.write(0, flashCount + 1);
       EEPROM.write(1, colorSelect);
       EEPROM.write(2, projectSelect);
-      EEPROM.write(0, flashCount + 1);
       EEPROM.commit();
+      flashCount = flashCount + 1;
     }
 
     // Timer stops with the second press of the SELECT BUTTON.
@@ -424,9 +425,10 @@ void loop() {
   if (timerState == 0) {
     if (buttons & BUTTON_RIGHT) {
       timeFormat = 1 - timeFormat;
-      EEPROM.write(3, timeFormat);
       EEPROM.write(0, flashCount + 1);
+      EEPROM.write(3, timeFormat);
       EEPROM.commit();
+      flashCount = flashCount + 1;
       delay(PAUSE);
     }
   }
