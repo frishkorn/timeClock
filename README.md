@@ -1,6 +1,6 @@
 timeClock - v2.2.2-alpha
 ---
-An Arduino Zero driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
+**An Arduino Zero driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.**
 
 *Arduino Zero, SD Shield (Rev B), and RGB LCD Shield are required. There is a timeUtility.ino file in the utility folder you can run once to set the RTC.*
 
