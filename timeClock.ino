@@ -252,6 +252,7 @@ void loop() {
       // Write colorSelect and projectSelect to Flash EEPROM once Timer starts.
       EEPROM.write(1, colorSelect);
       EEPROM.write(2, projectSelect);
+      EEPROM.write(0, flashCount + 1);
       EEPROM.commit();
     }
 
