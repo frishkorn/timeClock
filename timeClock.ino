@@ -146,14 +146,13 @@ void setup() {
   Serial.print("EEPROM writes: ");
   Serial.println(flashCount);
 
-
   // Print Date over Serial Interface.
   serialDate();
 
   // Read first byte of NV_SRAM, set colorSelect and projectSelect.
-  // DEBUG  colorSelect = RTCA.readnvram(0);
-  // DEBUG  projectSelect = RTCA.readnvram(1);
-  if (colorSelect == 255 && projectSelect == 255) { // Set to defaults if RTC has been recently set and NV_SRAM wiped.
+  colorSelect = EEPROM.read(1);
+  projectSelect = EEPROM.read(2);
+  if (colorSelect == 0 && projectSelect == 0) { // Set to defaults if EEPROM contains no data.
     colorSelect = 7;
     projectSelect = 1;
   }
@@ -161,7 +160,7 @@ void setup() {
   LCD.setBacklight(colorSelect);
 
   // Read previously user set timeFormat.
-  // DEBUG  timeFormat = RTCA.readnvram(9);
+  timeFormat = EEPROM.read(3);
   if (timeFormat > 1) {
     timeFormat = 0;
   }
@@ -427,6 +426,9 @@ void loop() {
   if (timerState == 0) {
     if (buttons & BUTTON_RIGHT) {
       timeFormat = 1 - timeFormat;
+      EEPROM.write(3, timeFormat);
+      EEPROM.write(0, flashCount + 1);
+      EEPROM.commit();
       delay(PAUSE);
     }
   }
