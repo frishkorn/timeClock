@@ -1,8 +1,8 @@
-timeClock - v2.2.1-alpha
+timeClock - v2.2.2-alpha
 ---
 An Arduino driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
 
-*Arduino Zero, SD Shield (Rev B), and RGB LCD Shield are required. There is a timeUtility.ino file in the utility folder you can run once to set the RTC and clear the devices onboard memory.*
+*Arduino Zero, SD Shield (Rev B), and RGB LCD Shield are required. There is a timeUtility.ino file in the utility folder you can run once to set the RTC.*
 
 timeClock has 6 projects that can be selected using the UP / DOWN buttons. Back-light color will change for each Project and Project Name will be displayed. Time and date will always be displayed on the Main Screen. To display the Project Selection Screen at any time, press LEFT button.
 Project names can be written to the SD card in the projects.txt file. Currently they are limited to 8 characters and are loaded on startup. See example projects.txt file in the utility folder. 
@@ -14,12 +14,12 @@ While the timer is active, a 15 minute interval will flash. The screen will blin
 
 To select between 12/24 time format, on Main Screen press RIGHT button.
 
-Device records a Heartbeat to memory every 5 seconds, in case of loss of power. When a new log file is created, the heartbeat will be time-stamped at the top of the log file.
-
 Author: Chris Frishkorn
 
 Version Tracking
 ---
+**April 15th, 2017     - v2.2.2-alpha   -** *Changed NVRAM operations to Flash EEPROM (issue #135).*
+
 **April 14th, 2017     - v2.2.1-alpha   -** *Fixed serial and reset hang (issue #136).*
 
 **April 13th, 2017     - v2.2.0-alpha   -** *New SD card is now working with code (issue #134).*

@@ -7,7 +7,7 @@
 
   Version Tracking
   -----------------------
-  April 15th, 2017     - v2.2.2-alpha   - Started work on issue #135.
+  April 15th, 2017     - v2.2.2-alpha   - Changed NVRAM operations to Flash EEPROM (issue #135).
   April 14th, 2017     - v2.2.1-alpha   - Fixed serial and reset hang (issue #136).
   April 13th, 2017     - v2.2.0-alpha   - New SD card is now working with code (issue #134).
   March 15th, 2017     - v2.1.1-release - Released version 2.1.1.
@@ -149,10 +149,10 @@ void setup() {
   // Print Date over Serial Interface.
   serialDate();
 
-  // Read first byte of NV_SRAM, set colorSelect and projectSelect.
+  // Read Flash EEPROM, set colorSelect and projectSelect.
   colorSelect = EEPROM.read(1);
   projectSelect = EEPROM.read(2);
-  if (colorSelect == 0 && projectSelect == 0) { // Set to defaults if EEPROM contains no data.
+  if (colorSelect == 0 && projectSelect == 0) { // Set to defaults if Flash EEPROM contains no data.
     colorSelect = 7;
     projectSelect = 1;
   }
@@ -174,14 +174,10 @@ void loop() {
       if (colorSelect >= 7) {
         colorSelect = 7;
         projectSelect = 1;
-        // DEBUG        RTCA.writenvram(0, colorSelect);
-        // DEBUG        RTCA.writenvram(1, projectSelect);
       }
       else {
         colorSelect++;
         projectSelect--;
-        // DEBUG        RTCA.writenvram(0, colorSelect);
-        // DEBUG        RTCA.writenvram(1, projectSelect);
         LCD.setBacklight(colorSelect);
         mainShowProject();
       }
@@ -190,14 +186,10 @@ void loop() {
       if (colorSelect <= 2) {
         colorSelect = 2;
         projectSelect = 6;
-        // DEBUG        RTCA.writenvram(0, colorSelect);
-        // DEBUG        RTCA.writenvram(1, projectSelect);
       }
       else {
         colorSelect--;
         projectSelect++;
-        // DEBUG        RTCA.writenvram(0, colorSelect);
-        // DEBUG        RTCA.writenvram(1, projectSelect);
         LCD.setBacklight(colorSelect);
         mainShowProject();
       }
@@ -256,6 +248,11 @@ void loop() {
       LCD.print(F("Timer"));
       LCD.setCursor(5, 1);
       LCD.print(F("Started!"));
+
+      // Write colorSelect and projectSelect to Flash EEPROM once Timer starts.
+      EEPROM.write(1, colorSelect);
+      EEPROM.write(2, projectSelect);
+      EEPROM.commit();
     }
 
     // Timer stops with the second press of the SELECT BUTTON.
