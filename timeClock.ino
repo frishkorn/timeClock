@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino Zero driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Version 2.2.2-alpha by Chris Frishkorn.
+  Version 2.2.3-alpha by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  November 23rd, 2019  - v2.2.3-alpha   - Change serial output port (issue #139).
   April 16th, 2017     - v2.2.2-alpha   - Code has been ported to use Arduino Zero board (issue #127).
   April 15th, 2017     - v2.2.2-alpha   - Changed NVRAM operations to Flash EEPROM (issue #135).
   April 14th, 2017     - v2.2.1-alpha   - Fixed serial and reset hang (issue #136).
@@ -55,14 +56,14 @@ void error(const char *str) {
   LCD.print(F("System Error!"));
   LCD.setCursor(0, 1);
   LCD.print(str);
-  Serial.print(F("Error: "));
-  Serial.println(str);
+  SerialUSB.print(F("Error: "));
+  SerialUSB.println(str);
   while (1);
 }
 
 void setup() {
   // Intialize Serial, I2C, LCD communications.
-  Serial.begin(57600);
+  SerialUSB.begin(57600);
   Wire.begin();
   RTCA.begin();
   LCD.begin(16, 2);
@@ -73,25 +74,25 @@ void setup() {
   LCD.setCursor(7, 1);
   LCD.print(F("v2.2.2a"));
   printLineLong();
-  Serial.println(F("timeClock v2.2.2-alpha"));
+  SerialUSB.println(F("timeClock v2.2.2-alpha"));
   printLineLong();
   if (!RTCA.initialized()) {
     error("RTC Not Set");
-    Serial.println(F("RTC is NOT running!"));
+    SerialUSB.println(F("RTC is NOT running!"));
   }
 
   // Check if the SD card is functional.
-  Serial.print(F("SD card initializing... "));
+  SerialUSB.print(F("SD card initializing... "));
   pinMode(10, OUTPUT);
   if (!SD.begin(chipSelect)) {
     error("Card Read Error");
   }
   delay(TIME_OUT);
-  Serial.println(F("Done."));
+  SerialUSB.println(F("Done."));
 
   // Read from projects.txt file and set Project Names
   File projects = SD.open("projects.txt");
-  Serial.print(F("Reading projects.txt file... "));
+  SerialUSB.print(F("Reading projects.txt file... "));
   if (projects) {
     for (uint8_t h = 0; h < 6; h++) {
       if (projects.available()) {
@@ -100,7 +101,7 @@ void setup() {
       }
     }
     delay(TIME_OUT);
-    Serial.println(F("Done."));
+    SerialUSB.println(F("Done."));
   } else {
     // Set projectName to Project1 - Project6 if SD card contains no projects.txt file.
     for (uint8_t x = 0; x < 6; x++) {
@@ -108,7 +109,7 @@ void setup() {
       projectName[x][7] = 49 + x;
     }
     delay(TIME_OUT);
-    Serial.println(F("Not found!"));
+    SerialUSB.println(F("Not found!"));
   }
   projects.close();
 
@@ -128,12 +129,12 @@ void setup() {
     filename[6] = i / 10 + '0';
     filename[7] = i % 10 + '0';
     if (!SD.exists(filename)) {
-      Serial.print(F("Creating file "));
-      Serial.print(filename);
-      Serial.print(F("... "));
+      SerialUSB.print(F("Creating file "));
+      SerialUSB.print(filename);
+      SerialUSB.print(F("... "));
       logFile = SD.open(filename, FILE_WRITE);
       delay(TIME_OUT);
-      Serial.println(F("Done."));
+      SerialUSB.println(F("Done."));
       break;
     }
   }
@@ -144,8 +145,8 @@ void setup() {
 
   // Read number of times flash has been written to.
   flashCount = EEPROM.read(0);
-  Serial.print("EEPROM writes: ");
-  Serial.println(flashCount);
+  SerialUSB.print("EEPROM writes: ");
+  SerialUSB.println(flashCount);
 
   // Print Date over Serial Interface.
   serialDate();
@@ -238,9 +239,9 @@ void loop() {
     if (timerState == 1 && prevState == 0) {
       timerStart = now.secondstime(); // Time from RTC in seconds since 1/1/2000.
       blinkStart = now.secondstime();
-      Serial.println(projectName[k]);
+      SerialUSB.println(projectName[k]);
       printLineShort();
-      Serial.print(F("Timer Started: "));
+      SerialUSB.print(F("Timer Started: "));
       serialTime();
       delay(TIME_OUT);
       LCD.setBacklight(1);
@@ -281,7 +282,7 @@ void loop() {
         logFile.print("0");
       }
       logFile.println(ss, DEC);
-      Serial.print(F("Timer Stopped: "));
+      SerialUSB.print(F("Timer Stopped: "));
       serialTime();
       delay(TIME_OUT);
       LCD.setBacklight(colorSelect);
@@ -291,21 +292,21 @@ void loop() {
       LCD.setCursor(5, 1);
       LCD.print(F("Stopped!"));
       printLineShort();
-      Serial.print(F("Elapsed Timer: "));
+      SerialUSB.print(F("Elapsed Timer: "));
       if (hh < 10) {
-        Serial.print("0");
+        SerialUSB.print("0");
       }
-      Serial.print(hh, DEC);
-      Serial.print(":");
+      SerialUSB.print(hh, DEC);
+      SerialUSB.print(":");
       if (mm < 10) {
-        Serial.print("0");
+        SerialUSB.print("0");
       }
-      Serial.print(mm, DEC);
-      Serial.print(":");
+      SerialUSB.print(mm, DEC);
+      SerialUSB.print(":");
       if (ss < 10) {
-        Serial.print("0");
+        SerialUSB.print("0");
       }
-      Serial.println(ss, DEC);
+      SerialUSB.println(ss, DEC);
       printLineShort();
     }
     prevState = timerState;
@@ -550,38 +551,38 @@ void mainShowProject() {
 
 void serialDate() {
   printLineMed();
-  Serial.print(F("Date: "));
+  SerialUSB.print(F("Date: "));
   DateTime now = RTCA.now();
   if (now.month() < 10) {
-    Serial.print("0");
+    SerialUSB.print("0");
   }
-  Serial.print(now.month(), DEC);
-  Serial.print('/');
+  SerialUSB.print(now.month(), DEC);
+  SerialUSB.print('/');
   if (now.day() < 10) {
-    Serial.print("0");
+    SerialUSB.print("0");
   }
-  Serial.print(now.day(), DEC);
-  Serial.print('/');
-  Serial.println(now.year(), DEC);
+  SerialUSB.print(now.day(), DEC);
+  SerialUSB.print('/');
+  SerialUSB.println(now.year(), DEC);
   printLineMed();
 }
 
 void serialTime() {
   DateTime now = RTCA.now();
   if (now.hour() < 10) {
-    Serial.print("0");
+    SerialUSB.print("0");
   }
-  Serial.print(now.hour(), DEC);
-  Serial.print(":");
+  SerialUSB.print(now.hour(), DEC);
+  SerialUSB.print(":");
   if (now.minute() < 10) {
-    Serial.print("0");
+    SerialUSB.print("0");
   }
-  Serial.print(now.minute(), DEC);
-  Serial.print(":");
+  SerialUSB.print(now.minute(), DEC);
+  SerialUSB.print(":");
   if (now.second() < 10) {
-    Serial.print("0");
+    SerialUSB.print("0");
   }
-  Serial.println(now.second(), DEC);
+  SerialUSB.println(now.second(), DEC);
 }
 
 void LCDprintDate() {
@@ -610,21 +611,21 @@ void blinkLCD() {
 
 void printLineLong() {
   for (uint8_t l = 0; l < 21; l++) {
-    Serial.print("-");
+    SerialUSB.print("-");
   }
-  Serial.println("-");
+  SerialUSB.println("-");
 }
 
 void printLineMed() {
   for (uint8_t l = 0; l < 15; l++) {
-    Serial.print("-");
+    SerialUSB.print("-");
   }
-  Serial.println("-");
+  SerialUSB.println("-");
 }
 
 void printLineShort() {
   for (uint8_t l = 0; l < 7; l++) {
-    Serial.print("-");
+    SerialUSB.print("-");
   }
-  Serial.println("-");
+  SerialUSB.println("-");
 }
