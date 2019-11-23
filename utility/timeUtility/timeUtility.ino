@@ -12,7 +12,7 @@
 
 #include <Wire.h>
 #include <SPI.h>
-#include "RTClib.h"
+#include <RTClib.h>
 #include <Adafruit_RGBLCDShield.h>
 
 #define PAUSE 2500
