@@ -1,4 +1,4 @@
-timeClock - v2.2.2-alpha
+timeClock - v2.2.3-alpha
 ---
 **An Arduino Zero driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.**
 
@@ -18,6 +18,8 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
+**November 23rd, 2019  - v2.2.3-alpha   -** *Change serial output port (issue #139).*
+
 **April 16th, 2017     - v2.2.2-alpha   -** *Code has been ported to use Arduino Zero board (issue #127).*
 
 **April 15th, 2017     - v2.2.2-alpha   -** *Changed NVRAM operations to Flash EEPROM (issue #135).*
