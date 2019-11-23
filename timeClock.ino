@@ -72,9 +72,9 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock"));
   LCD.setCursor(7, 1);
-  LCD.print(F("v2.2.2a"));
+  LCD.print(F("v2.2.3a"));
   printLineLong();
-  SerialUSB.println(F("timeClock v2.2.2-alpha"));
+  SerialUSB.println(F("timeClock v2.2.3-alpha"));
   printLineLong();
   if (!RTCA.initialized()) {
     error("RTC Not Set");
