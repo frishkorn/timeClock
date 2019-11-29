@@ -77,8 +77,8 @@ void setup() {
   SerialUSB.println(F("timeClock v2.2.3-alpha"));
   printLineLong();
   if (!RTCA.initialized()) {
-    error("RTC Not Set");
     SerialUSB.println(F("RTC is NOT running!"));
+    error("RTC Not Set");
   }
 
   // Check if the SD card is functional.
