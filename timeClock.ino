@@ -550,8 +550,6 @@ void loop() {
       DateTime now = RTCA.now();
       uint32_t backlightTimer = now.secondstime();
       if ((backlightTimer - backlightStart) >= BACKLIGHT) {
-        // SerialUSB.println("Timer reached!");
-        // resetBacklightStart();
         LCD.setBacklight(0);
       }
   }
