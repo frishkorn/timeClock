@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino Zero driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Version 2.2.3-alpha by Chris Frishkorn.
+  Version 2.3.0-beta by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  November 28th, 2019  - v2.3.0-beta    - Disable backlight due to inactivity (issue #121).
   November 23rd, 2019  - v2.2.3-alpha   - Change serial output port (issue #139).
   April 16th, 2017     - v2.2.2-alpha   - Code has been ported to use Arduino Zero board (issue #127).
   April 15th, 2017     - v2.2.2-alpha   - Changed NVRAM operations to Flash EEPROM (issue #135).
@@ -27,12 +28,13 @@
 
 #define MAX_INTERVAL 360000 // seconds
 #define NOTIFY_INTERVAL 900
+#define BACKLIGHT 60
 #define SYNC_INTERVAL 5000 // milli-seconds
 #define TIME_OUT 1500
 #define BLINK 1000
 #define PAUSE 100
 
-uint32_t syncTime, timerStart, blinkStart;
+uint32_t syncTime, timerStart, blinkStart, backlightStart;
 uint16_t flashCount;
 uint8_t colorSelect = 7, projectSelect = 1, timerState, prevState, timeFormat, rollOver, blinkCount;
 const uint8_t chipSelect = 10;
@@ -72,9 +74,9 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock"));
   LCD.setCursor(7, 1);
-  LCD.print(F("v2.2.3a"));
+  LCD.print(F("v2.3.0b"));
   printLineLong();
-  SerialUSB.println(F("timeClock v2.2.3-alpha"));
+  SerialUSB.println(F("timeClock v2.3.0-beta"));
   printLineLong();
   if (!RTCA.initialized()) {
     SerialUSB.println(F("RTC is NOT running!"));
@@ -154,7 +156,7 @@ void setup() {
   // Read Flash EEPROM, set colorSelect and projectSelect.
   colorSelect = EEPROM.read(1);
   projectSelect = EEPROM.read(2);
-  if (colorSelect == 0 && projectSelect == 0) { // Set to defaults if Flash EEPROM contains no data.
+  if (colorSelect == 255 && projectSelect == 255) { // Set to defaults if Flash EEPROM contains no data.
     colorSelect = 7;
     projectSelect = 1;
   }
@@ -166,6 +168,10 @@ void setup() {
   if (timeFormat > 1) {
     timeFormat = 0;
   }
+
+  // Set current time as backlight start.
+  DateTime now = RTCA.now();
+  backlightStart = now.secondstime();
 }
 
 void loop() {
@@ -311,6 +317,7 @@ void loop() {
     }
     prevState = timerState;
     blinkCount = 0;
+    resetBacklightStart();
     delay(TIME_OUT);
   }
 
@@ -532,6 +539,16 @@ void loop() {
     }
   }
 
+  // After inactivity interval is reached turn off backlight if timer is not running.
+  if (timerState == 0) {
+      DateTime now = RTCA.now();
+      uint32_t backlightTimer = now.secondstime();
+      if ((backlightTimer - backlightStart) >= BACKLIGHT) {
+        SerialUSB.println("Timer reached!");
+        resetBacklightStart();
+      }
+  }
+
   // Write data to card, only if 5 seconds has elapsed since last write.
   if ((millis() - syncTime) < SYNC_INTERVAL) return;
   syncTime = millis();
@@ -628,4 +645,9 @@ void printLineShort() {
     SerialUSB.print("-");
   }
   SerialUSB.println("-");
+}
+
+void resetBacklightStart() {
+  DateTime now = RTCA.now();
+  backlightStart = now.secondstime();
 }
