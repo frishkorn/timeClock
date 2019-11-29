@@ -323,6 +323,7 @@ void loop() {
 
   // Show Project Name on LCD when user presses LEFT BUTTON.
   if (buttons & BUTTON_LEFT) {
+    resetBacklightStart();
     mainShowProject();
   }
 
@@ -438,6 +439,7 @@ void loop() {
       EEPROM.write(3, timeFormat);
       EEPROM.commit();
       flashCount = flashCount + 1;
+      resetBacklightStart();
       delay(PAUSE);
     }
   }
