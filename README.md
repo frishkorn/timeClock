@@ -1,8 +1,10 @@
-timeClock - v2.2.3-alpha
+timeClock - v2.3.0-release
 ---
 **An Arduino Zero driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.**
 
 *Arduino Zero, SD Shield (Rev B), and RGB LCD Shield are required. There is a timeUtility.ino file in the utility folder you can run once to set the RTC.*
+
+### Now for the Arduino Zero!
 
 timeClock has 6 projects that can be selected using the UP / DOWN buttons. Back-light color will change for each Project and Project Name will be displayed. Time and date will always be displayed on the Main Screen. To display the Project Selection Screen at any time, press LEFT button.
 Project names can be written to the SD card in the projects.txt file. Currently they are limited to 8 characters and are loaded on startup. See example projects.txt file in the utility folder. 
@@ -12,12 +14,16 @@ To view the Elapsed Timer Screen while timer is running, press the RIGHT button 
 
 While the timer is active, a 15 minute interval will flash. The screen will blink 3 times to capture the attention of the user. Then the screen will blink the number of times the 15 minute interval has passed. Once timer has stopped the interval flash will reset. This is to give the user an idea of how much time has passed without reaching up to press the RIGHT button.
 
+After 10 minutes of inactivity the LCD backlight will turn off. The exception to this is while the timer is running. Press any button to wake the screen.
+
 To select between 12/24 time format, on Main Screen press RIGHT button.
 
 Author: Chris Frishkorn
 
 Version Tracking
 ---
+**November 28th, 2019  - v2.3.0-release -** *Backlight now shuts off after 10 mins of inactivity (issue #121).*
+
 **November 23rd, 2019  - v2.2.3-alpha   -** *Change serial output port (issue #139).*
 
 **April 16th, 2017     - v2.2.2-alpha   -** *Code has been ported to use Arduino Zero board (issue #127).*
