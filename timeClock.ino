@@ -316,10 +316,10 @@ void loop() {
       }
       SerialUSB.println(ss, DEC);
       printLineShort();
+      resetBacklightStart();
     }
     prevState = timerState;
     blinkCount = 0;
-    resetBacklightStart();
     delay(TIME_OUT);
   }
 
@@ -548,8 +548,9 @@ void loop() {
       DateTime now = RTCA.now();
       uint32_t backlightTimer = now.secondstime();
       if ((backlightTimer - backlightStart) >= BACKLIGHT) {
-        SerialUSB.println("Timer reached!");
-        resetBacklightStart();
+        // SerialUSB.println("Timer reached!");
+        // resetBacklightStart();
+        LCD.setBacklight(0);
       }
   }
 
@@ -651,7 +652,31 @@ void printLineShort() {
   SerialUSB.println("-");
 }
 
+void resetBacklightColor() {
+  uint8_t color;
+  if (projectSelect == 1) {
+    color = 7;
+  }
+  else if (projectSelect == 2) {
+    color = 6;
+  }
+  else if (projectSelect == 3) {
+    color = 5;
+  }
+  else if (projectSelect == 4) {
+    color = 4;
+  }
+  else if (projectSelect == 5) {
+    color = 3;
+  }
+  else {
+    color == 2;
+  }
+  LCD.setBacklight(color);
+}
+
 void resetBacklightStart() {
   DateTime now = RTCA.now();
   backlightStart = now.secondstime();
+  resetBacklightColor();
 }
