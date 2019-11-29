@@ -179,6 +179,7 @@ void loop() {
   uint8_t buttons = LCD.readButtons();
   if (timerState == 0) { // Prevent user from changing project while timer is active.
     if (buttons & BUTTON_UP) {
+      resetBacklightStart();
       if (colorSelect >= 7) {
         colorSelect = 7;
         projectSelect = 1;
@@ -191,6 +192,7 @@ void loop() {
       }
     }
     if (buttons & BUTTON_DOWN) {
+      resetBacklightStart();
       if (colorSelect <= 2) {
         colorSelect = 2;
         projectSelect = 6;
