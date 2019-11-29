@@ -1,13 +1,13 @@
 /*timeClock
 
   An Arduino Zero driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Version 2.3.0-beta by Chris Frishkorn.
+  Version 2.3.0-release by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
-  November 28th, 2019  - v2.3.0-beta    - Disable backlight due to inactivity (issue #121).
+  November 28th, 2019  - v2.3.0-release - Backlight now shuts off after 10 mins of inactivity (issue #121).
   November 23rd, 2019  - v2.2.3-alpha   - Change serial output port (issue #139).
   April 16th, 2017     - v2.2.2-alpha   - Code has been ported to use Arduino Zero board (issue #127).
   April 15th, 2017     - v2.2.2-alpha   - Changed NVRAM operations to Flash EEPROM (issue #135).
@@ -28,7 +28,7 @@
 
 #define MAX_INTERVAL 360000 // seconds
 #define NOTIFY_INTERVAL 900
-#define BACKLIGHT 60
+#define BACKLIGHT 600
 #define SYNC_INTERVAL 5000 // milli-seconds
 #define TIME_OUT 1500
 #define BLINK 1000
@@ -74,9 +74,9 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock"));
   LCD.setCursor(7, 1);
-  LCD.print(F("v2.3.0b"));
+  LCD.print(F("v2.3.0r"));
   printLineLong();
-  SerialUSB.println(F("timeClock v2.3.0-beta"));
+  SerialUSB.println(F("timeClock v2.3.0-release"));
   printLineLong();
   if (!RTCA.initialized()) {
     SerialUSB.println(F("RTC is NOT running!"));
@@ -325,7 +325,9 @@ void loop() {
 
   // Show Project Name on LCD when user presses LEFT BUTTON.
   if (buttons & BUTTON_LEFT) {
-    resetBacklightStart();
+    if (timerState == 0) {
+      resetBacklightStart();
+    }
     mainShowProject();
   }
 
