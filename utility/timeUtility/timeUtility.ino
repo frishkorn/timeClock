@@ -9,6 +9,9 @@
   April 15th, 2017    - v0.0.3-alpha - Updated to work with new SD Shield and RTC.
   May 15th, 2016      - v0.0.2-alpha - Added LCD output (issue #84).
   December 28th, 2015 - v0.0.1-alpha - Utility created.
+
+  - See GitHub for complete version tracking notes.
+  
 */
 
 #include <Wire.h>
