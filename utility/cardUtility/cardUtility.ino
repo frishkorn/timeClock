@@ -1,4 +1,16 @@
-/* cardUtility */
+/*cardUtility
+
+  Utility to work with files on SD card via serial interface.
+  Version 0.0.1-alpha by Chris Frishkorn.
+  Track this project on GitHub: https://github.com/frishkorn/timeClock
+  
+  Version Tracking
+  -----------------------
+  November 30th, 2019  - v0.0.1-alpha - Initial cardUtility version.
+  
+  - See GitHub for complete version tracking notes.
+
+*/
 
 #include <SD.h>
 #include <SPI.h>
