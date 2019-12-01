@@ -1,4 +1,4 @@
-timeClock - v2.3.0-release
+timeClock - v2.3.1-release
 ---
 **An Arduino Zero driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.**
 
@@ -22,6 +22,8 @@ Author: Chris Frishkorn
 
 Version Tracking
 ---
+**December 1st, 2019   - v2.3.1-release -** *Fixed project color roll over issue (issue #147).*
+
 **November 28th, 2019  - v2.3.0-release -** *Backlight now shuts off after 10 mins of inactivity (issue #121).*
 
 **November 23rd, 2019  - v2.2.3-alpha   -** *Change serial output port (issue #139).*
