@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino Zero driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Version 2.3.0-release by Chris Frishkorn.
+  Version 2.3.1-release by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  December 1st, 2019   - v2.3.1-release - Fixed project color roll over issue (issue #147).
   November 28th, 2019  - v2.3.0-release - Backlight now shuts off after 10 mins of inactivity (issue #121).
   November 23rd, 2019  - v2.2.3-alpha   - Change serial output port (issue #139).
   April 16th, 2017     - v2.2.2-alpha   - Code has been ported to use Arduino Zero board (issue #127).
@@ -74,9 +75,9 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock"));
   LCD.setCursor(7, 1);
-  LCD.print(F("v2.3.0r"));
+  LCD.print(F("v2.3.1r"));
   printLineLong();
-  SerialUSB.println(F("timeClock v2.3.0-release"));
+  SerialUSB.println(F("timeClock v2.3.1-release"));
   printLineLong();
   if (!RTCA.initialized()) {
     SerialUSB.println(F("RTC is NOT running!"));
@@ -179,30 +180,31 @@ void loop() {
   uint8_t buttons = LCD.readButtons();
   if (timerState == 0) { // Prevent user from changing project while timer is active.
     if (buttons & BUTTON_UP) {
-      resetBacklightStart();
       if (colorSelect >= 7) {
         colorSelect = 7;
         projectSelect = 1;
+        resetBacklightStart();
       }
       else {
         colorSelect++;
         projectSelect--;
-        LCD.setBacklight(colorSelect);
+        resetBacklightStart();
         mainShowProject();
       }
     }
     if (buttons & BUTTON_DOWN) {
-      resetBacklightStart();
       if (colorSelect <= 2) {
         colorSelect = 2;
         projectSelect = 6;
+        resetBacklightStart();
       }
       else {
         colorSelect--;
         projectSelect++;
-        LCD.setBacklight(colorSelect);
+        resetBacklightStart();
         mainShowProject();
       }
+      resetBacklightStart();
     }
   }
 
@@ -670,7 +672,7 @@ void resetBacklightColor() {
     color = 3;
   }
   else {
-    color == 2;
+    color = 2;
   }
   LCD.setBacklight(color);
 }
