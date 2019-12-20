@@ -7,7 +7,7 @@ timeClock - v2.3.2-beta
 ### Now for the Arduino Zero!
 
 timeClock has 6 projects that can be selected using the UP / DOWN buttons. Back-light color will change for each Project and Project Name will be displayed. Time and date will always be displayed on the Main Screen. To display the Project Selection Screen at any time, press LEFT button.
-Project names can be written to the SD card in the projects.txt file. Currently they are limited to 8 characters and are loaded on startup. See example projects.txt file in the utility folder. 
+Project names can be written to the SD card in the projects.txt file. Currently they are limited to 8 characters and are loaded on startup. See example projects.txt file in the utility folder. Last project selected will be saved to memory and is restored when power is cycled.
 
 To start a timer press SELECT. The back-light will change to red notifying you the timer is running. The project title, start time, and date will be logged to the SD card using a CSV file format. Pressing SELECT again will stop the timer. Project title, stop time, date, and elapsed timer will be logged to the SD card. Time in log file is in 24-hour format.
 To view the Elapsed Timer Screen while timer is running, press the RIGHT button at any time. Elapsed Timer Screen will be displayed for 5 seconds and return to the Main Screen. Timer can run a maximum of 99 hours, 59 minutes, and 59 seconds. It will automatically stop at this point and log the date and time to the SD card.
