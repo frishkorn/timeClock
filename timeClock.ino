@@ -23,7 +23,7 @@
 
 #define MAX_INTERVAL 360000 // seconds
 #define NOTIFY_INTERVAL 900
-#define BACKLIGHT 60
+#define BACKLIGHT 600
 #define SYNC_INTERVAL 5000 // milli-seconds
 #define TIME_OUT 1500
 #define BLINK 1000
