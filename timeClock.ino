@@ -1,20 +1,14 @@
 /*timeClock
 
   An Arduino Zero driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Version 2.3.1-release by Chris Frishkorn.
+  Version 2.3.2-beta by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  December 20th, 2019  - v2.3.2-beta    - Always write last project to data-flash (issue #149).
   December 1st, 2019   - v2.3.1-release - Fixed project color roll over issue (issue #147).
-  November 28th, 2019  - v2.3.0-release - Backlight now shuts off after 10 mins of inactivity (issue #121).
-  November 23rd, 2019  - v2.2.3-alpha   - Change serial output port (issue #139).
-  April 16th, 2017     - v2.2.2-alpha   - Code has been ported to use Arduino Zero board (issue #127).
-  April 15th, 2017     - v2.2.2-alpha   - Changed NVRAM operations to Flash EEPROM (issue #135).
-  April 14th, 2017     - v2.2.1-alpha   - Fixed serial and reset hang (issue #136).
-  April 13th, 2017     - v2.2.0-alpha   - New SD card shield is now working with code (issue #134).
-  March 15th, 2017     - v2.1.1-release - Released version 2.1.1.
 
   - See GitHub for older version tracking notes.
 
@@ -29,7 +23,7 @@
 
 #define MAX_INTERVAL 360000 // seconds
 #define NOTIFY_INTERVAL 900
-#define BACKLIGHT 600
+#define BACKLIGHT 60
 #define SYNC_INTERVAL 5000 // milli-seconds
 #define TIME_OUT 1500
 #define BLINK 1000
@@ -75,9 +69,9 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock"));
   LCD.setCursor(7, 1);
-  LCD.print(F("v2.3.1r"));
+  LCD.print(F("v2.3.2b"));
   printLineLong();
-  SerialUSB.println(F("timeClock v2.3.1-release"));
+  SerialUSB.println(F("timeClock v2.3.2-beta"));
   printLineLong();
   if (!RTCA.initialized()) {
     SerialUSB.println(F("RTC is NOT running!"));
@@ -145,22 +139,26 @@ void setup() {
   if (!logFile) {
     error("File Write Error");
   }
-
-  // Read number of times flash has been written to.
-  flashCount = EEPROM.read(0);
-  SerialUSB.print("EEPROM writes: ");
-  SerialUSB.println(flashCount);
-
-  // Print Date over Serial Interface.
-  serialDate();
-
+  
   // Read Flash EEPROM, set colorSelect and projectSelect.
   colorSelect = EEPROM.read(1);
   projectSelect = EEPROM.read(2);
   if (colorSelect == 255 && projectSelect == 255) { // Set to defaults if Flash EEPROM contains no data.
     colorSelect = 7;
     projectSelect = 1;
+    flashCount = 0;
   }
+  
+  // Read number of times flash has been written to and print it and date to console.
+  if (flashCount == 0) {
+    EEPROM.write(0, 0);
+  }
+  flashCount = EEPROM.read(0);
+  SerialUSB.print("EEPROM writes: ");
+  SerialUSB.println(flashCount);
+  serialDate();
+
+  // Set project color to LCD screen.
   LCD.clear();
   LCD.setBacklight(colorSelect);
 
@@ -183,27 +181,26 @@ void loop() {
       if (colorSelect >= 7) {
         colorSelect = 7;
         projectSelect = 1;
-        resetBacklightStart();
       }
       else {
         colorSelect++;
         projectSelect--;
-        resetBacklightStart();
         mainShowProject();
       }
+      writeEEPROM();
+      resetBacklightStart();
     }
     if (buttons & BUTTON_DOWN) {
       if (colorSelect <= 2) {
         colorSelect = 2;
         projectSelect = 6;
-        resetBacklightStart();
       }
       else {
         colorSelect--;
         projectSelect++;
-        resetBacklightStart();
         mainShowProject();
       }
+      writeEEPROM();
       resetBacklightStart();
     }
   }
@@ -260,13 +257,6 @@ void loop() {
       LCD.print(F("Timer"));
       LCD.setCursor(5, 1);
       LCD.print(F("Started!"));
-
-      // Write colorSelect and projectSelect to Flash EEPROM once Timer starts.
-      EEPROM.write(0, flashCount + 1);
-      EEPROM.write(1, colorSelect);
-      EEPROM.write(2, projectSelect);
-      EEPROM.commit();
-      flashCount = flashCount + 1;
     }
 
     // Timer stops with the second press of the SELECT BUTTON.
@@ -565,6 +555,7 @@ void loop() {
 
 void mainShowProject() {
   LCD.clear();
+  LCD.setBacklight(colorSelect);
   LCD.setCursor(2, 0);
   uint8_t k = projectSelect - 1;
   LCD.print(projectName[k]);
@@ -681,4 +672,13 @@ void resetBacklightStart() {
   DateTime now = RTCA.now();
   backlightStart = now.secondstime();
   resetBacklightColor();
+}
+
+void writeEEPROM() {
+  // Write colorSelect and projectSelect to Flash EEPROM once Timer starts.
+  EEPROM.write(0, flashCount + 1);
+  EEPROM.write(1, colorSelect);
+  EEPROM.write(2, projectSelect);
+  EEPROM.commit();
+  flashCount = flashCount + 1;
 }
