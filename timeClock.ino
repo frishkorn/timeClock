@@ -1,12 +1,13 @@
 /*timeClock
 
   An Arduino Zero driven time clock with 16x2 multi-color LCD display, user input buttons, RTC, and SD card.
-  Version 2.3.2-beta by Chris Frishkorn.
+  Version 2.3.3-beta by Chris Frishkorn.
 
   Track this project on GitHub: https://github.com/frishkorn/timeClock
 
   Version Tracking
   -----------------------
+  December 23rd, 2019  - v2.3.3-beta    - Set Limit on 15 Minute Notify Interval, Increase Blink (issue #150, #152).
   December 20th, 2019  - v2.3.2-beta    - Always write last project to data-flash (issue #149).
   December 1st, 2019   - v2.3.1-release - Fixed project color roll over issue (issue #147).
 
@@ -25,9 +26,11 @@
 #define NOTIFY_INTERVAL 900
 #define BACKLIGHT 600
 #define SYNC_INTERVAL 5000 // milli-seconds
-#define TIME_OUT 1500
+#define TIME_OUT 1750
 #define BLINK 1000
+#define RAPID_BLINK 500
 #define PAUSE 100
+#define MAX_NOTIFY 8 // integers
 
 uint32_t syncTime, timerStart, blinkStart, backlightStart;
 uint16_t flashCount;
@@ -69,9 +72,9 @@ void setup() {
   LCD.setCursor(2, 0);
   LCD.print(F("timeClock"));
   LCD.setCursor(7, 1);
-  LCD.print(F("v2.3.2b"));
+  LCD.print(F("v2.3.3b"));
   printLineLong();
-  SerialUSB.println(F("timeClock v2.3.2-beta"));
+  SerialUSB.println(F("timeClock v2.3.3-beta"));
   printLineLong();
   if (!RTCA.initialized()) {
     SerialUSB.println(F("RTC is NOT running!"));
@@ -246,6 +249,7 @@ void loop() {
     if (timerState == 1 && prevState == 0) {
       timerStart = now.secondstime(); // Time from RTC in seconds since 1/1/2000.
       blinkStart = now.secondstime();
+      blinkCount = 1;
       SerialUSB.println(projectName[k]);
       printLineShort();
       SerialUSB.print(F("Timer Started: "));
@@ -311,7 +315,6 @@ void loop() {
       resetBacklightStart();
     }
     prevState = timerState;
-    blinkCount = 0;
     delay(TIME_OUT);
   }
 
@@ -319,8 +322,10 @@ void loop() {
   if (buttons & BUTTON_LEFT) {
     if (timerState == 0) {
       resetBacklightStart();
+      mainShowProject();
+    } else {
+      timerShowProject();
     }
-    mainShowProject();
   }
 
   // Show Elapsed Timer time on LCD when user presses RIGHT BUTTON, only while timer is running.
@@ -526,14 +531,16 @@ void loop() {
     uint32_t blinkTimer = now.secondstime();
     if ((blinkTimer - blinkStart) >= NOTIFY_INTERVAL) {
       blinkStart = blinkTimer;
-      for (uint8_t n = 0; n < 3; n++) {
-        blinkLCD();
+      for (uint8_t n = 0; n < 10; n++) {
+        rapidBlink();
       }
       delay(TIME_OUT);
-      for (uint8_t c = 0; c <= blinkCount; c++) {
+      for (uint8_t c = 1; c <= blinkCount; c++) {
         blinkLCD();
       }
-      blinkCount++;
+      if (blinkCount < MAX_NOTIFY) {
+        blinkCount++;
+      }
     }
   }
 
@@ -562,6 +569,17 @@ void mainShowProject() {
   LCD.setCursor(6, 1);
   LCD.print(F("Selected"));
   delay(TIME_OUT);
+}
+
+void timerShowProject() {
+  LCD.clear();
+  LCD.setBacklight(1);
+  LCD.setCursor(2, 0);
+  uint8_t k = projectSelect - 1;
+  LCD.print(projectName[k]);
+  LCD.setCursor(6, 1);
+  LCD.print(F("Selected"));
+  delay(TIME_OUT);  
 }
 
 void serialDate() {
@@ -622,6 +640,13 @@ void blinkLCD() {
   delay(BLINK);
   LCD.setBacklight(1);
   delay(BLINK);
+}
+
+void rapidBlink() {
+  LCD.setBacklight(0);
+  delay(RAPID_BLINK);
+  LCD.setBacklight(1);
+  delay(RAPID_BLINK);
 }
 
 void printLineLong() {
